@@ -1,11 +1,11 @@
 # MaizeGaze
 Welcome to our Maize Tassel Detection and Counting Project.
 ## Collaborators:
-1. @edbertekaputera
-2. @chrisyellagracia
-3. @jiwonyah
-4. @daicc33
-5. 
+1. [Edbert Ekaputera @edbertekaputera](https://github.com/edbertekaputera)
+2. [Chrisyella Gracia @crisyellagracia](https://github.com/crisyellagracia)
+3. [Moon Jiwon @jiwonyah](https://github.com/jiwonyah)
+4. [Dai Rui Mei @daicc33](https://github.com/daicc33)
+5. Aung Ko Ko Oo
 ## Installation/Setup guide:
 
 ### 1. Flask API Server
