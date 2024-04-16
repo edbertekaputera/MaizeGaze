@@ -2,7 +2,7 @@
 Welcome to our Maize Tassel Detection and Counting Project.
 ## Collaborators:
 1. [Edbert Ekaputera @edbertekaputera](https://github.com/edbertekaputera)
-2. [Chrisyella Gracia @crisyellagracia](https://github.com/crisyellagracia)
+2. [Chrisyella Gracia @chrisyellagracia](https://github.com/chrisyellagracia)
 3. [Moon Jiwon @jiwonyah](https://github.com/jiwonyah)
 4. [Dai Rui Mei @daicc33](https://github.com/daicc33)
 5. Aung Ko Ko Oo
