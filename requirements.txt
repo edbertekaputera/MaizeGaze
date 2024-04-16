@@ -1,0 +1,10 @@
+flask==2.3.*
+flask-oauthlib==0.9.6
+flask-sqlalchemy==3.1.1
+flask-session==0.8.*
+flask-bcrypt==1.0.*
+flask-cors==4.0.*
+flask-mail==0.9.*
+werkzeug==2.3.7
+python-dotenv==1.0.1
+redis==5.0.3
