@@ -5,7 +5,7 @@ Welcome to our Maize Tassel Detection and Counting Project.
 2. [Chrisyella Gracia @chrisyellagracia](https://github.com/chrisyellagracia)
 3. [Moon Jiwon @jiwonyah](https://github.com/jiwonyah)
 4. [Dai Rui Mei @daicc33](https://github.com/daicc33)
-5. Aung Ko Ko Oo
+5. [Aung Ko Ko Oo @aungkokooo18](https://github.com/aungkokooo18)
 ## Installation/Setup guide:
 
 ### 1. Flask API Server
@@ -32,7 +32,7 @@ EMAIL_USER = 'YOUR_EMAIL'
 EMAIL_PASSWORD = 'YOUR_EMAIL_PASSWORD'
 
 # Client server
-CLIENT_SERVER_URL = http://localhost:3000
+CLIENT_SERVER_URL = http://localhost:5173
 
 # Database
 DATABASE_URL = sqlite:///database.db
@@ -66,17 +66,13 @@ First, install the dependencies as followed,
 # Move to the client directory
 cd client
 
-# Install tailwind CSS
-npm install -D tailwindcss
-npx tailwindcss init
-
 # Install dependencies
 npm install
 ```
 
-To run the web server, simply run the following command, and it should be hosted locally at `port 3000`.
+To run the web server, simply run the following command, and it should be hosted locally at `port 5173`.
 ```bash
-npm start
+npm run dev
 ```
 
 ### 3. Redis Server (For session management)

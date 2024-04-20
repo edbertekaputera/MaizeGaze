@@ -45,7 +45,11 @@ export default function AppRouter() {
 				/>
 
 				{/* Activation Email Route */}
-				<Route exact path="/activate_account/:token" element={<ActivateEmailPage />} />
+				<Route
+					exact
+					path="/activate_account/:token"
+					element={<ActivateEmailPage />}
+				/>
 
 				{/* Admin Routes */}
 				<Route
