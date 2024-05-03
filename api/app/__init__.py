@@ -3,7 +3,6 @@ import os
 from flask import Flask
 from flask_session import Session
 from flask_cors import CORS
-from flask_mail import Mail
 from config import Config
 # Local dependencies
 from app.db import db, User, TypeOfUser
@@ -30,14 +29,14 @@ db.init_app(flask_app)
 with flask_app.app_context():
 	db.create_all()
 	# Initialize admin
-	if not User.get(os.environ.get("ADMIN_EMAIL")):
+	if not User.get(os.environ["ADMIN_EMAIL"]):
 		admin = User(
 			email=os.environ.get("ADMIN_EMAIL"),
 			name=os.environ.get("ADMIN_NAME"),
 			user_type=TypeOfUser.ADMINISTRATOR,
 			password=bcrypt.generate_password_hash(os.environ.get("ADMIN_PASSWORD")),
 			email_is_verified=True
-		)
+		) # type: ignore
 		db.session.add(admin)
 		db.session.commit()
 
