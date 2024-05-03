@@ -3,7 +3,7 @@ from flask import session, request, current_app, Blueprint
 from flask_bcrypt import Bcrypt
 from functools import wraps # type: ignore
 # Local dependencies
-from app.db import User, TypeOfUser, db
+from app.db import User
 from .email import generate_token_from_email, extract_email_from_token, send_email
 
 # Initialize
@@ -29,7 +29,7 @@ def roles_required(*roles):
 		@wraps(function)
 		@login_required
 		def wrapper(*args, **kwargs):
-			current_user = User.get(session.get("email"))
+			current_user = User.get(session["email"])
 			if not current_user or current_user.user_type not in set(roles):
 				return {"status_code" : 401, 'message' : 'Unauthorized Access'}
 			if not current_user.email_is_verified:
@@ -40,34 +40,24 @@ def roles_required(*roles):
 
 # Register Route
 @router.route('/register', methods=['POST'])
-def register():
+def register() -> dict[str, str|int]:
 	"""
 	Route to registering a new account; Takes in arguments through json:
 		- email:str, 
 		- name:str, 
 		- password:str 
 	"""
-	email = request.json.get("email", None)
-	name = request.json.get("name", None)
-	password = request.json.get("password", None)
-
-	# Check whether email is already in the database (must be unique)
-	email_in_database = User.get(email)
-	if email_in_database:
-		return {'status_code' : 409, 'message' : 'email are already registered'}
-
-	# If register is successful, create new user
-	new_user = User(
-		email=email,
-		name=name,
-		user_type=TypeOfUser.FREE_USER,
-		password=bcrypt.generate_password_hash(password)
-	)
+	json = request.get_json()
+	email = json.get("email", None)
+	name = json.get("name", None)
+	password = json.get("password", None)
+	hashed_password = bcrypt.generate_password_hash(password)
 	
-	with current_app.app_context():
-		db.session.add(new_user)
-		db.session.commit()
-
+	# Register account
+	success = User.register_new_user(email, name, hashed_password)
+	if not success:
+		return {'status_code' : 409, 'message' : 'email are already registered'}
+	
 	# Send Email verification
 	token = generate_token_from_email(email)
 	send_email(
@@ -79,18 +69,19 @@ def register():
 		<a href='http://localhost:3000/activate_account/{token}'>Activate Account</a>
 		"""
 	)
-
 	# Regenerate session key after login
-	current_app.session_interface.regenerate(session)
+	current_app.session_interface.regenerate(session) # type: ignore
 	session["email"] = email
-
 	return {'status_code' : 201, 'message' : 'User registered'}
 
 # Resend Email Route
 @router.route('/resend_activation_email', methods=['POST'])
 @login_required
-def resend_activation_email():
+def resend_activation_email() -> dict[str, str|int]:
 	user = User.get(session["email"])
+	if not user:
+		return {'status_code' : 400, 'message' : 'Invalid email'}
+	
 	# Send Email verification
 	token = generate_token_from_email(user.email)
 	send_email(
@@ -107,22 +98,18 @@ def resend_activation_email():
 # Confirm Email Route
 @router.route('/activate_email', methods=['POST'])
 @login_required
-def activate_email():
+def activate_email() -> dict[str, str|int]:
 	"""
 	Route to verify an account's email; Takes in arguments through json:
 		- token:str, 
 	"""
-	token = request.json.get('token', None)
-	email = extract_email_from_token(token)
-	with current_app.app_context():
-		current_user = User.get(session['email'])
-		if current_user.email_is_verified:
-				return {'status_code' : 200, 'message' : 'User account is already activated'}
-		if current_user.email == email:
-			current_user.email_is_verified = True
-			db.session.commit()
-			return {'status_code' : 200, 'message' : 'User account is activated'}
-	return {'status_code' : 400, 'message' : 'Invalid Token'}
+	json = request.get_json()
+	token = json.get('token', None)
+	extracted_email = extract_email_from_token(token)
+	if not extracted_email:
+		return {'status_code' : 400, 'message' : 'Invalid Token'} 
+	return User.activate_new_user(token_email=extracted_email, session_email=session["email"])
+	
 
 # Login route
 @router.route('/login', methods=["POST"])
@@ -132,9 +119,9 @@ def login():
 		- email:str,
 		- password:str
 	"""
-	email = request.json.get("email", None)
-	password = request.json.get("password", None)
-
+	json = request.get_json()
+	email = json.get("email")
+	password = json.get("password")
 	user = User.get(email)
 	
 	# Check if user invalid or if user has setup password
@@ -143,10 +130,8 @@ def login():
 	# Check if password is wrong
 	if not bcrypt.check_password_hash(pw_hash=user.password, password=password):
 		return {'status_code' : 401, 'message' : 'Email or password incorrect'}
-
 	# Regenerate session key after login
-	current_app.session_interface.regenerate(session)
-
+	current_app.session_interface.regenerate(session) # type: ignore
 	session["email"] = email
 	return {'status_code' : 202, 'message' : 'User authorized', 'type': user.user_type}
 
@@ -163,15 +148,16 @@ def logout():
 @login_required
 def whoami():
 	if 'email' in session:
-		current_user = User.query.filter_by(email=session.get("email")).one_or_none()
-		return {
-			'status_code': 200, 
-			'data': {
-				'email': current_user.email,
-				'name': current_user.name,
-				'activated': current_user.email_is_verified,
-				'type': current_user.user_type.value
-		}}
+		current_user = User.get(session["email"])
+		if current_user:
+			return {
+				'status_code': 200, 
+				'data': {
+					'email': current_user.email,
+					'name': current_user.name,
+					'activated': current_user.email_is_verified,
+					'type': current_user.user_type.value
+			}}
 	return {'status_code': 200, "data": {'type': "anonymous"}}
 
 # Check exist email Route
@@ -180,7 +166,7 @@ def check_exist_email(email:str):
 	if email.strip() == "":
 		return {'status_code': 400, "message": "Bad request."}
 	
-	current_user = User.query.filter_by(email=email).one_or_none()
+	current_user = User.get(email)
 	if current_user:
 		return {'status_code': 200, "value": True}
 	return {'status_code': 200, "value": False}

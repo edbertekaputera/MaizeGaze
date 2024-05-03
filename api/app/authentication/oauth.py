@@ -45,9 +45,9 @@ def remote_login(provider:str):
 		- provider:str['google', 'github']
 	"""
 	if provider == "google":
-		return google.authorize(callback=current_app.config.get("GOOGLE_AUTH")["redirect_uri"])
+		return google.authorize(callback=current_app.config["GOOGLE_AUTH"]["redirect_uri"])
 	elif provider == "github":
-		return github.authorize(callback=current_app.config.get("GITHUB_AUTH")["redirect_uri"])
+		return github.authorize(callback=current_app.config["GITHUB_AUTH"]["redirect_uri"])
 	return abort(404)
 
 # Authorized Remote Login Callback
@@ -60,35 +60,35 @@ def authorized(provider:str):
 	"""
 	
 	# Regenerate session key after login
-	current_app.session_interface.regenerate(session)
+	current_app.session_interface.regenerate(session) # type: ignore
 	
 	# Google provider
 	if provider == "google":
 		response = google.authorized_response()
 		if response is None or response.get('access_token') is None:
-			return 'Login failed.'
-		session['google_token'] = (response['access_token'], '')
+			return redirect(current_app.config["CLIENT_SERVER_URL"] + "/login")
+		session['google_token'] = (response.get('access_token'), '')
 
 		# Extract email and name
 		userinfo = google.get('userinfo').data
-		email = userinfo.get("email")
-		name = userinfo.get("name")
+		email = userinfo.get("email") # type: ignore
+		name = userinfo.get("name") # type: ignore
 
 	# GitHub provider
 	if provider == "github":
 		response = github.authorized_response()
 		if response is None or response.get('access_token') is None:
-			return 'Login failed.'
-		session['github_token'] = (response['access_token'], '')
+			return redirect(current_app.config["CLIENT_SERVER_URL"] + "/login")
+		session['github_token'] = (response.get('access_token'), '')
 
 		# Extract first verified email and name
-		name = github.get("user").data.get("name")
+		name:str = github.get("user").data.get("name") # type: ignore
 		list_of_emails = github.get("user/emails").data
 		has_verified_email = False
 		# Iterate through emails and find verified
 		for e in list_of_emails:
-			if e.get("verified"):
-				email = e.get("email")
+			if e["verified"]: # type: ignore
+				email:str = e["email"] # type: ignore
 				has_verified_email = True
 				break
 		# No verified emails flag
@@ -96,15 +96,7 @@ def authorized(provider:str):
 			return 'Github Account does not have verified email. Login failed.'
 
 	# If its a new user, then register as a new free user.
-	user = User.get(email)
-	if not user:
-		user = User(email=email, 
-			  user_type=TypeOfUser.FREE_USER, 
-			  name=name, 
-			  email_is_verified=True)
-		with current_app.app_context():
-			db.session.add(user)
-			db.session.commit()
-	
+	User.register_new_user(email, name, email_is_verified=True)
+
 	session['email'] = email
-	return redirect(current_app.config.get("CLIENT_SERVER_URL"))
+	return redirect(current_app.config["CLIENT_SERVER_URL"])

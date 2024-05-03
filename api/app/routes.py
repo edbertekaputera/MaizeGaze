@@ -16,9 +16,10 @@ def test():
 @roles_required(*TypeOfUser.all_users())
 def test_user():
 	if 'email' in session:
-		user = User.get(session.get('email'))
-		return {'data': {
-			'name': user.name,
-			'email': user.email,
-		}}
+		user = User.get(session['email'])
+		if user:
+			return {'data': {
+				'name': user.name,
+				'email': user.email,
+			}}
 	return 'Hello! Log in with your Google account: <a href="/authentication/login/google">Log in</a><br>Hello! Log in with your Github account: <a href="/authentication/login/github">Log in</a>'

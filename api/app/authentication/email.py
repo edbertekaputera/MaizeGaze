@@ -12,7 +12,7 @@ def generate_token_from_email(email):
 
 def extract_email_from_token(token, expiration=3600):
     """Converts token to email"""
-    serializer = URLSafeTimedSerializer(current_app.config.get("SECRET_KEY"))
+    serializer = URLSafeTimedSerializer(current_app.config["SECRET_KEY"])
     try:
         email = serializer.loads(
             token, 
