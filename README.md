@@ -13,6 +13,9 @@ First, setup your python 3.10 environment. Ideally, use a virtual environment li
 
 Then, install the dependencies as followed,
 ```bash
+# Move to the API directory
+cd api
+# Install libraries
 pip install -r requirements.txt
 ```
 
@@ -53,9 +56,6 @@ GITHUB_REDIRECT_URI = http://localhost:5000/api/authentication/oauth/login/githu
 
 To run the server, simply run `application.py` as followed, and it should be hosted locally at `port 5000`
 ```bash
-# Move to the API directory
-cd api
-
 # Start server
 python application.py
 ```
@@ -95,8 +95,15 @@ docker start <CONTAINER_NAME>
 docker stop <CONTAINER_NAME>
 ```
 
+### 3. Celery Worker (For heavy tasks like model inference and training)
+Since we already have `celery` installed within our python environment, we can just run the following command,
+```bash
+celery -A app worker --loglevel INFO -c <NUMBER_OF_WORKERS>
+```
+This will run `<NUMBER_OF_WORKERS>` workers, which can run concurrently to handle tasks in the `celery task queue system`.
+
 ## Important Note:
-Make sure you have all three servers running at the same time, so that the system can work properly.
+Make sure you have all three servers and the celery workers running at the same time, so that the system can work properly.
 
 If you want to add changes or contribute, please 
 1. create your own `branch`

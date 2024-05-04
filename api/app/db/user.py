@@ -15,7 +15,7 @@ class TypeOfUser(str, Enum):
 	@classmethod
 	def all_users(cls):
 		"""Returns a list containing all user types"""
-		return cls._member_names_
+		return [cls.PREMIUM_USER, cls.STANDARD_USER, cls.FREE_USER]
 
 # User Schema
 class User(db.Model):
