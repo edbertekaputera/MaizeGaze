@@ -4,9 +4,11 @@ from flask import Flask
 from flask_session import Session
 from flask_cors import CORS
 from config import Config
+from celery import Celery, Task
 # Local dependencies
 from app.db import db, User, TypeOfUser
 from app.authentication import oauth, bcrypt, mail, router as auth_router
+from app.detect import router as detect_router
 from app.routes import router as main_router
 
 # Initialize Flask App
@@ -23,6 +25,21 @@ mail.init_app(flask_app)
 oauth.init_app(flask_app)
 # Encryption
 bcrypt.init_app(flask_app)
+
+# Celery
+def celery_init_app(app: Flask) -> Celery:
+    class FlaskTask(Task):
+        def __call__(self, *args: object, **kwargs: object) -> object:
+            with app.app_context():
+                return self.run(*args, **kwargs)
+
+    celery_app = Celery(app.name, task_cls=FlaskTask)
+    celery_app.config_from_object(app.config["CELERY"])
+    celery_app.set_default()
+    app.extensions["celery"] = celery_app
+    return celery_app
+
+celery = celery_init_app(flask_app)
 
 # Database
 db.init_app(flask_app)
@@ -42,4 +59,5 @@ with flask_app.app_context():
 
 # Routes (make sure everything starts with /api to prevent collision with web routes)
 flask_app.register_blueprint(auth_router, url_prefix="/api/authentication")
+flask_app.register_blueprint(detect_router, url_prefix="/api/detect")
 flask_app.register_blueprint(main_router, url_prefix="/api")

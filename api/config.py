@@ -23,8 +23,21 @@ class Config(object):
 	SESSION_PERMANENT = False
 	SESSION_USE_SIGNER = True
 	PERMANENT_SESSION_LIFETIME = 3600
-	SESSION_REDIS = redis.from_url(os.environ.get('REDIS_URL'))
+	SESSION_REDIS = redis.from_url(os.environ.get('REDIS_SESSION_URL'))
 	
+	# Celery
+	# CELERY_BROKER_URL = os.environ.get('REDIS_BROKER_URL')
+	# CELERY_RESULT_BACKEND = os.environ.get('REDIS_BROKER_URL')
+	# CELERY_TASK_IGNORE_RESULT = True
+	# CELERY_ACCEPT_CONTENT = ['json']
+	# CELERY_TASK_SERIALIZER = 'json'
+	# CELERY_RESULT_SERIALIZER = 'json'
+	CELERY = dict(
+            broker_url= os.environ.get('REDIS_BROKER_URL'),
+            result_backend= os.environ.get('REDIS_BROKER_URL'),
+            task_ignore_result=True,
+	)
+
 	# Mail configurations
 	MAIL_DEFAULT_SENDER = os.environ.get('EMAIL_USER')
 	MAIL_SERVER = "smtp-mail.outlook.com"
