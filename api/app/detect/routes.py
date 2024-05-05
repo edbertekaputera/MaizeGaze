@@ -21,9 +21,9 @@ def allowed_file(filename:str):
 # @roles_required(*TypeOfUser.all_users())
 def init_detection():
     # Get uploaded file
-	if "file" not in request.files:
+	if "image" not in request.files:
 		return {"success": False}
-	file = request.files["file"]
+	file = request.files["image"]
 	# Check file
 	if not file or file.filename == "" or file.filename == None:
 		return {"success": False}
