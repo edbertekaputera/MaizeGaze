@@ -19,12 +19,16 @@ class TypeOfUser(str, Enum):
 
 # User Schema
 class User(db.Model):
-	__tablename__ = "user"
+	__tablename__ = "User"
 	email = db.Column(db.String(250), nullable=False, primary_key=True)
 	name = db.Column(db.String(250), nullable=False)
 	user_type = db.Column(db.Enum(TypeOfUser), nullable=False)
 	email_is_verified = db.Column(db.Boolean(), default=False)
 	password = db.Column(db.String(250))
+
+	# Relationship
+	userToDetectionQuotaRel = db.relationship("DetectionQuota", back_populates="detectionQuotaToUserRel", cascade="all, delete, save-update",
+									foreign_keys="DetectionQuota.user")
 	
 	@classmethod
 	def get(cls, email:str) -> Self|None:
@@ -43,7 +47,7 @@ class User(db.Model):
 			user_type=TypeOfUser.FREE_USER,
 			password=hashed_password,
 			email_is_verified=email_is_verified
-		)
+		) # type: ignore
 		with current_app.app_context():
 			db.session.add(new_user)
 			db.session.commit()

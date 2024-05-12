@@ -2,8 +2,9 @@
 from flask import session, Blueprint, request
 from celery.result import AsyncResult
 from base64 import encodebytes # type: ignore
+from datetime import date 
 # Local dependencies
-from app.db import TypeOfUser, User
+from app.db import DetectionQuota, TypeOfUser
 from app.authentication import roles_required
 from .task import detect_and_count
 
@@ -18,8 +19,8 @@ def allowed_file(filename:str):
 
 # Initialize detection task route
 @router.route("/init_detection", methods=["POST"])
-# @roles_required(*TypeOfUser.all_users())
-def init_detection():
+@roles_required(*TypeOfUser.all_users())
+def init_detection() -> dict[str, bool|str]:
     # Get uploaded file
 	if "image" not in request.files:
 		return {"success": False}
@@ -31,18 +32,19 @@ def init_detection():
 	if not allowed_file(file.filename):
 		return {"success": False}
 	# Check user
-	
+	success = DetectionQuota.increment_quota(session['email'])
+	if not success:
+		return {"success": False}
 	# Initialize task
 	encoded = encodebytes(file.stream.read()).decode("ascii")	
 	result = detect_and_count.delay(encoded) # type: ignore
 	return {"success": True, "result_id": result.id}
 
-
 # Retrieve detection task results route
 @router.route("/get_detection_result", methods=["GET"])
-# @roles_required(*TypeOfUser.all_users())
-def get_detection_result():
-	result_id = request.args.get("result_id")
+@roles_required(*TypeOfUser.all_users())
+def get_detection_result() -> dict[str, str]:
+	result_id = request.args["result_id"]
 	result = AsyncResult(result_id)
 	if result.ready():
 		# Task has completed
@@ -60,3 +62,13 @@ def get_detection_result():
 	else:
 		# Task is still pending
 		return {'status': 'RUNNING'}
+
+# Retrieve detection quota route
+@router.route("/get_detection_quota", methods=["GET"])
+@roles_required(*TypeOfUser.all_users())
+def get_detection_quota() -> dict[str, int]:
+	today = date.today()
+	dq = DetectionQuota.get(user_email=session['email'], month=today.month, year=today.year)
+	if not dq:
+		return {"quota": 0}
+	return {"quota": dq.quota}

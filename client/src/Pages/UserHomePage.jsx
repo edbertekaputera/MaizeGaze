@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { Button, Spinner } from "flowbite-react";
 import { AuthContext } from "../Components/Authentication/PrivateRoute";
@@ -10,7 +10,21 @@ function UserHomePage() {
 	const [file, setFile] = useState();
 	const [status, setStatus] = useState("");
 	const [result, setResult] = useState({});
+	const [quota, setQuota] = useState(0);
+
 	const navigate = useNavigate();
+
+	useEffect(() => {
+		axios
+			.get("/api/detect/get_detection_quota")
+			.then((res) => {
+				setQuota(res.data.quota);
+			})
+			.catch((error) => {
+				console.log(error);
+				alert("ERROR");
+			});
+	}, [status]);
 
 	const handleSubmit = (event) => {
 		event.preventDefault();
@@ -89,7 +103,7 @@ function UserHomePage() {
 				Reset
 			</Button>
 			Welcome {userInfo.name}... <br />
-			Your email is {userInfo.email}, and you are a {userInfo.type}
+			Your email is {userInfo.email}, and you are a {userInfo.type}, you have done {quota}/25 detections this month.
 			{status === "" && (
 				<DropImageInput file={file} setFile={setFile} show={true} />
 			)}
