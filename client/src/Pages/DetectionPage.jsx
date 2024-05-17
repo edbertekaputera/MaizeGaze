@@ -85,11 +85,33 @@ function DetectionPage() {
 	};
 
 	return (
-		<>
+		<div className="relative h-svh overflow-hidden">
 			<LoadingCard show={status === "RUNNING"}>
 				Detecting Maize Tassels...
 			</LoadingCard>
-			<Card className="my-10 mx-16 shadow-lg border">
+
+			<div class="blob text-yellow-300">
+				<GiCorn size={250} />
+			</div>
+
+			<div class="blob2 text-custom-green-2">
+				<GiCorn size={250} />
+			</div>
+
+			<div class="blob3 text-custom-green-1">
+				<GiCorn size={250} />
+			</div>
+
+			<div class="blob4 text-custom-brown-1">
+				<GiCorn size={250} />
+			</div>
+
+			<div class="blob5 text-blue-500">
+				<GiCorn size={250} />
+			</div>
+
+
+			<Card className="relative my-6 mx-4 lg:my:10 lg:mx-16 shadow-lg border">
 				<header className="flex flex-wrap flex-row gap-2 justify-between shadow-b border-b-2 pb-5 border-black">
 					<h1 className="text-4xl font-extrabold">Detect Maize Tassel</h1>
 					<span className="px-4 py-2 bg-custom-brown-3 rounded-lg shadow-md font-semibold">
@@ -110,7 +132,7 @@ function DetectionPage() {
 						)}
 						{status === "SUCCESS" && (
 							<img
-								className="rounded shadow border"
+								className="rounded shadow border max-h-192"
 								src={"data:image/png;base64," + result.annotated_image}
 							/>
 						)}
@@ -144,7 +166,7 @@ function DetectionPage() {
 						</section>
 					)}
 					{status == "SUCCESS" && (
-						<section className="flex flex-row font-medium text-xl">
+						<section className="flex flex-col md:flex-row font-medium text-xl">
 							<span>TOTAL TASSEL COUNT =</span>
 							<div className="ml-1 text-custom-green-1 flex flex-row justify-start items-center gap-1">
 								<span>{result.tassel_count}</span>
@@ -194,7 +216,7 @@ function DetectionPage() {
 					)}
 				</div>
 			</Card>
-		</>
+		</div>
 	);
 }
 
