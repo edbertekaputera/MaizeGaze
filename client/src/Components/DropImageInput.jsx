@@ -2,7 +2,7 @@ import { Button } from "flowbite-react";
 import { useDropzone } from "react-dropzone";
 import React, { useEffect } from "react";
 
-function DropImageInput({ file, setFile, show }) {
+function DropImageInput({ file, setFile, disabled }) {
 	const { getRootProps, getInputProps } = useDropzone({
 		accept: "image/*",
 		noKeyboard: true,
@@ -29,21 +29,16 @@ function DropImageInput({ file, setFile, show }) {
 		},
 	});
 
-	// useEffect(() => {
-	// 	// Make sure to revoke the data uris to avoid memory leaks
-	// 	if (file && file.preview) URL.revokeObjectURL(file.preview);
-	// }, [file]);
-
 	return (
 		<div className="flex items-center justify-center w-full h-full">
 			<label
 				htmlFor="dropzone-file"
 				className={
-					"flex flex-col items-center justify-center w-full border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+					"flex flex-col items-center justify-center h-full min-h-138 p-5 w-full border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
 				}
 			>
 				{file ? (
-					<div className="text-black flex flex-col items-center gap-4 my-2">
+					<div className="text-black flex flex-col items-center gap-4 mt-4">
 						<img
 							src={file.preview}
 							onLoad={() => URL.revokeObjectURL(file.preview)}
@@ -87,15 +82,13 @@ function DropImageInput({ file, setFile, show }) {
 								SVG, PNG, JPG, JPEG or GIF (max 10MB)
 							</p>
 						</div>
-						{show && (
-							<input
-								id="dropzone-file"
-								{...getInputProps()}
-								type="file"
-								className="hidden"
-								disabled={!file}
-							/>
-						)}
+						<input
+							id="dropzone-file"
+							{...getInputProps()}
+							type="file"
+							className="hidden"
+							disabled={disabled || !file}
+						/>
 					</div>
 				)}
 			</label>

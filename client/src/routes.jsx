@@ -8,6 +8,8 @@ import HomePage from "./Pages/HomePage";
 import UserHomePage from "./Pages/UserHomePage";
 import AdminHomePage from "./Pages/AdminHomePage";
 import ActivateEmailPage from "./Pages/ActivateEmailPage";
+import NavigationBar from "./Components/NavigationBar";
+import DetectionPage from "./Pages/DetectionPage";
 
 export default function AppRouter() {
 	return (
@@ -75,6 +77,22 @@ export default function AppRouter() {
 							]}
 						>
 							<UserHomePage />
+						</PrivateRoute>
+					}
+				/>
+
+				<Route
+					exact
+					path="/user/detect"
+					element={
+						<PrivateRoute
+							requiredRoles={[
+								"FREE_USER",
+								"STANDARD_USER",
+								"PREMIUM_USER",
+							]}
+						>
+							<DetectionPage />
 						</PrivateRoute>
 					}
 				/>

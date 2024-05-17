@@ -1,9 +1,10 @@
 // Libraries
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { useState, useEffect, createContext } from "react";
 import axios from "axios";
 import { Spinner } from "flowbite-react";
 import ResendActivatioNCard from "../Login/ResendActivationCard";
+import NavigationBar from "../NavigationBar";
 
 // Context for authentication
 export const AuthContext = createContext();
@@ -16,6 +17,8 @@ const PrivateRoute = ({ requiredRoles, children }) => {
 		type: "",
 		activated: false,
 	});
+
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		axios
@@ -46,6 +49,19 @@ const PrivateRoute = ({ requiredRoles, children }) => {
 			});
 	}, [requiredRoles]);
 
+	const logout = async () => {
+		await axios
+			.post("/api/authentication/logout")
+			.then((res) => {
+				if (res.data.status_code === 200) {
+					navigate("/");
+				}
+			})
+			.catch((error) => {
+				console.log(error);
+			});
+	};
+
 	if (userInfo.type == "") {
 		return (
 			<div className="text-center text-8xl">
@@ -57,15 +73,17 @@ const PrivateRoute = ({ requiredRoles, children }) => {
 	if (requiredRoles.includes(userInfo.type)) {
 		if (!userInfo.activated) {
 			return (
-				<AuthContext.Provider value={userInfo}>
+				<AuthContext.Provider value={{ userInfo, logout }}>
 					<div className="flex justify-center items-center h-screen">
+						<NavigationBar />
 						<ResendActivatioNCard />
 					</div>
 				</AuthContext.Provider>
 			);
 		}
 		return (
-			<AuthContext.Provider value={userInfo}>
+			<AuthContext.Provider value={{ userInfo, logout }}>
+				<NavigationBar />
 				{children}
 			</AuthContext.Provider>
 		);
