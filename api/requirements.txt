@@ -6,7 +6,7 @@ flask-session==0.8.*
 flask-bcrypt==1.0.*
 flask-cors==4.0.*
 flask-mail==0.9.*
-werkzeug==2.3.7
+werkzeug==3.0.3
 python-dotenv==1.0.1
 # Redis
 redis==5.0.3
