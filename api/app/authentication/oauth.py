@@ -1,5 +1,5 @@
 # Libraries
-from flask_oauthlib.client import OAuth
+from authlib.integrations.flask_client import OAuth
 from flask_cors import cross_origin
 from flask import session, redirect, request, abort, current_app, Blueprint
 
@@ -11,26 +11,33 @@ oauth = OAuth() # Used for remote app authentication
 router = Blueprint("oauth", __name__)
 # Note: All routes here will have a prefix of /api/authentication/oauth
 
-# Google authentication
-google = oauth.remote_app(
-    'google',
-	app_key="GOOGLE_AUTH"
-)
-
-# GitHub authentication
-github = oauth.remote_app(
-    'github',
-	app_key="GITHUB_AUTH"
-)
-
 # Token getter
-@google.tokengetter
 def get_google_oauth_token():
     return session.get('google_token')
-
-@github.tokengetter
 def get_github_oauth_token():
     return session.get('github_token')
+
+# Google authentication
+google = oauth.register(
+	'google',
+	api_base_url= 'https://www.googleapis.com/oauth2/v1/',
+	request_token_url= None,
+	access_token_url= 'https://accounts.google.com/o/oauth2/token',
+	authorize_url= 'https://accounts.google.com/o/oauth2/auth',
+	fetch_token=get_google_oauth_token,
+	client_kwargs={'scope': 'profile email'}
+) 
+
+# GitHub authentication
+github = oauth.register(
+	'github',
+	api_base_url= 'https://api.github.com/',
+	request_token_url= None,
+	access_token_url= 'https://github.com/login/oauth/access_token',
+	authorize_url= 'https://github.com/login/oauth/authorize',
+	fetch_token=get_github_oauth_token,
+	client_kwargs={'scope': 'user:email'}
+) 
 
 # Authorized Remote Login Route
 @router.route('/test', methods=["GET"])
@@ -45,9 +52,9 @@ def remote_login(provider:str):
 		- provider:str['google', 'github']
 	"""
 	if provider == "google":
-		return google.authorize(callback=current_app.config["GOOGLE_AUTH"]["redirect_uri"])
+		return google.authorize_redirect(current_app.config["GOOGLE_REDIRECT_URI"]) # type: ignore
 	elif provider == "github":
-		return github.authorize(callback=current_app.config["GITHUB_AUTH"]["redirect_uri"])
+		return github.authorize_redirect(current_app.config["GITHUB_REDIRECT_URI"]) # type: ignore
 	return abort(404)
 
 # Authorized Remote Login Callback
@@ -64,31 +71,36 @@ def authorized(provider:str):
 	
 	# Google provider
 	if provider == "google":
-		response = google.authorized_response()
-		if response is None or response.get('access_token') is None:
+		token = google.authorize_access_token() # type: ignore
+		if token is None or token.get('access_token') is None:
 			return redirect(current_app.config["CLIENT_SERVER_URL"] + "/login")
-		session['google_token'] = (response.get('access_token'), '')
-
+		session['google_token'] = token["access_token"]
 		# Extract email and name
-		userinfo = google.get('userinfo').data
-		email = userinfo.get("email") # type: ignore
-		name = userinfo.get("name") # type: ignore
+		resp = google.get('userinfo') # type: ignore
+		resp.raise_for_status()
+		userinfo = resp.json()
+		email = userinfo.get("email") 
+		name = userinfo.get("name")
 
 	# GitHub provider
 	if provider == "github":
-		response = github.authorized_response()
-		if response is None or response.get('access_token') is None:
+		token = github.authorize_access_token() # type: ignore
+		if token is None or token.get('access_token') is None:
 			return redirect(current_app.config["CLIENT_SERVER_URL"] + "/login")
-		session['github_token'] = (response.get('access_token'), '')
-
+		session['github_token'] = token["access_token"]
 		# Extract first verified email and name
-		name:str = github.get("user").data.get("name") # type: ignore
-		list_of_emails = github.get("user/emails").data
+		resp = github.get('user') # type: ignore
+		resp.raise_for_status()
+		name = resp.json().get("name")
+		email_resp = github.get('user/emails') # type: ignore
+		email_resp.raise_for_status()
+		list_of_emails = email_resp.json()
 		has_verified_email = False
+
 		# Iterate through emails and find verified
 		for e in list_of_emails:
-			if e["verified"]: # type: ignore
-				email:str = e["email"] # type: ignore
+			if e["verified"]: 
+				email = e["email"]
 				has_verified_email = True
 				break
 		# No verified emails flag
