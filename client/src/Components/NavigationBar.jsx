@@ -41,7 +41,7 @@ export default function NavigationBar() {
 				Are you sure you want to log out?
 			</ConfirmationModal>
 			{/* Navbar */}
-			<Navbar fluid rounded className="bg-custom-green-3 shadow">
+			<Navbar fluid rounded className="relative bg-custom-green-3 shadow z-10">
 				<RiMenu2Fill
 					size={40}
 					className="ml-2 hover:bg-gray-200 p-1 rounded-lg"
