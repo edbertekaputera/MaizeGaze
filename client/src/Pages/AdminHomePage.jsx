@@ -5,7 +5,7 @@ import { AuthContext } from "../Components/Authentication/PrivateRoute";
 import { useNavigate } from "react-router-dom";
 
 function AdminHomePage() {
-	const userInfo = useContext(AuthContext);
+	const { userInfo } = useContext(AuthContext);
 	const navigate = useNavigate();
 
 	return (

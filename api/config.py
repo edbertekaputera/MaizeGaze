@@ -50,28 +50,12 @@ class Config(object):
 
  	# Google OAuth 2.0 configurations:
     # https://developers.google.com/identity/protocols/oauth2/web-server#httprest
-	GOOGLE_AUTH = {
-		"consumer_key" : os.environ.get('GOOGLE_CLIENT_ID'),
-		"consumer_secret" : os.environ.get('GOOGLE_CLIENT_SECRET'),
-		"redirect_uri" : os.environ.get('GOOGLE_REDIRECT_URI'),
-		"request_token_params": {'scope': ['profile', 'email']},
-		"base_url" : 'https://www.googleapis.com/oauth2/v1/',
-		"request_token_url" : None,
-		"access_token_method" : 'POST',
-		"access_token_url" : 'https://accounts.google.com/o/oauth2/token',
-		"authorize_url" : 'https://accounts.google.com/o/oauth2/auth',
-	}
+	GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
+	GOOGLE_CLIENT_SECRET =  os.environ.get('GOOGLE_CLIENT_SECRET')
+	GOOGLE_REDIRECT_URI = os.environ.get('GOOGLE_REDIRECT_URI')
 
 	# GitHub OAuth 2.0 configurations:
     # https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps
-	GITHUB_AUTH =  {
-		"consumer_key": os.environ.get('GITHUB_CLIENT_ID'),
-		"consumer_secret": os.environ.get('GITHUB_CLIENT_SECRET'),
-		"redirect_uri" : os.environ.get('GITHUB_REDIRECT_URI'),
-		"request_token_params" : {'scope': 'user:email'},
-		"base_url" : 'https://api.github.com/',
-		"request_token_url": None,
-		"access_token_method" : 'POST',
-		"access_token_url": 'https://github.com/login/oauth/access_token',
-		"authorize_url": 'https://github.com/login/oauth/authorize',
-	}
+	GITHUB_CLIENT_ID = os.environ.get('GITHUB_CLIENT_ID')
+	GITHUB_CLIENT_SECRET =  os.environ.get('GITHUB_CLIENT_SECRET')
+	GITHUB_REDIRECT_URI = os.environ.get('GITHUB_REDIRECT_URI')

@@ -70,5 +70,5 @@ def get_detection_quota() -> dict[str, int]:
 	today = date.today()
 	dq = DetectionQuota.get(user_email=session['email'], month=today.month, year=today.year)
 	if not dq:
-		return {"quota": 0}
-	return {"quota": dq.quota}
+		return {"quota": 25}
+	return {"quota": 25 - dq.quota}

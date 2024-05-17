@@ -5,6 +5,7 @@ from flask_session import Session
 from flask_cors import CORS
 from config import Config
 from celery import Celery, Task
+from sqlalchemy import event
 # Local dependencies
 from app.db import db, User, TypeOfUser
 from app.authentication import oauth, bcrypt, mail, router as auth_router
@@ -42,9 +43,16 @@ def celery_init_app(app: Flask) -> Celery:
 celery = celery_init_app(flask_app)
 
 # Database
+def _fk_pragma_on_connect(dbapi_con, con_record):
+    dbapi_con.execute('pragma foreign_keys=ON')
+    
 db.init_app(flask_app)
 with flask_app.app_context():
 	db.create_all()
+	# Enforce Foreign Key contraint on SQLite
+	if 'sqlite' in flask_app.config['SQLALCHEMY_DATABASE_URI']:
+		event.listen(db.engine, 'connect', _fk_pragma_on_connect)
+            
 	# Initialize admin
 	if not User.get(os.environ["ADMIN_EMAIL"]):
 		admin = User(

@@ -38,14 +38,17 @@ function LoginCard() {
 	};
 
 	return (
-		<Card>
+		<Card className="bg-custom-white">
 			<div className="mb-2 text-center block w-96 mx-4">
-				<Label className="text-xl" value="Sign in to your account" />
+				<Label
+					className="text-xl font-semibold"
+					value="Sign in to your account"
+				/>
 			</div>
 			<form className="flex flex-col gap-4" onSubmit={handleSubmit}>
 				<div>
 					<div className="mb-2 block">
-						<Label htmlFor="userName" value="Username" />
+						<Label htmlFor="email" value="Email" />
 					</div>
 					<TextInput
 						id="email"
@@ -53,7 +56,7 @@ function LoginCard() {
 						required={true}
 						type="email"
 						onChange={(event) => setEmail(event.target.value)}
-						color={invalidMsg === "" ? "gray" : "failure"}
+						color={invalidMsg === "" ? "white" : "failure"}
 						helperText={
 							<React.Fragment>
 								<span className="font-medium">{invalidMsg}</span>
@@ -70,21 +73,30 @@ function LoginCard() {
 						type="password"
 						required={true}
 						onChange={(event) => setPassword(event.target.value)}
-						color={invalidMsg === "" ? "gray" : "failure"}
+						color={invalidMsg === "" ? "white" : "failure"}
 						helperText={
 							<React.Fragment>
 								<span className="font-medium">{invalidMsg}</span>
 							</React.Fragment>
 						}
 					/>
+					<div className="flex justify-end">
+						<Link className="text-sm font-medium text-blue-600 hover:underline dark:text-blue-500">
+							Forgot password?
+						</Link>
+					</div>
 				</div>
+
 				<div className="flex flex-col gap-3">
-					<Button type="submit" className="mt-2">
+					<Button
+						type="submit"
+						className="mt-2 bg-custom-green-1 hover:bg-custom-green-2"
+					>
 						Sign In
 					</Button>
 					<Button
 						type="button"
-						className="mt-2 border border-black hover:bg-gray-100 hover:border-gray-500"
+						className="mt-2 border bg-white border-black hover:bg-gray-100 hover:border-gray-500"
 						color={"white"}
 						href={
 							"http://localhost:5000/api/authentication/oauth/login/google"
@@ -95,7 +107,7 @@ function LoginCard() {
 					</Button>
 					<Button
 						type="button"
-						className="mt-2 border border-black hover:bg-gray-100 hover:border-gray-500"
+						className="mt-2 border bg-white border-black hover:bg-gray-100 hover:border-gray-500"
 						color={"white"}
 						href={
 							"http://localhost:5000/api/authentication/oauth/login/github"

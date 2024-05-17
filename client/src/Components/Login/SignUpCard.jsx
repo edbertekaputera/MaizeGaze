@@ -67,9 +67,9 @@ function SignUpCard() {
 	};
 
 	return (
-		<Card>
+		<Card className="bg-custom-white">
 			<div className="mb-2 text-center block w-96 mx-4">
-				<Label className="text-xl" value="Create an account" />
+				<Label className="text-xl font-semibold" value="Create an account" />
 			</div>
 			<form className="flex flex-col gap-4 w-full" onSubmit={validateSubmit}>
 				<div>
@@ -84,7 +84,7 @@ function SignUpCard() {
 						onChange={(event) => {
 							setName(event.target.value);
 						}}
-						color={nameError === "" ? "gray" : "failure"}
+						color={nameError === "" ? "white" : "failure"}
 						helperText={
 							<React.Fragment>
 								<span className="font-medium">{nameError}</span>
@@ -106,7 +106,7 @@ function SignUpCard() {
 						onChange={(event) => {
 							setEmail(event.target.value);
 						}}
-						color={emailError === "" ? "gray" : "failure"}
+						color={emailError === "" ? "white" : "failure"}
 						helperText={
 							<React.Fragment>
 								<span className="font-medium">{emailError}</span>
@@ -122,6 +122,7 @@ function SignUpCard() {
 						id="password"
 						type="password"
 						required={true}
+						color={"white"}
 						onBlur={(event) => setPassword(event.target.value)}
 					/>
 				</div>
@@ -136,7 +137,7 @@ function SignUpCard() {
 						onChange={(event) => setRePassword(event.target.value)}
 						color={
 							rePassword.trim() === ""
-								? "gray"
+								? "white"
 								: password !== rePassword
 								? "failure"
 								: "success"
@@ -154,7 +155,7 @@ function SignUpCard() {
 						}
 					/>
 				</div>
-				<Button type="submit">Create Account</Button>
+				<Button type="submit" className="mt-2 bg-custom-green-1 hover:bg-custom-green-2">Create Account</Button>
 				<div className="mb-2 block">
 					<Label value="Already have an account? " />
 					<Link
