@@ -22,7 +22,7 @@ export default function NavigationBar() {
 	const [showConfirmLogoutModal, setShowConfirmLogoutModal] = useState(false);
 
 	const drawerRoutes = {
-		ADMIN: [],
+		ADMINISTRATOR: [],
 		FREE_USER: [
 			{ icon: MdSpaceDashboard, link: "/user", name: "Dashboard" },
 			{ icon: GiCorn, link: "/user/detect", name: "Detect and Count" },
