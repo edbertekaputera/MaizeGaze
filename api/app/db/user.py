@@ -29,6 +29,8 @@ class User(db.Model):
 	# Relationship
 	userToDetectionQuotaRel = db.relationship("DetectionQuota", back_populates="detectionQuotaToUserRel", cascade="all, delete, save-update",
 									foreign_keys="DetectionQuota.user")
+	userToFarmRel = db.relationship("Farm", back_populates="farmToUserRel", cascade="all, delete, save-update",
+									foreign_keys="Farm.user")
 	
 	@classmethod
 	def get(cls, email:str) -> Self|None:

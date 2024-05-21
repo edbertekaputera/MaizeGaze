@@ -20,7 +20,7 @@ class DetectionQuota(db.Model):
 	user = db.Column(db.String(250), db.ForeignKey("User.email"), nullable=False, primary_key=True)
 	detectionQuotaToUserRel = db.relationship("User", back_populates="userToDetectionQuotaRel", cascade="all, delete, save-update",
 									foreign_keys="DetectionQuota.user")
-
+ 
 	@classmethod
 	def get(cls, user_email:str, month:int, year:int) -> Self|None:
 		"""
