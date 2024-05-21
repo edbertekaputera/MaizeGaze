@@ -4,6 +4,7 @@ from typing_extensions import Self # type: ignore
 from enum import Enum # type: ignore
 
 from .sqlalchemy import db
+from .farm import Farm
 
 # Enum for User.user_type
 class TypeOfUser(str, Enum):
@@ -50,8 +51,12 @@ class User(db.Model):
 			password=hashed_password,
 			email_is_verified=email_is_verified
 		) # type: ignore
+		
+		# TEMPORARY only for hardcoded FARM
+		temp_farm = Farm(name="Corn Farm", city="city",address="test address", country="country", land_size=1000, user=email) # type: ignore
 		with current_app.app_context():
 			db.session.add(new_user)
+			db.session.add(temp_farm)
 			db.session.commit()
 		return True
 	

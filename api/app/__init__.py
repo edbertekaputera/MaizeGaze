@@ -11,6 +11,7 @@ from app.db import db, User, TypeOfUser
 from app.authentication import oauth, bcrypt, mail, router as auth_router
 from app.detect import router as detect_router
 from app.storage import router as storage_router
+from app.user import router as user_router
 from app.routes import router as main_router
 
 # Initialize Flask App
@@ -74,4 +75,5 @@ with flask_app.app_context():
 flask_app.register_blueprint(auth_router, url_prefix="/api/authentication")
 flask_app.register_blueprint(detect_router, url_prefix="/api/detect")
 flask_app.register_blueprint(storage_router, url_prefix="/api/storage")
+flask_app.register_blueprint(user_router, url_prefix="/api/user")
 flask_app.register_blueprint(main_router, url_prefix="/api")

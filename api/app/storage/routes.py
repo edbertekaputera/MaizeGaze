@@ -21,7 +21,7 @@ def allowed_file(filename:str):
 		filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @router.route("/save", methods=["POST"])
-@roles_required(*TypeOfUser.all_users(), TypeOfUser.ADMINISTRATOR)
+@roles_required(*TypeOfUser.all_users())
 def save() -> dict[str, bool]:
 	# Get uploaded file
 	if "image" not in request.files:
