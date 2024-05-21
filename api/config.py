@@ -38,6 +38,10 @@ class Config(object):
             task_ignore_result=True,
 	)
 
+	# Bucket Storage
+	USE_LOCAL_STORAGE = (os.environ.get("CLOUD_BUCKET_URL") == None)
+	LOCAL_STORAGE_PATH = os.path.join(basedir, "local_storage")
+
 	# Mail configurations
 	MAIL_DEFAULT_SENDER = os.environ.get('EMAIL_USER')
 	MAIL_SERVER = "smtp-mail.outlook.com"

@@ -9,11 +9,13 @@ import { ImPencil2 } from "react-icons/im";
 
 import axios from "axios";
 import LoadingCard from "../Components/LoadingCard";
+import SaveResultModal from "../Components/Storage/SaveResultModal";
 
 function DetectionPage() {
 	const [file, setFile] = useState();
 	const [status, setStatus] = useState("");
 	const [result, setResult] = useState({});
+	const [showSaveModal, setShowSaveModal] = useState(false);
 	const [quota, setQuota] = useState(0);
 	const navigate = useNavigate();
 
@@ -89,6 +91,13 @@ function DetectionPage() {
 			<LoadingCard show={status === "RUNNING"}>
 				Detecting Maize Tassels...
 			</LoadingCard>
+			<SaveResultModal
+				state={showSaveModal}
+				setState={setShowSaveModal}
+				file={file}
+				results={result}
+				post_save_action={handleReset}
+			/>
 
 			<div class="blob text-yellow-300">
 				<GiCorn size={250} />
@@ -109,7 +118,6 @@ function DetectionPage() {
 			<div class="blob5 text-blue-500">
 				<GiCorn size={250} />
 			</div>
-
 
 			<Card className="relative my-6 mx-4 lg:my:10 lg:mx-16 shadow-lg border">
 				<header className="flex flex-wrap flex-row gap-2 justify-between shadow-b border-b-2 pb-5 border-black">
@@ -201,8 +209,9 @@ function DetectionPage() {
 									</div>
 								</Button>
 								<Button
-									disabled
+									disabled={!file || !result}
 									className="bg-custom-green-1 hover:bg-custom-green-2 pl-6 pr-8 py-2 shadow lg:w-56"
+									onClick={() => setShowSaveModal(true)}
 								>
 									<div className="flex flex-row justify-center items-center ">
 										<MdOutlineSaveAlt size={16} />

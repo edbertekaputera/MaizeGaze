@@ -10,6 +10,8 @@ from sqlalchemy import event
 from app.db import db, User, TypeOfUser
 from app.authentication import oauth, bcrypt, mail, router as auth_router
 from app.detect import router as detect_router
+from app.storage import router as storage_router
+from app.user import router as user_router
 from app.routes import router as main_router
 
 # Initialize Flask App
@@ -45,7 +47,11 @@ celery = celery_init_app(flask_app)
 # Database
 def _fk_pragma_on_connect(dbapi_con, con_record):
     dbapi_con.execute('pragma foreign_keys=ON')
-    
+
+# If local storage
+if flask_app.config["USE_LOCAL_STORAGE"] and not os.path.isdir(flask_app.config["LOCAL_STORAGE_PATH"]):
+	os.mkdir(flask_app.config["LOCAL_STORAGE_PATH"])
+
 db.init_app(flask_app)
 with flask_app.app_context():
 	db.create_all()
@@ -68,4 +74,6 @@ with flask_app.app_context():
 # Routes (make sure everything starts with /api to prevent collision with web routes)
 flask_app.register_blueprint(auth_router, url_prefix="/api/authentication")
 flask_app.register_blueprint(detect_router, url_prefix="/api/detect")
+flask_app.register_blueprint(storage_router, url_prefix="/api/storage")
+flask_app.register_blueprint(user_router, url_prefix="/api/user")
 flask_app.register_blueprint(main_router, url_prefix="/api")
