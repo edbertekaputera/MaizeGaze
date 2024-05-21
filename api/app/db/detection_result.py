@@ -11,9 +11,6 @@ class DetectionResult(db.Model):
 	__tablename__ = "DetectionResult"
 	# attributes
 	id = db.Column(db.String(250), nullable=False, primary_key=True)
-	annot_image_path = db.Column(db.String(250), nullable=False)
-	original_image_path = db.Column(db.String(250), nullable=False)
-	annot_txt_path = db.Column(db.String(250), nullable=False)
 	tassel_count = db.Column(db.Integer(), nullable=False)
 	record_date = db.Column(db.Date(), nullable=False)
 	name = db.Column(db.String(250), nullable=False)
@@ -50,7 +47,8 @@ class DetectionResult(db.Model):
 				db.session.add(new_result)
 				db.session.commit()
 			return True
-		except:
+		except BaseException as e:
+			print(e)
 			return False
 	
 	@classmethod
