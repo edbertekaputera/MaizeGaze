@@ -23,13 +23,9 @@ function LoginCard() {
 			});
 
 		if (response.data.status_code === 202) {
-			if (
-				["FREE_USER", "STANDARD_USER", "PREMIUM_USER"].includes(
-					response.data.type
-				)
-			) {
+			if (!response.data.is_admin) {
 				navigate("/user");
-			} else if (response.data.type === "ADMINISTRATOR") {
+			} else {
 				navigate("/administrator");
 			}
 		} else {

@@ -1,14 +1,12 @@
 # Libraries
-from flask import session, Blueprint, request, current_app
-from base64 import encodebytes
+from flask import session, Blueprint, request
 from datetime import date 
-import os
 import json
 from uuid import uuid4
 
 # Local dependencies
-from app.db import DetectionResult, TypeOfUser
-from app.authentication import roles_required
+from app.db import DetectionResult
+from app.authentication import permissions_required
 from .utils import UserDirectory
 
 # Initialize
@@ -21,7 +19,7 @@ def allowed_file(filename:str):
 		filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @router.route("/save", methods=["POST"])
-@roles_required(*TypeOfUser.all_users())
+@permissions_required(is_user=True)
 def save() -> dict[str, bool]:
 	# Get uploaded file
 	if "image" not in request.files:
@@ -35,17 +33,15 @@ def save() -> dict[str, bool]:
 		return {"success": False}
 	
 	# Initialize user directory
-	user_directory_path = os.path.join(current_app.config["LOCAL_STORAGE_PATH"], session["email"])
-	user_directory = UserDirectory(user_directory_path)
+	user_directory = UserDirectory()
 
 	# Generate ID
 	id = str(uuid4())
-	print(id)
 	# Process annotations
 	annotations = json.loads(request.form["annotations"])
 
 	# Store in Bucket Storage
-	success_storage = user_directory.save(id, file, annotations)
+	success_storage = user_directory.save(request.form["farm_name"], id, file, annotations)
 	if not success_storage:
 		return {"success": False}
 	
@@ -61,3 +57,34 @@ def save() -> dict[str, bool]:
 	}
 	success_db = DetectionResult.save(data)
 	return {"success": success_db}
+
+@router.route("/query_result", methods=["GET"])
+@permissions_required(is_user=True)
+def queryResult() -> dict[str, int | str | dict[str, str | int | list[dict[str,float]]]]:
+	farm = request.args["farm_name"]
+	id = request.args["id"]
+	result = DetectionResult.queryResult(session["email"], farm, id)
+	if not result:
+		return {"status_code": 404, "message": "Detection Results not found."}
+	
+	# Retrieve Image, Annotations, and Annotated Images
+	user_directory = UserDirectory()
+	resources = user_directory.retrieveResource(result)
+	
+	# Add metadata info
+	result_json = {
+		"id": result.id,
+		"tassel_count": int(result.tassel_count),
+		"record_date": result.record_date.strftime("%Y-%m-%d"),
+		"name": result.name,
+		"description": result.description,
+		"farm_name": result.farm_name,
+		"farm_user": result.farm_user,
+		"original_image": resources["original_image"],
+		"annotated_image": resources["annotated_image"],
+		"annotations": resources["annotations"]
+	}
+	
+
+	return {"status_code": 200, "result": result_json}
+

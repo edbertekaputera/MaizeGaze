@@ -67,6 +67,9 @@ function SaveResultModal({ state, setState, file, results, post_save_action }) {
 			<MessageModal
 				state={showMessageModal}
 				setState={(bool) => {
+					setName("");
+					setDescription("");
+					setSelectedFarms(farms[0]);
 					setShowMessageModal(bool);
 					setState(bool);
 					post_save_action();
@@ -74,12 +77,7 @@ function SaveResultModal({ state, setState, file, results, post_save_action }) {
 			>
 				Successfully saved!
 			</MessageModal>
-			<Modal
-				show={state}
-				size="lg"
-				onClose={() => setOpenModal(setState)}
-				popup
-			>
+			<Modal show={state} size="lg" onClose={() => setState(false)} popup>
 				<div className="rounded shadow-md">
 					<Modal.Header>
 						<h1 className="text-2xl">Save Detection Result</h1>
@@ -108,7 +106,9 @@ function SaveResultModal({ state, setState, file, results, post_save_action }) {
 										}
 									>
 										{farms.map((f) => (
-											<option>{f.name}</option>
+											<option key={f.name} value={f.name}>
+												{f.name}
+											</option>
 										))}
 									</Select>
 								</div>

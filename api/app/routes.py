@@ -3,7 +3,7 @@ from flask import session, Blueprint
 import requests
 # Local dependencies
 from app.db import TypeOfUser, User
-from app.authentication import roles_required
+from app.authentication import login_required
 
 # Initialize
 router = Blueprint("main", __name__)
@@ -13,7 +13,7 @@ def test():
 	return {'data': 'test success'}
 
 @router.route('/test_user')
-@roles_required(*TypeOfUser.all_users())
+@login_required
 def test_user():
 	if 'email' in session:
 		user = User.get(session['email'])
