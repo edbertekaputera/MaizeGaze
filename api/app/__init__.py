@@ -58,13 +58,32 @@ with flask_app.app_context():
 	# Enforce Foreign Key contraint on SQLite
 	if 'sqlite' in flask_app.config['SQLALCHEMY_DATABASE_URI']:
 		event.listen(db.engine, 'connect', _fk_pragma_on_connect)
+
+	# Initialize ADMINISTRATOR and FREE_USER types
+	if not TypeOfUser.get("FREE_USER"):
+		free_user = TypeOfUser(
+            name="FREE_USER",
+            detection_quota_limit = 25,
+			storage_limit = 5
+		) # type: ignore
+		db.session.add(free_user)
+		db.session.commit()
+	if not TypeOfUser.get("ADMINISTRATOR"):
+		admin_type = TypeOfUser(
+			name="ADMINISTRATOR",
+			is_admin = True,
+			detection_quota_limit = 100,
+			storage_limit = 100
+		) # type: ignore
+		db.session.add(admin_type)
+		db.session.commit()
             
-	# Initialize admin
+	# Initialize admin 
 	if not User.get(os.environ["ADMIN_EMAIL"]):
 		admin = User(
 			email=os.environ.get("ADMIN_EMAIL"),
 			name=os.environ.get("ADMIN_NAME"),
-			user_type=TypeOfUser.ADMINISTRATOR,
+			user_type="ADMINISTRATOR",
 			password=bcrypt.generate_password_hash(os.environ.get("ADMIN_PASSWORD")),
 			email_is_verified=True
 		) # type: ignore

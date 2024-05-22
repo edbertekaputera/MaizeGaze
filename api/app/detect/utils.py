@@ -1,8 +1,8 @@
 from ultralytics import YOLO
 from ultralytics.engine.results import Results
 from PIL import Image
-from io import BytesIO # type: ignore
-from base64 import encodebytes, decodebytes # type: ignore
+from io import BytesIO 
+from base64 import encodebytes, decodebytes
 import numpy as np
 import torch as pt
 import cv2

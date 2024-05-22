@@ -1,42 +1,15 @@
 # Libraries
 from flask import session, request, current_app, Blueprint
 from flask_bcrypt import Bcrypt
-from functools import wraps # type: ignore
 # Local dependencies
-from app.db import User
+from app.db import User, TypeOfUser
 from .email import generate_token_from_email, extract_email_from_token, send_email
+from .utils import login_required
 
 # Initialize
 bcrypt = Bcrypt()  # Used to hash passwords
 router = Blueprint("authentication", __name__)
 # Note: All routes here will have a prefix of /api/authentication
-
-
-# Require-login route wrapper
-def login_required(function):
-	'''Function wrapper for login-protected routes'''
-	@wraps(function)
-	def wrapper(*args, **kwargs):
-		if not session.get("email"):
-			return {"status_code" : 401, 'message' : 'Unauthorized Access'}
-		return function(*args, **kwargs)
-	return wrapper
-
-# Verified User-specific route wrapper
-def roles_required(*roles):
-	'''Function wrapper for verified role-protected routes'''
-	def decorator(function):
-		@wraps(function)
-		@login_required
-		def wrapper(*args, **kwargs):
-			current_user = User.get(session["email"])
-			if not current_user or current_user.user_type not in set(roles):
-				return {"status_code" : 401, 'message' : 'Unauthorized Access'}
-			if not current_user.email_is_verified:
-				return {"status_code" : 401, 'message' : 'Unverified Email'}
-			return function(*args, **kwargs)
-		return wrapper
-	return decorator
 
 # Register Route
 @router.route('/register', methods=['POST'])
@@ -54,10 +27,16 @@ def register() -> dict[str, str|int]:
 	hashed_password = bcrypt.generate_password_hash(password)
 	
 	# Register account
-	success = User.register_new_user(email, name, hashed_password)
-	if not success:
+	user = User.register_new_user(email, name, hashed_password)
+	if not user:
 		return {'status_code' : 409, 'message' : 'email are already registered'}
-	
+	print("test")
+	# Get Type
+	user_type = TypeOfUser.get(user.user_type)
+	if not user_type:
+		return {'status_code' : 409, 'message' : 'Error occured!'}
+	print("test2")
+
 	# Send Email verification
 	token = generate_token_from_email(email)
 	send_email(
@@ -66,12 +45,21 @@ def register() -> dict[str, str|int]:
 		html=f"""
 		Hello {name}! Thank you for registering a new account in our website..<br/>
 		Before you start using our services, please activate your account by verifying this email...<br/><br/>
-		<a href='http://localhost:3000/activate_account/{token}'>Activate Account</a>
+		<a href='{current_app.config["CLIENT_SERVER_URL"]}/activate_account/{token}'>Activate Account</a>
 		"""
 	)
+	print("test3")
+
 	# Regenerate session key after login
 	current_app.session_interface.regenerate(session) # type: ignore
+	print("test4")
 	session["email"] = email
+	session["type"] = user_type.name
+	session["is_admin"] = user_type.is_admin
+	session["detection_quota_limit"] = user_type.detection_quota_limit
+	session["storage_limit"] = user_type.storage_limit
+	print("test5")
+
 	return {'status_code' : 201, 'message' : 'User registered'}
 
 # Resend Email Route
@@ -90,7 +78,7 @@ def resend_activation_email() -> dict[str, str|int]:
 		html=f"""
 		Hello {user.name}! Thank you for registering a new account in our website..<br/>
 		Before you start using our services, please activate your account by verifying this email...<br/><br/>
-		<a href='http://localhost:3000/activate_account/{token}'>Activate Account</a>
+		<a href='{current_app.config["CLIENT_SERVER_URL"]}/activate_account/{token}'>Activate Account</a>
 		"""
 	)
 	return {'status_code' : 200, 'message' : 'Activation email has been resent.'}
@@ -130,10 +118,19 @@ def login():
 	# Check if password is wrong
 	if not bcrypt.check_password_hash(pw_hash=user.password, password=password):
 		return {'status_code' : 401, 'message' : 'Email or password incorrect'}
+	# Get Type
+	user_type = TypeOfUser.get(user.user_type)
+	if not user_type:
+		return {'status_code' : 401, 'message' : 'Email or password incorrect'}
+
 	# Regenerate session key after login
 	current_app.session_interface.regenerate(session) # type: ignore
 	session["email"] = email
-	return {'status_code' : 202, 'message' : 'User authorized', 'type': user.user_type}
+	session["type"] = user_type.name
+	session["is_admin"] = user_type.is_admin
+	session["detection_quota_limit"] = user_type.detection_quota_limit
+	session["storage_limit"] = user_type.storage_limit
+	return {'status_code' : 202, 'message' : 'User authorized', 'is_admin': user_type.is_admin}
 
 # Logout Route
 @router.route('/logout', methods=['POST'])
@@ -144,7 +141,7 @@ def logout():
 	return {'status_code' : 200, 'message' : 'User logged out'}
 
 # Identity Route
-@router.route("/whoami", methods=['POST'])
+@router.route("/whoami", methods=['GET'])
 @login_required
 def whoami():
 	if 'email' in session:
@@ -156,7 +153,10 @@ def whoami():
 					'email': current_user.email,
 					'name': current_user.name,
 					'activated': current_user.email_is_verified,
-					'type': current_user.user_type.value
+					'type': session['type'],
+					'is_admin': session['is_admin'],
+					'detection_quota_limit': session['detection_quota_limit'],
+					'storage_limit': session['storage_limit'],
 			}}
 	return {'status_code': 200, "data": {'type': "anonymous"}}
 
@@ -170,4 +170,3 @@ def check_exist_email(email:str):
 	if current_user:
 		return {'status_code': 200, "value": True}
 	return {'status_code': 200, "value": False}
-

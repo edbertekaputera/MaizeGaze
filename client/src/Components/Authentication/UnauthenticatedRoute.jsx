@@ -6,26 +6,39 @@ import { Spinner } from "flowbite-react";
 
 // Private Route Wrapper
 const UnAuthenticatedRoute = ({ children }) => {
-	const [authType, setAuthType] = useState();
+	const [authType, setAuthType] = useState({
+		type: "",
+		is_admin: false,
+	});
 
 	useEffect(() => {
 		axios
-			.post("/api/authentication/whoami")
+			.get("/api/authentication/whoami")
 			.then((res) => {
 				if (res.data.status_code === 200) {
-					setAuthType(res.data.data.type);
+					setAuthType((prev) => ({
+						...prev,
+						type: res.data.data.type,
+						is_admin: res.data.data.is_admin,
+					}));
 				} else {
 					console.log(`${res.data.status_code}: ${res.data.message}`);
-					setAuthType("anonymous");
+					setAuthType((prev) => ({
+						...prev,
+						type: "anonymous",
+					}));
 				}
 			})
 			.catch((error) => {
 				console.log(error);
-				setAuthType("anonymous");
+				setAuthType((prev) => ({
+					...prev,
+					type: "anonymous",
+				}));
 			});
 	}, []);
 
-	if (!authType) {
+	if (authType.type == "") {
 		return (
 			<div className="text-center text-8xl">
 				<Spinner aria-label="Extra large spinner example" size="xl" />
@@ -33,12 +46,12 @@ const UnAuthenticatedRoute = ({ children }) => {
 		);
 	}
 
-	if (["FREE_USER", "STANDARD_USER", "PREMIUM_USER"].includes(authType)) {
-		return <Navigate to="/user" />;
-	} else if (authType === "ADMINISTRATOR") {
+	if (authType.type == "anonymous") {
+		return children;
+	} else if (authType.is_admin) {
 		return <Navigate to="/administrator" />;
 	} else {
-		return children;
+		return <Navigate to="/user" />;
 	}
 };
 

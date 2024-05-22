@@ -1,5 +1,5 @@
-import { Button, Card } from "flowbite-react";
-import React, { useEffect, useState } from "react";
+import { Button, Card, Tooltip } from "flowbite-react";
+import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import DropImageInput from "../Components/DropImageInput";
 import { GrPowerReset } from "react-icons/gr";
@@ -10,8 +10,10 @@ import { ImPencil2 } from "react-icons/im";
 import axios from "axios";
 import LoadingCard from "../Components/LoadingCard";
 import SaveResultModal from "../Components/Storage/SaveResultModal";
+import { AuthContext } from "../Components/Authentication/PrivateRoute";
 
 function DetectionPage() {
+	const { userInfo } = useContext(AuthContext);
 	const [file, setFile] = useState();
 	const [status, setStatus] = useState("");
 	const [result, setResult] = useState({});
@@ -99,23 +101,23 @@ function DetectionPage() {
 				post_save_action={handleReset}
 			/>
 
-			<div class="blob text-yellow-300">
+			<div className="blob text-yellow-300">
 				<GiCorn size={250} />
 			</div>
 
-			<div class="blob2 text-custom-green-2">
+			<div className="blob2 text-custom-green-2">
 				<GiCorn size={250} />
 			</div>
 
-			<div class="blob3 text-custom-green-1">
+			<div className="blob3 text-custom-green-1">
 				<GiCorn size={250} />
 			</div>
 
-			<div class="blob4 text-custom-brown-1">
+			<div className="blob4 text-custom-brown-1">
 				<GiCorn size={250} />
 			</div>
 
-			<div class="blob5 text-blue-500">
+			<div className="blob5 text-blue-500">
 				<GiCorn size={250} />
 			</div>
 
@@ -123,7 +125,7 @@ function DetectionPage() {
 				<header className="flex flex-wrap flex-row gap-2 justify-between shadow-b border-b-2 pb-5 border-black">
 					<h1 className="text-4xl font-extrabold">Detect Maize Tassel</h1>
 					<span className="px-4 py-2 bg-custom-brown-3 rounded-lg shadow-md font-semibold">
-						Monthly Quota: {quota}/25
+						Monthly Quota: {quota}/{userInfo.detection_quota_limit}
 					</span>
 				</header>
 				<div className="flex flex-wrap flex-col justify-start px-8 mt-4 gap-3">
@@ -159,18 +161,25 @@ function DetectionPage() {
 									</span>
 								</div>
 							</Button>
-							<Button
-								disabled={status === "RUNNING" || quota == 0}
-								className="bg-custom-green-1 hover:bg-custom-green-2 pl-6 pr-8 py-2 shadow w-full lg:w-56"
-								onClick={handleSubmit}
+							<Tooltip
+								content="You ran out of Detection Quota this month."
+								className={`${quota > 0 && "hidden"} bg-custom-brown-1`}
+								arrow={false}
 							>
-								<div className="flex flex-row justify-center items-center ">
-									<GiCorn size={16} />
-									<span className="ml-2 font-bold text-center">
-										Detect
-									</span>
-								</div>
-							</Button>
+								<Button
+									disabled={status === "RUNNING" || quota == 0}
+									className="bg-custom-green-1 hover:bg-custom-green-2 pl-6 pr-8 py-2 shadow w-full lg:w-56"
+									onClick={handleSubmit}
+									h
+								>
+									<div className="flex flex-row justify-center items-center ">
+										<GiCorn size={16} />
+										<span className="ml-2 font-bold text-center">
+											Detect
+										</span>
+									</div>
+								</Button>
+							</Tooltip>
 						</section>
 					)}
 					{status == "SUCCESS" && (

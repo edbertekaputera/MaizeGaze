@@ -58,7 +58,7 @@ export default function AppRouter() {
 					exact
 					path="/administrator"
 					element={
-						<PrivateRoute requiredRoles={["ADMINISTRATOR"]}>
+						<PrivateRoute admin_only>
 							<AdminHomePage />
 						</PrivateRoute>
 					}
@@ -69,13 +69,7 @@ export default function AppRouter() {
 					exact
 					path="/user"
 					element={
-						<PrivateRoute
-							requiredRoles={[
-								"FREE_USER",
-								"STANDARD_USER",
-								"PREMIUM_USER",
-							]}
-						>
+						<PrivateRoute user_only>
 							<UserHomePage />
 						</PrivateRoute>
 					}
@@ -85,13 +79,7 @@ export default function AppRouter() {
 					exact
 					path="/user/detect"
 					element={
-						<PrivateRoute
-							requiredRoles={[
-								"FREE_USER",
-								"STANDARD_USER",
-								"PREMIUM_USER",
-							]}
-						>
+						<PrivateRoute user_only>
 							<DetectionPage />
 						</PrivateRoute>
 					}

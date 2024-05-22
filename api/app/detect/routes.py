@@ -4,8 +4,8 @@ from celery.result import AsyncResult
 from base64 import encodebytes # type: ignore
 from datetime import date 
 # Local dependencies
-from app.db import DetectionQuota, TypeOfUser
-from app.authentication import roles_required
+from app.db import DetectionQuota
+from app.authentication import permissions_required
 from .task import detect_and_count
 
 # Initialize
@@ -19,7 +19,7 @@ def allowed_file(filename:str):
 
 # Initialize detection task route
 @router.route("/init_detection", methods=["POST"])
-@roles_required(*TypeOfUser.all_users())
+@permissions_required(is_user=True)
 def init_detection() -> dict[str, bool|str]:
     # Get uploaded file
 	if "image" not in request.files:
@@ -32,7 +32,7 @@ def init_detection() -> dict[str, bool|str]:
 	if not allowed_file(file.filename):
 		return {"success": False}
 	# Check user
-	success = DetectionQuota.increment_quota(session['email'])
+	success = DetectionQuota.increment_quota(session['email'], session["detection_quota_limit"])
 	if not success:
 		return {"success": False}
 	# Initialize task
@@ -42,7 +42,7 @@ def init_detection() -> dict[str, bool|str]:
 
 # Retrieve detection task results route
 @router.route("/get_detection_result", methods=["GET"])
-@roles_required(*TypeOfUser.all_users())
+@permissions_required(is_user=True)
 def get_detection_result() -> dict[str, str]:
 	result_id = request.args["result_id"]
 	result = AsyncResult(result_id)
@@ -65,10 +65,10 @@ def get_detection_result() -> dict[str, str]:
 
 # Retrieve detection quota route
 @router.route("/get_detection_quota", methods=["GET"])
-@roles_required(*TypeOfUser.all_users())
+@permissions_required(is_user=True)
 def get_detection_quota() -> dict[str, int]:
 	today = date.today()
 	dq = DetectionQuota.get(user_email=session['email'], month=today.month, year=today.year)
 	if not dq:
-		return {"quota": 25}
-	return {"quota": 25 - dq.quota}
+		return {"quota": session["detection_quota_limit"]}
+	return {"quota":  session["detection_quota_limit"] - dq.quota}

@@ -1,10 +1,10 @@
 # Libraries
 from authlib.integrations.flask_client import OAuth
 from flask_cors import cross_origin
-from flask import session, redirect, request, abort, current_app, Blueprint
+from flask import session, redirect, abort, current_app, Blueprint
 
 # Local dependencies
-from app.db import User, TypeOfUser, db
+from app.db import User, TypeOfUser
 
 # Initialize
 oauth = OAuth() # Used for remote app authentication
@@ -108,7 +108,20 @@ def authorized(provider:str):
 			return 'Github Account does not have verified email. Login failed.'
 
 	# If its a new user, then register as a new free user.
-	User.register_new_user(email, name, email_is_verified=True)
-
+	user = User.register_new_user(email, name, email_is_verified=True)
+	if not user:
+		user = User.get(email)
+	if not user:
+		abort(500)
+		
+	# Get Type
+	user_type = TypeOfUser.get(user.user_type)
+	if not user_type:
+		return redirect(current_app.config["CLIENT_SERVER_URL"] + "/login")
+	
 	session['email'] = email
+	session["type"] = user_type.name
+	session["is_admin"] = user_type.is_admin
+	session["detection_quota_limit"] = user_type.detection_quota_limit
+	session["storage_limit"] = user_type.storage_limit
 	return redirect(current_app.config["CLIENT_SERVER_URL"])

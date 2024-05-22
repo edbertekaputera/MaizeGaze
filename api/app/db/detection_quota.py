@@ -6,8 +6,6 @@ from datetime import date
 # Local dependencies
 from .sqlalchemy import db
 
-DEFAULT_QUOTA = 25
-
 # Views Schema
 class DetectionQuota(db.Model):
 	__tablename__ = "DetectionQuota"
@@ -33,7 +31,7 @@ class DetectionQuota(db.Model):
 		return cls.query.filter_by(user=user_email, month=month, year=year).one_or_none()
 
 	@classmethod
-	def increment_quota(cls, email:str) -> bool:
+	def increment_quota(cls, email:str, limit:int) -> bool:
 		with current_app.app_context():
 			today = date.today()
 			detection_quota = cls.get(email, today.month, today.year)
@@ -43,7 +41,7 @@ class DetectionQuota(db.Model):
 				db.session.add(newViews)
 			# else increment views by 1
 			else:
-				if detection_quota.quota >= DEFAULT_QUOTA:
+				if detection_quota.quota >= limit:
 					return False
 				detection_quota.quota = detection_quota.quota + 1
 			db.session.commit()
