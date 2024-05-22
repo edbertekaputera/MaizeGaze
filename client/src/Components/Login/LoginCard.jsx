@@ -51,6 +51,7 @@ function LoginCard() {
 						placeholder="user@email.com"
 						required={true}
 						type="email"
+						autoComplete="email"
 						onChange={(event) => setEmail(event.target.value)}
 						color={invalidMsg === "" ? "white" : "failure"}
 						helperText={
@@ -68,6 +69,7 @@ function LoginCard() {
 						id="password1"
 						type="password"
 						required={true}
+						autoComplete="current-password"
 						onChange={(event) => setPassword(event.target.value)}
 						color={invalidMsg === "" ? "white" : "failure"}
 						helperText={

@@ -170,7 +170,6 @@ function DetectionPage() {
 									disabled={status === "RUNNING" || quota == 0}
 									className="bg-custom-green-1 hover:bg-custom-green-2 pl-6 pr-8 py-2 shadow w-full lg:w-56"
 									onClick={handleSubmit}
-									h
 								>
 									<div className="flex flex-row justify-center items-center ">
 										<GiCorn size={16} />
