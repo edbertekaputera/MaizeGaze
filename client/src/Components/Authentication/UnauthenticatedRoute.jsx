@@ -47,7 +47,7 @@ const UnAuthenticatedRoute = ({ children }) => {
 	}
 
 	if (authType.type == "anonymous") {
-		return <div className="flex flex-col 2xl:h-screen"> {children}</div>;
+		return children;
 	} else if (authType.is_admin) {
 		return <Navigate to="/administrator" />;
 	} else {
