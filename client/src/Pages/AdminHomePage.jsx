@@ -9,23 +9,7 @@ function AdminHomePage() {
 	const navigate = useNavigate();
 
 	return (
-		<div>
-			<Button
-				onClick={async () => {
-					await axios
-						.post("/api/authentication/logout")
-						.then((res) => {
-							if (res.data.status_code === 200) {
-								navigate("/");
-							}
-						})
-						.catch((error) => {
-							console.log(error);
-						});
-				}}
-			>
-				Logout
-			</Button>
+		<div className="min-h-screen">
 			Welcome {userInfo.name}... <br />
 			Your email is {userInfo.email}, and you are a {userInfo.type}
 		</div>
