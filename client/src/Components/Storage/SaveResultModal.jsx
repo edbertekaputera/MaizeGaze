@@ -96,7 +96,7 @@ function SaveResultModal({ state, setState, file, results, post_save_action }) {
 									/>
 								</div>
 								<div className="flex flex-col gap-1 w-1/2">
-									<Label htmlFor="farm_input">Name</Label>
+									<Label htmlFor="farm_input">Farm</Label>
 									<Select
 										id="farm_input"
 										required

@@ -2,9 +2,10 @@
 import { Navigate, useNavigate } from "react-router-dom";
 import { useState, useEffect, createContext } from "react";
 import axios from "axios";
-import { Spinner } from "flowbite-react";
+import { Footer, Spinner } from "flowbite-react";
 import ResendActivatioNCard from "../Login/ResendActivationCard";
 import NavigationBar from "../NavigationBar";
+import logo from "../../assets/logo.png";
 
 // Context for authentication
 export const AuthContext = createContext();
@@ -96,8 +97,22 @@ const PrivateRoute = ({ admin_only = false, user_only = false, children }) => {
 		}
 		return (
 			<AuthContext.Provider value={{ userInfo, logout }}>
-				<NavigationBar />
-				{children}
+				<div className="flex flex-col">
+					<NavigationBar />
+					{children}
+					<Footer
+						container
+						className="flex flex-row justify-between items-center bg-custom-brown-3 rounded-none gap-2"
+					>
+						{/* <Footer.Brand href="#" src={logo} alt="Flowbite Logo" /> */}
+						<img src={logo} alt="Flowbite Logo" width={32}/>
+						<Footer.Copyright
+							className="text-lg font-bold text-custom-brown-1"
+							by="MaizeGaze"
+							year={2024}
+						/>
+					</Footer>
+				</div>
 			</AuthContext.Provider>
 		);
 	} else if (userInfo.type == "anonymous") {

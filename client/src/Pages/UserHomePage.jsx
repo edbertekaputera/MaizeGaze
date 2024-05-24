@@ -8,7 +8,7 @@ import DropImageInput from "../Components/DropImageInput";
 function UserHomePage() {
 	const { userInfo } = useContext(AuthContext);
 	return (
-		<div>
+		<div className="min-h-screen">
 			Welcome {userInfo.name}... <br />
 			Your email is {userInfo.email}, and you are a {userInfo.type}.
 		</div>
