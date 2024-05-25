@@ -12,7 +12,7 @@ class DetectionResult(db.Model):
 	# attributes
 	id = db.Column(db.String(250), nullable=False, primary_key=True)
 	tassel_count = db.Column(db.Integer(), nullable=False)
-	record_date = db.Column(db.Date(), nullable=False)
+	record_date = db.Column(db.DateTime(), nullable=False)
 	name = db.Column(db.String(250), nullable=False)
 	description = db.Column(db.String(250), nullable=False)
 

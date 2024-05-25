@@ -84,7 +84,9 @@ const PrivateRoute = ({ admin_only = false, user_only = false, children }) => {
 		);
 	}
 
-	if (checkPermission()) {
+	if (userInfo.type == "anonymous") {
+		return <Navigate to="/login" />;
+	} else if (checkPermission()) {
 		if (!userInfo.activated) {
 			return (
 				<AuthContext.Provider value={{ userInfo, logout }}>
@@ -105,7 +107,7 @@ const PrivateRoute = ({ admin_only = false, user_only = false, children }) => {
 						className="flex flex-row justify-between items-center bg-custom-brown-3 rounded-none gap-2"
 					>
 						{/* <Footer.Brand href="#" src={logo} alt="Flowbite Logo" /> */}
-						<img src={logo} alt="Flowbite Logo" width={32}/>
+						<img src={logo} alt="Flowbite Logo" width={32} />
 						<Footer.Copyright
 							className="text-lg font-bold text-custom-brown-1"
 							by="MaizeGaze"
@@ -115,8 +117,6 @@ const PrivateRoute = ({ admin_only = false, user_only = false, children }) => {
 				</div>
 			</AuthContext.Provider>
 		);
-	} else if (userInfo.type == "anonymous") {
-		return <Navigate to="/login" />;
 	} else if (userInfo.is_admin) {
 		return <Navigate to="/administrator" />;
 	} else {
