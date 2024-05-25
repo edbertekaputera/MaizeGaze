@@ -19,18 +19,20 @@ function SaveResultModal({ state, setState, file, results, post_save_action }) {
 	const [showMessageModal, setShowMessageModal] = useState(false);
 
 	useEffect(() => {
-		axios
-			.get("/api/user/farm/query_all_farms_owned")
-			.then((res) => {
-				if (res.status === 200) {
-					setFarms(res.data.farms);
-					setSelectedFarms(res.data.farms[0].name);
-				}
-			})
-			.catch((error) => {
-				console.log(error);
-			});
-	}, []);
+		if (state) {
+			axios
+				.get("/api/user/farm/query_all_farms_owned")
+				.then((res) => {
+					if (res.status === 200) {
+						setFarms(res.data.farms);
+						setSelectedFarms(res.data.farms[0].name);
+					}
+				})
+				.catch((error) => {
+					console.log(error);
+				});
+		}
+	}, [state]);
 
 	const handleSave = (event) => {
 		event.preventDefault();
@@ -61,7 +63,7 @@ function SaveResultModal({ state, setState, file, results, post_save_action }) {
 				alert("Error while saving...");
 			});
 	};
-
+	console.log(selectedFarms);
 	return (
 		<>
 			<MessageModal
