@@ -1,6 +1,6 @@
 # Libraries
 from flask import session, Blueprint, request
-from datetime import date 
+from datetime import datetime
 import json
 from uuid import uuid4
 
@@ -51,7 +51,7 @@ def save() -> dict[str, bool]:
 		"farm_name": request.form["farm_name"],
 		"farm_user": session["email"],
 		"tassel_count": request.form["tassel_count"],
-		"record_date": date.today(),
+		"record_date": datetime.now(),
 		"name": request.form["name"],
 		"description": request.form["description"]
 	}
@@ -75,7 +75,7 @@ def queryResult() -> dict[str, int | str | dict[str, str | int | list[dict[str,f
 	result_json = {
 		"id": result.id,
 		"tassel_count": int(result.tassel_count),
-		"record_date": result.record_date.strftime("%Y-%m-%d"),
+		"record_date": result.record_date.strftime("%Y-%m-%d %H:%M:%S"),
 		"name": result.name,
 		"description": result.description,
 		"farm_name": result.farm_name,

@@ -46,12 +46,9 @@ def remote_login(provider:str):
 	Route to login using different providers; Takes in arguments
 		- provider:str['google', 'github']
 	"""
-	if provider == "google":
-		google = oauth.create_client("google")
-		return google.authorize_redirect(url_for('authentication.oauth.authorized', provider="google", _external=True)) # type: ignore
-	elif provider == "github":
-		github = oauth.create_client("github")
-		return github.authorize_redirect(url_for('authentication.oauth.authorized', provider="github", _external=True))  # type: ignore
+	if provider in ["google", "github"]:
+		client = oauth.create_client(provider)
+		return client.authorize_redirect(url_for('authentication.oauth.authorized', provider=provider, _external=True)) # type: ignore
 	return abort(404)
 
 # Authorized Remote Login Callback
