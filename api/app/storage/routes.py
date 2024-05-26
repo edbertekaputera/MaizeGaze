@@ -139,11 +139,9 @@ def downloadResult() -> Response:
 
 @router.route("/search_result_history", methods=["GET"])
 @permissions_required(is_user=True)
-def searchResultHistory() -> list:
-	results = DetectionResult.queryAllResultHistory()(session["email"])
-
+def searchResultHistory() -> dict[str, list[dict[str, str|int]]]:
+	results = DetectionResult.queryAllResultHistory(session["email"])
 	resultList = []
-
 	for result in results:
 		result_json = {
 		"id": result.id,
