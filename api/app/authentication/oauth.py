@@ -1,7 +1,8 @@
 # Libraries
 from authlib.integrations.flask_client import OAuth
 from flask_cors import cross_origin
-from flask import session, redirect, abort, current_app, Blueprint
+from flask import session, redirect, abort, current_app, Blueprint, url_for
+
 
 # Local dependencies
 from app.db import User, TypeOfUser
@@ -11,31 +12,25 @@ oauth = OAuth() # Used for remote app authentication
 router = Blueprint("oauth", __name__)
 # Note: All routes here will have a prefix of /api/authentication/oauth
 
-# Token getter
-def get_google_oauth_token():
-    return session.get('google_token')
-def get_github_oauth_token():
-    return session.get('github_token')
-
 # Google authentication
-google = oauth.register(
+oauth.register(
 	'google',
-	api_base_url= 'https://www.googleapis.com/oauth2/v1/',
-	request_token_url= None,
 	access_token_url= 'https://accounts.google.com/o/oauth2/token',
+	access_token_params=None,
 	authorize_url= 'https://accounts.google.com/o/oauth2/auth',
-	fetch_token=get_google_oauth_token,
-	client_kwargs={'scope': 'profile email'}
+	authorize_params=None,
+	api_base_url= 'https://www.googleapis.com/oauth2/v1/',
+	client_kwargs={'scope': 'email profile'}
 ) 
 
 # GitHub authentication
-github = oauth.register(
+oauth.register(
 	'github',
-	api_base_url= 'https://api.github.com/',
-	request_token_url= None,
 	access_token_url= 'https://github.com/login/oauth/access_token',
+	access_token_params=None,
 	authorize_url= 'https://github.com/login/oauth/authorize',
-	fetch_token=get_github_oauth_token,
+	authorize_params=None,
+	api_base_url= 'https://api.github.com/',
 	client_kwargs={'scope': 'user:email'}
 ) 
 
@@ -51,10 +46,9 @@ def remote_login(provider:str):
 	Route to login using different providers; Takes in arguments
 		- provider:str['google', 'github']
 	"""
-	if provider == "google":
-		return google.authorize_redirect(current_app.config["GOOGLE_REDIRECT_URI"]) # type: ignore
-	elif provider == "github":
-		return github.authorize_redirect(current_app.config["GITHUB_REDIRECT_URI"]) # type: ignore
+	if provider in ["google", "github"]:
+		client = oauth.create_client(provider)
+		return client.authorize_redirect(url_for('authentication.oauth.authorized', provider=provider, _external=True)) # type: ignore
 	return abort(404)
 
 # Authorized Remote Login Callback
@@ -71,6 +65,8 @@ def authorized(provider:str):
 	
 	# Google provider
 	if provider == "google":
+		# print()# type: ignore
+		google = oauth.create_client("google")
 		token = google.authorize_access_token() # type: ignore
 		if token is None or token.get('access_token') is None:
 			return redirect(current_app.config["CLIENT_SERVER_URL"] + "/login")
@@ -84,6 +80,7 @@ def authorized(provider:str):
 
 	# GitHub provider
 	if provider == "github":
+		github = oauth.create_client("github")
 		token = github.authorize_access_token() # type: ignore
 		if token is None or token.get('access_token') is None:
 			return redirect(current_app.config["CLIENT_SERVER_URL"] + "/login")

@@ -12,7 +12,7 @@ class DetectionResult(db.Model):
 	# attributes
 	id = db.Column(db.String(250), nullable=False, primary_key=True)
 	tassel_count = db.Column(db.Integer(), nullable=False)
-	record_date = db.Column(db.Date(), nullable=False)
+	record_date = db.Column(db.DateTime(), nullable=False)
 	name = db.Column(db.String(250), nullable=False)
 	description = db.Column(db.String(250), nullable=False)
 
@@ -36,8 +36,8 @@ class DetectionResult(db.Model):
 		return cls.query.filter_by(farm_user=email).all()
 	
 	@classmethod
-	def queryResult(cls, email:str, farm_name:str, id:str) -> Self | None:
-		return cls.query.filter_by(farm_user=email, farm_name=farm_name, id=id).one_or_none()
+	def queryResult(cls, farm_user:str, farm_name:str, id:str) -> Self | None:
+		return cls.query.filter_by(farm_user=farm_user, farm_name=farm_name, id=id).one_or_none()
 	
 	@classmethod
 	def save(cls, data:dict) -> bool:
@@ -58,10 +58,12 @@ class DetectionResult(db.Model):
 			with current_app.app_context():
 				for key in results_pk:
 					result = cls.queryResult(**key)
-					cls.query.filter_by(**key).delete()
+					if not result or cls.query.filter_by(**key).delete() == 0:
+						continue
 					list_of_results.append(result)
 				db.session.commit()
-		except:
+		except BaseException as err:
+			print(err)
 			pass
 		return list_of_results
 	
@@ -70,7 +72,8 @@ class DetectionResult(db.Model):
 		list_of_results = []
 		for key in results_pk:
 			result = cls.queryResult(**key)
-			list_of_results.append(result)
+			if result:
+				list_of_results.append(result)
 		return list_of_results
 
 	

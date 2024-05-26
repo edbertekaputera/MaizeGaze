@@ -19,6 +19,7 @@ function DetectionPage() {
 	const [result, setResult] = useState({});
 	const [showSaveModal, setShowSaveModal] = useState(false);
 	const [quota, setQuota] = useState(0);
+	const [showToolTip, setShowToolTip] = useState(false);
 	const navigate = useNavigate();
 
 	useEffect(() => {
@@ -89,7 +90,7 @@ function DetectionPage() {
 	};
 
 	return (
-		<div className="relative h-svh overflow-hidden">
+		<div className="relative overflow-hidden min-h-screen">
 			<LoadingCard show={status === "RUNNING"}>
 				Detecting Maize Tassels...
 			</LoadingCard>
@@ -121,7 +122,7 @@ function DetectionPage() {
 				<GiCorn size={250} />
 			</div>
 
-			<Card className="relative my-6 mx-4 lg:my:10 lg:mx-16 shadow-lg border">
+			<Card className="relative my-6 mx-4 lg:my:10 lg:mx-16 shadow-lg border xl:mb-20">
 				<header className="flex flex-wrap flex-row gap-2 justify-between shadow-b border-b-2 pb-5 border-black">
 					<h1 className="text-4xl font-extrabold">Detect Maize Tassel</h1>
 					<span className="px-4 py-2 bg-custom-brown-3 rounded-lg shadow-md font-semibold">
@@ -161,11 +162,17 @@ function DetectionPage() {
 									</span>
 								</div>
 							</Button>
-							<Tooltip
-								content="You ran out of Detection Quota this month."
-								className={`${quota > 0 && "hidden"} bg-custom-brown-1`}
-								arrow={false}
+							<div
+								className="relative"
+								onMouseEnter={() => setShowToolTip(true)}
+								onMouseLeave={() => setShowToolTip(false)}
 							>
+								<div
+									hidden={quota > 0 || !showToolTip}
+									className="absolute -top-11 lg:-left-12 text-sm lg:w-80 text-center bg-red-500 text-white px-3 py-2 rounded-lg shadow"
+								>
+									You ran out of Detection Quota this month.
+								</div>
 								<Button
 									disabled={status === "RUNNING" || quota == 0}
 									className="bg-custom-green-1 hover:bg-custom-green-2 pl-6 pr-8 py-2 shadow w-full lg:w-56"
@@ -178,7 +185,7 @@ function DetectionPage() {
 										</span>
 									</div>
 								</Button>
-							</Tooltip>
+							</div>
 						</section>
 					)}
 					{status == "SUCCESS" && (

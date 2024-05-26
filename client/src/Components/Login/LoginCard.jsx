@@ -97,7 +97,7 @@ function LoginCard() {
 						className="mt-2 border bg-white border-black hover:bg-gray-100 hover:border-gray-500"
 						color={"white"}
 						href={
-							"http://localhost:5000/api/authentication/oauth/login/google"
+							"/api/authentication/oauth/login/google"
 						}
 					>
 						<FcGoogle size={20} className="mr-2" />
@@ -108,7 +108,7 @@ function LoginCard() {
 						className="mt-2 border bg-white border-black hover:bg-gray-100 hover:border-gray-500"
 						color={"white"}
 						href={
-							"http://localhost:5000/api/authentication/oauth/login/github"
+							"/api/authentication/oauth/login/github"
 						}
 					>
 						<FaGithub size={20} className="mr-2" />

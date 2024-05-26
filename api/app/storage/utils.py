@@ -1,6 +1,7 @@
 # Libraries
 import os
 from werkzeug.datastructures import FileStorage
+import zipfile
 from PIL import Image
 import cv2
 import numpy as np
@@ -34,6 +35,17 @@ class UserDirectory():
 		return total_size
 	
 	def save(self, farm_name:str, id:str, image:FileStorage, annotations:list[dict[str, float]]) -> bool:
+		"""Saves detection result files into bucket storage
+
+		Args:
+			farm_name (str): farm name
+			id (str): detection result id
+			image (FileStorage): image passed through request.
+			annotations (list[dict[str, float]]): list of annotations.
+
+		Returns:
+			bool: success.
+		"""
 		image_pil = Image.open(BytesIO(image.stream.read()))
 		# Get image size
 		image_bytes = BytesIO()
@@ -55,18 +67,41 @@ class UserDirectory():
 			return False
 		return True
 	
-	# Convert Image to base64 bytes:
+	def delete(self, result:DetectionResult) -> bool:
+		"""Deletes detection result files in bucket storage
+
+		Args:
+			result (DetectionResult): DetectionResult instance
+
+		Returns:
+			bool: success
+		"""
+		try:
+			# Delete image
+			image_path = os.path.join(self.__user_directory, "images", f"{result.farm_name}_{result.id}.jpg")
+			os.remove(image_path)		
+			# Delete txt
+			txt_path = os.path.join(self.__user_directory, "labels", f"{result.farm_name}_{result.id}.txt")
+			os.remove(txt_path)
+		except BaseException as err:
+			print(err)
+			return False
+		return True
+	
 	def convert_img_to_bytes(self, img:Image.Image) -> str:
+		"""Converts image to base64 bytes"""
 		img_bytes = BytesIO()
 		img.save(img_bytes, format="PNG")
 		return encodebytes(img_bytes.getvalue()).decode("ascii")
 	
 	def retrieveImage(self, result:DetectionResult) -> Image.Image:
+		"""Retrieves image (PIL.Image.Image) given result (DetectionResult)."""
 		path = os.path.join(self.__user_directory, "images", f"{result.farm_name}_{result.id}.jpg")
 		img = Image.open(path)
 		return img
 	
 	def retrieveAnnotations(self, result:DetectionResult) -> list[dict[str, float]]:
+		"""Retrieves annotations given result (DetectionResult)."""
 		path = os.path.join(self.__user_directory, "labels", f"{result.farm_name}_{result.id}.txt")
 		list_of_annots = []
 		with open(path, "r") as f:
@@ -85,6 +120,7 @@ class UserDirectory():
 		return list_of_annots
 	
 	def box_label(self, image:np.ndarray, box:dict[str,float], label:str="", color=(256, 0, 256), txt_color=(255, 255, 255)):
+		"""Annotates an image with a given detection box"""
 		lw = max(round(sum(image.shape) / 2 * 0.002), 2)
 		p1 = ( int((box["x"] - 0.5 * box["width"]) * image.shape[1]), int((box["y"] - 0.5 * box["height"]) * image.shape[0]) )
 		p2 = ( int((box["x"] + 0.5 * box["width"]) * image.shape[1]), int((box["y"] + 0.5 * box["height"]) * image.shape[0]) )
@@ -103,6 +139,17 @@ class UserDirectory():
 					lineType=cv2.LINE_AA)
 			
 	def retrieveResource(self, result:DetectionResult) -> dict[str, str | list[dict[str,float]]]:
+		"""Retrieves detection result files from bucket storage
+
+		Args:
+			result (DetectionResult): Detection Result instance.
+
+		Returns:
+			dict[str, str | list[dict[str,float]]]: dictionary containing 
+				- original_image: original image base64 bytes,
+				- annotated_image: annotated image base64 bytes,
+				- annotations: list of annotations.
+		"""
 		img = self.retrieveImage(result)
 		annotations = self.retrieveAnnotations(result)
 		base64_img = self.convert_img_to_bytes(img)
@@ -119,7 +166,27 @@ class UserDirectory():
 			"annotated_image": base64_annotated_img,
 			"annotations": annotations
 		}
+	
+	def downloadZipped(self, results:list[DetectionResult]) -> BytesIO:
+		"""Reads detection result files a zip file buffer
 
+		Args:
+			results (list[DetectionResult]): list of Detection Result instances
+
+		Returns:
+			BytesIO: Zip File Buffer
+		"""
+		zip_buffer = BytesIO()
+		with zipfile.ZipFile(zip_buffer, mode="w") as zip_file:
+			# Directories
+			zip_file.writestr("images/", "")
+			zip_file.writestr("labels/", "")
+			for r in results:
+				image_path = os.path.join(self.__user_directory, "images", f"{r.farm_name}_{r.id}.jpg")
+				zip_file.write(image_path, f"images/{r.farm_name}_{r.id}.jpg")
+				txt_path = os.path.join(self.__user_directory, "labels", f"{r.farm_name}_{r.id}.txt")	
+				zip_file.write(txt_path, f"labels/{r.farm_name}_{r.id}.txt")
+		return zip_buffer
 
 	
 

@@ -95,7 +95,7 @@ export default function AppRouter() {
 				/> */}
 
 				{/* Other routes */}
-				{/* <Route exact path="/test" element={<TestPage />} /> */}
+				<Route path="*" element={<HomePage />} />
 			</Routes>
 		</BrowserRouter>
 	);

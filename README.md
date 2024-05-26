@@ -40,8 +40,10 @@ CLIENT_SERVER_URL = http://localhost:5173
 # Database
 DATABASE_URL = sqlite:///database.db
 
-# Redis
-REDIS_URL = redis://localhost:6379
+# Redis Session
+REDIS_SESSION_URL = redis://localhost:6379/0
+# Redis Broker
+REDIS_BROKER_URL = redis://localhost:6379/1
 
 # Google OAuth
 GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID'

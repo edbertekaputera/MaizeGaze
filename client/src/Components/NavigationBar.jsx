@@ -68,7 +68,6 @@ export default function NavigationBar() {
 							Logout
 						</Dropdown.Item>
 					</Dropdown>
-					<Navbar.Toggle />
 				</div>
 			</Navbar>
 			{/* Drawer */}
