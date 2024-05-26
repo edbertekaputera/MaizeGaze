@@ -88,3 +88,24 @@ def queryResult() -> dict[str, int | str | dict[str, str | int | list[dict[str,f
 
 	return {"status_code": 200, "result": result_json}
 
+@router.route("/search_result_history", methods=["GET"])
+@permissions_required(is_user=True)
+def searchResultHistory() -> list:
+	results = DetectionResult.queryAllResultHistory()(session["email"])
+
+	resultList = []
+
+	for result in results:
+		result_json = {
+		"id": result.id,
+		"tassel_count": int(result.tassel_count),
+		"record_date": result.record_date.strftime("%Y-%m-%d"),
+		"name": result.name,
+		"description": result.description,
+		"farm_name": result.farm_name,
+		"farm_user": result.farm_user
+		}
+
+		resultList.append(result_json)
+
+	return {"result": resultList}
