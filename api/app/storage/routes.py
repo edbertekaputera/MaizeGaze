@@ -111,10 +111,10 @@ def deleteResults() -> dict[str, bool]:
 
 	return {"success": (len(results) == len(list_of_results) and success_flag)}
 
-@router.route("/download_results", methods=["GET"])
+@router.route("/download_results", methods=["POST"])
 @permissions_required(is_user=True)
 def downloadResult() -> Response:
-	result_pk = json.loads(request.args["results_pk"])
+	result_pk = request.get_json()["results_pk"]
 	list_of_results = []
 	for result in result_pk:
 		list_of_results.append({
@@ -130,6 +130,8 @@ def downloadResult() -> Response:
 	# Initialize user directory
 	user_directory = UserDirectory()
 	zip_buffer = user_directory.downloadZipped(results)
+	zip_buffer.seek(0)
+	# Send file
 	return send_file(
 		zip_buffer,
 		mimetype="application/zip",
@@ -146,7 +148,7 @@ def searchResultHistory() -> dict[str, list[dict[str, str|int]]]:
 		result_json = {
 		"id": result.id,
 		"tassel_count": int(result.tassel_count),
-		"record_date": result.record_date.strftime("%Y-%m-%d"),
+		"record_date": result.record_date.strftime("%Y-%m-%d %H:%M:%S"),
 		"name": result.name,
 		"description": result.description,
 		"farm_name": result.farm_name,
@@ -156,3 +158,10 @@ def searchResultHistory() -> dict[str, list[dict[str, str|int]]]:
 		resultList.append(result_json)
 
 	return {"result": resultList}
+
+@router.route("/get_storage_size", methods=["GET"])
+@permissions_required(is_user=True)
+def get_storage_size() -> dict[str, float | int]:
+	user_directory = UserDirectory()
+	used_storage_size = user_directory.get_size()
+	return {"status_code": 200, "storage_size" : used_storage_size}
