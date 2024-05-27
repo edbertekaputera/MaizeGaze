@@ -34,6 +34,9 @@ class UserDirectory():
 				total_size += self.get_directory_size(entry.path)
 		return total_size
 	
+	def get_size(self) -> int:
+		return self.__size
+	
 	def save(self, farm_name:str, id:str, image:FileStorage, annotations:list[dict[str, float]]) -> bool:
 		"""Saves detection result files into bucket storage
 

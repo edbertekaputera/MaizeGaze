@@ -10,6 +10,7 @@ import AdminHomePage from "./Pages/AdminHomePage";
 import ActivateEmailPage from "./Pages/ActivateEmailPage";
 import NavigationBar from "./Components/NavigationBar";
 import DetectionPage from "./Pages/DetectionPage";
+import ResultHistoryPage from "./Pages/ResultHistoryPage";
 
 export default function AppRouter() {
 	return (
@@ -81,6 +82,16 @@ export default function AppRouter() {
 					element={
 						<PrivateRoute user_only>
 							<DetectionPage />
+						</PrivateRoute>
+					}
+				/>
+
+				<Route
+					exact
+					path="/user/result_history"
+					element={
+						<PrivateRoute user_only>
+							<ResultHistoryPage />
 						</PrivateRoute>
 					}
 				/>

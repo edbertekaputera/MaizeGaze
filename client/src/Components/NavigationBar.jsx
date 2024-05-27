@@ -8,7 +8,7 @@ import {
 } from "flowbite-react";
 import { RiMenu2Fill } from "react-icons/ri";
 import { GiCorn } from "react-icons/gi";
-import { MdLogout, MdSpaceDashboard } from "react-icons/md";
+import { MdLogout, MdSpaceDashboard, MdOutlineWorkHistory } from "react-icons/md";
 import { LuUserCircle2 } from "react-icons/lu";
 
 import logo from "../assets/full_logo.png";
@@ -26,6 +26,7 @@ export default function NavigationBar() {
 		FREE_USER: [
 			{ icon: MdSpaceDashboard, link: "/user", name: "Dashboard" },
 			{ icon: GiCorn, link: "/user/detect", name: "Detect and Count" },
+			{ icon: MdOutlineWorkHistory, link: "/user/result_history", name: "Result History" },
 		],
 	};
 
@@ -41,7 +42,11 @@ export default function NavigationBar() {
 				Are you sure you want to log out?
 			</ConfirmationModal>
 			{/* Navbar */}
-			<Navbar fluid rounded className="relative bg-custom-green-3 shadow z-10">
+			<Navbar
+				fluid
+				rounded
+				className="relative bg-custom-green-3 shadow z-10"
+			>
 				<RiMenu2Fill
 					size={40}
 					className="ml-2 hover:bg-gray-200 p-1 rounded-lg"
@@ -51,7 +56,16 @@ export default function NavigationBar() {
 					<img src={logo} width={180} />
 				</Navbar.Brand>
 				<div className="flex md:order-2">
-					<Dropdown arrowIcon={false} inline label={<LuUserCircle2 size={48} className="mr-2 hover:bg-gray-200 p-1 rounded-lg"/>}>
+					<Dropdown
+						arrowIcon={false}
+						inline
+						label={
+							<LuUserCircle2
+								size={48}
+								className="mr-2 hover:bg-gray-200 p-1 rounded-lg"
+							/>
+						}
+					>
 						<Dropdown.Header>
 							<span className="block text-sm">{userInfo.name}</span>
 							<span className="block truncate text-sm font-medium">
