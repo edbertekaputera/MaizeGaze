@@ -31,48 +31,50 @@ function ViewResultModal({ state, setState, id, farm_name }) {
 	});
 
 	useEffect(() => {
-		axios
-			.get(`/api/storage/query_result`, {
-				params: {
-					id: id,
-					farm_name: farm_name,
-				},
-			})
-			.then((res) => {
-				if (res.data.status_code == 200) {
-					const splitted = res.data.result.record_date.split(" ");
-					const splitted_date = splitted[0].split("-");
-					const splitted_time = splitted[1].split(":");
-					const date_obj = new Date(
-						splitted_date[0],
-						parseInt(splitted_date[1]) - 1,
-						splitted_date[2],
-						splitted_time[0],
-						splitted_time[1],
-						splitted_time[2]
-					);
-					setData((prev) => ({
-						...prev,
-						tassel_count: res.data.result.tassel_count,
-						record_date: date_obj,
-						name: res.data.result.name,
-						description: res.data.result.description,
-						original_image: res.data.result.original_image,
-						annotated_image: res.data.result.annotated_image,
-						annotations: res.data.result.annotations,
-					}));
-				} else {
-					console.log(res.data.status_code, res.data.message);
-					alert(res.data.message);
-					setState(false);
-				}
-			})
-			.catch((error) => {
-				console.log(error);
-				alert("Error while fetching...");
-			})
-			.then(() => setIsLoading(false));
-	}, []);
+		if (state && data.name === "") {
+			axios
+				.get(`/api/storage/query_result`, {
+					params: {
+						id: id,
+						farm_name: farm_name,
+					},
+				})
+				.then((res) => {
+					if (res.data.status_code == 200) {
+						const splitted = res.data.result.record_date.split(" ");
+						const splitted_date = splitted[0].split("-");
+						const splitted_time = splitted[1].split(":");
+						const date_obj = new Date(
+							splitted_date[0],
+							parseInt(splitted_date[1]) - 1,
+							splitted_date[2],
+							splitted_time[0],
+							splitted_time[1],
+							splitted_time[2]
+						);
+						setData((prev) => ({
+							...prev,
+							tassel_count: res.data.result.tassel_count,
+							record_date: date_obj,
+							name: res.data.result.name,
+							description: res.data.result.description,
+							original_image: res.data.result.original_image,
+							annotated_image: res.data.result.annotated_image,
+							annotations: res.data.result.annotations,
+						}));
+					} else {
+						console.log(res.data.status_code, res.data.message);
+						alert(res.data.message);
+						setState(false);
+					}
+				})
+				.catch((error) => {
+					console.log(error);
+					alert("Error while fetching...");
+				})
+				.then(() => setIsLoading(false));
+		}
+	}, [state]);
 
 	const handleDownload = () => {
 		let data = {
@@ -211,13 +213,11 @@ function ViewResultModal({ state, setState, id, farm_name }) {
 				<div className="rounded shadow-md">
 					<Modal.Header></Modal.Header>
 					<Modal.Body>
-						<LoadingCard show={isLoading}>
-							Loading Image...
-						</LoadingCard>
+						<LoadingCard show={isLoading}>Loading Image...</LoadingCard>
 						<div className="p-5">
 							<div className="flex justify-center">
 								<img
-									className="max-h-1/2 rounded-sm"
+									className="max-h-138 rounded-sm"
 									src={"data:image/png;base64," + data.annotated_image}
 									alt="Annotated Image"
 								/>
@@ -268,7 +268,7 @@ function ViewResultModal({ state, setState, id, farm_name }) {
 										<span className="ml-2">{farm_name}</span>
 									</div>
 									<div className="flex items-center ml-auto">
-										<span>{format(data.record_date, "KK:mm a")}</span>
+										<span>{format(data.record_date, "HH:mm:ss")}</span>
 									</div>
 								</div>
 								<div className="flex flex-wrap mt-5 items-center">
