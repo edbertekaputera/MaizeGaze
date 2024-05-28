@@ -373,14 +373,15 @@ function ResultHistoryPage() {
 							<h2 className="font-bold text-lg">Storage used</h2>
 							<span className="ml-1 font-bold text-green-900">
 								{formatBytes(usedStorageSize)} /{" "}
-								{userInfo.storage_limit} GB ({" "}
-								{(
+								{formatBytes(
+									userInfo.storage_limit * Math.pow(1024, 2)
+								)}
+								{` (${(
 									Math.round(
 										(10000 * usedStorageSize) /
-											(userInfo.storage_limit * Math.pow(1024, 3))
+											(userInfo.storage_limit * Math.pow(1024, 2))
 									) / 100
-								).toFixed(2)}
-								% )
+								).toFixed(2)}%)`}
 							</span>
 						</span>
 						<Progress
@@ -389,7 +390,7 @@ function ResultHistoryPage() {
 							progress={
 								Math.round(
 									(10000 * usedStorageSize) /
-										(userInfo.storage_limit * Math.pow(1024, 3))
+										(userInfo.storage_limit * Math.pow(1024, 2))
 								) / 100
 							}
 							size="xl"

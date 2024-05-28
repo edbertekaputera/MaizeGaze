@@ -13,7 +13,7 @@ from flask import current_app, session
 class UserDirectory():
 	def __init__(self) -> None:
 		self.__user_directory = os.path.join(current_app.config["LOCAL_STORAGE_PATH"], session["email"])
-		self.__storage_limit = session["storage_limit"] * 1024 * 1024 * 1024
+		self.__storage_limit = session["storage_limit"] * 1024 * 1024
 		
 		if not os.path.isdir(self.__user_directory):
 			os.mkdir(self.__user_directory)
@@ -29,6 +29,8 @@ class UserDirectory():
 		total_size = 0
 		for entry in os.scandir(path):
 			if entry.is_file():
+				if entry.name == ".DS_Store":
+					continue
 				total_size += entry.stat().st_size
 			elif entry.is_dir():
 				total_size += self.get_directory_size(entry.path)
