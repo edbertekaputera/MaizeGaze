@@ -9,10 +9,12 @@ from io import BytesIO
 from base64 import encodebytes
 from app.db import DetectionResult
 from flask import current_app, session
+from hashlib import sha256
 
 class UserDirectory():
 	def __init__(self) -> None:
-		self.__user_directory = os.path.join(current_app.config["LOCAL_STORAGE_PATH"], session["email"])
+		hashed_email = sha256(session["email"].encode('utf-8')).hexdigest()
+		self.__user_directory = os.path.join(current_app.config["LOCAL_STORAGE_PATH"], hashed_email)
 		self.__storage_limit = session["storage_limit"] * 1024 * 1024
 		
 		if not os.path.isdir(self.__user_directory):
