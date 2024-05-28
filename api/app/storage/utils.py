@@ -9,11 +9,13 @@ from io import BytesIO
 from base64 import encodebytes
 from app.db import DetectionResult
 from flask import current_app, session
+from hashlib import sha256
 
 class UserDirectory():
 	def __init__(self) -> None:
-		self.__user_directory = os.path.join(current_app.config["LOCAL_STORAGE_PATH"], session["email"])
-		self.__storage_limit = session["storage_limit"] * 1024 * 1024 * 1024
+		hashed_email = sha256(session["email"].encode('utf-8')).hexdigest()
+		self.__user_directory = os.path.join(current_app.config["LOCAL_STORAGE_PATH"], hashed_email)
+		self.__storage_limit = session["storage_limit"] * 1024 * 1024
 		
 		if not os.path.isdir(self.__user_directory):
 			os.mkdir(self.__user_directory)
@@ -29,10 +31,15 @@ class UserDirectory():
 		total_size = 0
 		for entry in os.scandir(path):
 			if entry.is_file():
+				if entry.name == ".DS_Store":
+					continue
 				total_size += entry.stat().st_size
 			elif entry.is_dir():
 				total_size += self.get_directory_size(entry.path)
 		return total_size
+	
+	def get_size(self) -> int:
+		return self.__size
 	
 	def save(self, farm_name:str, id:str, image:FileStorage, annotations:list[dict[str, float]]) -> bool:
 		"""Saves detection result files into bucket storage

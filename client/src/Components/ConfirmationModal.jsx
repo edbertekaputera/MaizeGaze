@@ -6,7 +6,7 @@ function ConfirmationModal({ state, setState, action, icon, children }) {
 		<Modal
 			show={state}
 			size="md"
-			onClose={() => setOpenModal(setState)}
+			onClose={() => setState(false)}
 			popup
 		>
 			<div className="rounded shadow-md">
