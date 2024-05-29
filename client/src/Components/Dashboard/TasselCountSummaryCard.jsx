@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Card, Select } from "flowbite-react";
+import DoubleDatePicker from "../DoubleDatePicker";
 import {
 	isThisMonth,
 	isThisQuarter,
@@ -12,7 +13,12 @@ import {
 function TasselCountSummaryCard({ className }) {
 	const [data, setData] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
-	const [selectedFarm, setSelectedFarm] = useState("all");
+	const [filter, setFilter] = useState({
+		farm_name: "all",
+		startDate: -1,
+		endDate: new Date(),
+	});
+
 	const [farm, setFarm] = useState([]);
 
 	useEffect(() => {
@@ -59,7 +65,7 @@ function TasselCountSummaryCard({ className }) {
 		return data.reduce((total, result) => {
 			return (total =
 				isThisWeek(result.record_date) &&
-				(selectedFarm == "all" || selectedFarm == result.farm_name)
+				(filter.farm_name == "all" || filter.farm_name == result.farm_name)
 					? total + result.tassel_count
 					: total);
 		}, 0);
@@ -69,7 +75,7 @@ function TasselCountSummaryCard({ className }) {
 		return data.reduce((total, result) => {
 			return (total =
 				isThisMonth(result.record_date) &&
-				(selectedFarm == "all" || selectedFarm == result.farm_name)
+				(filter.farm_name == "all" || filter.farm_name == result.farm_name)
 					? total + result.tassel_count
 					: total);
 		}, 0);
@@ -79,7 +85,7 @@ function TasselCountSummaryCard({ className }) {
 		return data.reduce((total, result) => {
 			return (total =
 				isThisQuarter(result.record_date) &&
-				(selectedFarm == "all" || selectedFarm == result.farm_name)
+				(filter.farm_name == "all" || filter.farm_name == result.farm_name)
 					? total + result.tassel_count
 					: total);
 		}, 0);
@@ -89,7 +95,7 @@ function TasselCountSummaryCard({ className }) {
 		return data.reduce((total, result) => {
 			return (total =
 				isThisYear(result.record_date) &&
-				(selectedFarm == "all" || selectedFarm == result.farm_name)
+				(filter.farm_name == "all" || filter.farm_name == result.farm_name)
 					? total + result.tassel_count
 					: total);
 		}, 0);
@@ -97,7 +103,9 @@ function TasselCountSummaryCard({ className }) {
 
 	const getFilteredData = () => {
 		return data.filter((result) => {
-			return selectedFarm == "all" || selectedFarm == result.farm_name;
+			return (
+				filter.farm_name == "all" || filter.farm_name == result.farm_name
+			);
 		});
 	};
 
@@ -115,20 +123,20 @@ function TasselCountSummaryCard({ className }) {
 
 	return (
 		<>
-			<Card
-				className={
-					"relative my-6 mx-4 lg:my:10 lg:mx-16 shadow-lg border xl:mb-20 " +
-					className
-				}
-			>
-				<header className="flex flex-wrap flex-row gap-2 justify-between shadow-b border-b-2 pb-5 border-black">
-					<h1 className="text-4xl font-extrabold">Tassel Count Summary</h1>
+			<Card className={"shadow-lg border " + className}>
+				<header className="flex flex-wrap flex-row gap-2 justify-end shadow-b pb-2 border-black">
+					{/* <h1 className="text-4xl font-extrabold">Tassel Count Summary</h1> */}
 					<Select
 						id="farm_input"
-						value={selectedFarm}
+						value={filter.farm_name}
 						color="success"
 						className="shadow drop-shadow-md rounded-lg hover:outline outline-custom-green-2"
-						onChange={(ev) => setSelectedFarm(ev.target.value)}
+						onChange={(ev) =>
+							setFilter((prev) => ({
+								...prev,
+								farm_name: ev.target.value,
+							}))
+						}
 					>
 						<option key={"all"} value={"all"}>
 							All
