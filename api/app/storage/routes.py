@@ -165,3 +165,19 @@ def get_storage_size() -> dict[str, float | int]:
 	user_directory = UserDirectory()
 	used_storage_size = user_directory.get_size()
 	return {"status_code": 200, "storage_size" : used_storage_size}
+
+@router.route("/query_daily_statistics", methods=["GET"])
+@permissions_required(is_user=True)
+def queryDailyStatistics() -> dict[str, list[dict[str, str|int]]]:
+	results = DetectionResult.queryDailyStatistics(session["email"])
+	resultList = []
+	for result in results:
+		print(result)
+		result_json = {
+		"tassel_count": int(result.total_tassel_count),
+		"record_date": result.record_date,
+		"farm_name": result.farm_name,
+		}
+		resultList.append(result_json)
+
+	return {"result": resultList}
