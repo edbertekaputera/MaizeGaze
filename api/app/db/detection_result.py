@@ -76,8 +76,13 @@ class DetectionResult(db.Model):
 				list_of_results.append(result)
 		return list_of_results
 
-	
- 
+	@classmethod
+	def queryDailyStatistics(cls, email:str) -> list:
+		return db.session.query(cls.farm_name, db.func.date(cls.record_date).label("record_date"), db.func.sum(cls.tassel_count).label("total_tassel_count")) \
+			.filter_by(farm_user=email) \
+			.group_by(cls.farm_name, db.func.date(cls.record_date)) \
+			.all()
+		
  
  
 	
