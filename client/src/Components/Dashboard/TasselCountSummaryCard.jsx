@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef  } from "react";
 import axios from "axios";
 import { Card, Select } from "flowbite-react";
 import DoubleDatePicker from "../DoubleDatePicker";
@@ -8,7 +8,11 @@ import {
 	isThisWeek,
 	isThisYear,
 	isToday,
+	subDays,
+    eachDayOfInterval,
+    format
 } from "date-fns";
+import Chart from "chart.js/auto";
 
 function TasselCountSummaryCard({ className }) {
 	const [data, setData] = useState([]);
@@ -20,6 +24,8 @@ function TasselCountSummaryCard({ className }) {
 	});
 
 	const [farm, setFarm] = useState([]);
+	const chartRef = useRef(null); 
+    const chartInstance = useRef(null);
 
 	useEffect(() => {
 		axios
@@ -121,6 +127,69 @@ function TasselCountSummaryCard({ className }) {
 		).toFixed(2);
 	};
 
+	const getchartData = (startDate, endDate) => {
+        const daysArray = eachDayOfInterval({ start: startDate, end: endDate });
+
+        const formattedDaysArray = daysArray.map((day) => format(day, "yyyy-MM-dd"));
+        const countsByDate = Object.fromEntries(
+            formattedDaysArray.map((date) => [date, 0])
+        );
+
+        getFilteredData().forEach((record) => {
+            const formattedDate = format(record.record_date, "yyyy-MM-dd");
+            if (formattedDate in countsByDate) {
+                countsByDate[formattedDate] = record.tassel_count;
+            }
+        });
+
+        return {
+            labels: formattedDaysArray,
+            datasets: [
+                {
+                    label: "Tassel Count",
+                    data: Object.values(countsByDate),
+                    backgroundColor: "rgba(54, 162, 235, 0.6)",
+                },
+            ],
+        };
+    };
+
+	useEffect(() => {
+        if (chartInstance.current) {
+            chartInstance.current.destroy(); 
+        }
+
+        const ctx = chartRef.current.getContext("2d");
+
+		const startDate = subDays(new Date(), 6) // put start date here
+		const endDate = new Date() // put end date here
+
+        const chartData = getchartData(startDate,endDate);
+
+        chartInstance.current = new Chart(ctx, {
+            type: "bar",
+            data: chartData,
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                    },
+                },
+            },
+        });
+
+		const resizeChart = () => {
+            chartInstance.current.resize();
+        };
+        window.addEventListener("resize", resizeChart);
+
+        return () => {
+            if (chartInstance.current) {
+                chartInstance.current.destroy();
+            }
+        };
+    }, [data, selectedFarm]);
+
 	return (
 		<>
 			<Card className={"shadow-lg border " + className}>
@@ -148,51 +217,50 @@ function TasselCountSummaryCard({ className }) {
 						))}
 					</Select>
 				</header>
-				<div className="flex flex-col justify-center mb-2 items-center">
-					<section className="grid grid-cols-2 sm:grid-cols-4 divide-custom-green-1 shadow-lg drop-shadow-sm bg-custom-green-3">
-						<div className="flex flex-col justify-center items-center px-6 py-2 shadow-lg outline-gray-900 border-b sm:border-b-0 border-r border-black">
-							<h2 className="text-xl mb-3 font-bold drop-shadow-sm">
-								Week
-							</h2>
-							<span className="text-3xl font-semibold text-custom-green-1">
-								{getThisWeekTotal()}
-							</span>
-						</div>
-						<div className="flex flex-col justify-center items-center px-6 py-2 shadow-lg outline-gray-900 border-b sm:border-b-0 sm:border-r border-black">
-							<h2 className="text-xl mb-3 font-bold drop-shadow-sm">
-								Month
-							</h2>
-							<span className="text-3xl font-semibold text-custom-green-1">
-								{getThisMonthTotal()}
-							</span>
-						</div>
-						<div className="flex flex-col justify-center items-center px-6 py-2 shadow-lg outline-gray-900 border-r border-black">
-							<h2 className="text-xl mb-3 font-bold drop-shadow-sm">
-								Quarter
-							</h2>
-							<span className="text-3xl font-semibold text-custom-green-1">
-								{getThisQuarterTotal()}
-							</span>
-						</div>
-						<div className="flex flex-col justify-center items-center px-6 py-2 shadow-lg outline-gray-900">
-							<h2 className="text-xl mb-3 font-bold drop-shadow-sm">
-								Year
-							</h2>
-							<span className="text-3xl font-semibold text-custom-green-1">
-								{getThisYearTotal()}000
-							</span>
-						</div>
-					</section>
-					<section className="flex flex-col w-full mt-6">
-						<span className="text-lg">Daily Average :</span>
-						<span className="text-2xl font-bold">
-							{getDailyAverage()}
+				<section className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="bg-white shadow p-4 rounded-lg flex flex-col justify-center items-center text-center">
+                        <h2 className="text-xl mb-3 font-bold drop-shadow-sm">
+							Week
+						</h2>
+                        <span className="text-3xl font-semibold text-custom-green-1">
+							{getThisWeekTotal()}
 						</span>
-					</section>
-					<section className="">
-						{/* PUT CHART HERE (USE getFilteredData() for the data) */}
-					</section>
-				</div>
+                    </div>
+                        <div className="bg-white shadow p-4 rounded-lg flex flex-col justify-center items-center text-center">
+                        <h2 className="text-xl mb-3 font-bold drop-shadow-sm">
+							Month
+						</h2>
+                        <span className="text-3xl font-semibold text-custom-green-1">
+								{getThisMonthTotal()}
+						</span>
+                    </div>
+                        <div className="bg-white shadow p-4 rounded-lg flex flex-col justify-center items-center text-center">
+                        <h2 className="text-xl mb-3 font-bold drop-shadow-sm">
+							Quarter
+						</h2>
+                        <span className="text-3xl font-semibold text-custom-green-1">
+								{getThisQuarterTotal()}
+						</span>
+                    </div>
+                        <div className="bg-white shadow p-4 rounded-lg flex flex-col justify-center items-center text-center">
+                        <h2 className="text-xl mb-3 font-bold drop-shadow-sm">
+							Year
+						</h2>
+						<span className="text-3xl font-semibold text-custom-green-1">
+							{getThisYearTotal()}000
+						</span>
+                    </div>
+                </section>
+
+				<section className="flex flex-col w-full mt-6">
+					<span className="text-lg">Daily Average :</span>
+					<span className="text-2xl font-bold">
+						{getDailyAverage()}
+					</span>
+				</section>
+				<section className="mt-8 w-full">
+					<canvas ref={chartRef} />
+				</section>
 			</Card>
 		</>
 	);
