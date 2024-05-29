@@ -5,7 +5,7 @@ import PrivateRoute from "./Components/Authentication/PrivateRoute";
 import LoginPage from "./Pages/LoginPage";
 import SignupPage from "./Pages/SignupPage";
 import HomePage from "./Pages/HomePage";
-import UserHomePage from "./Pages/UserHomePage";
+import UserDashboard from "./Pages/UserDashboard";
 import AdminHomePage from "./Pages/AdminHomePage";
 import ActivateEmailPage from "./Pages/ActivateEmailPage";
 import NavigationBar from "./Components/NavigationBar";
@@ -71,7 +71,7 @@ export default function AppRouter() {
 					path="/user"
 					element={
 						<PrivateRoute user_only>
-							<UserHomePage />
+							<UserDashboard />
 						</PrivateRoute>
 					}
 				/>
