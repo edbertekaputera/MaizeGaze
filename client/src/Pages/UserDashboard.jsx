@@ -38,10 +38,7 @@ function UserDashboard() {
 						and experience the future of agriculture!
 					</p>
 					<div class="flex flex-col space-y-4 sm:flex-row sm:justify-center sm:space-y-0 sm:gap-x-4">
-						<Button
-							className="bg-custom-green-2 hover:bg-custom-green-1 focus:ring-4 focus:ring-custom-green-3"
-							onClick={() => navigate("/user/detect")}
-						>
+						<Button className="bg-custom-green-2 hover:bg-custom-green-1 focus:ring-4 focus:ring-custom-green-3">
 							<div className="flex flex-row justify-center items-center align-middle py-1 px-1 rounded-lg ">
 								<span className="text-lg text-white font-medium">
 									Start Detecting
