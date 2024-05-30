@@ -15,16 +15,16 @@ function UserDashboard() {
 
 	return (
 		<div className="min-h-screen flex flex-col gap-y-5">
-			<section class="relative bg-gray-900 bg-blend-multiply overflow-y-hidden">
+			<section className="relative bg-gray-900 bg-blend-multiply overflow-y-hidden">
 				<img
 					src={background_jumbotron}
 					className="z-0 absolute w-full opacity-20"
 				/>
-				<div class="relative z-10 px-4 mx-auto max-w-screen-xl text-center py-12 lg:py-24">
-					<h1 class="mb-4 text-4xl font-extrabold tracking-tight leading-none text-white md:text-5xl lg:text-6xl">
+				<div className="relative z-10 px-4 mx-auto max-w-screen-xl text-center py-12 lg:py-24">
+					<h1 className="mb-4 text-4xl font-extrabold tracking-tight leading-none text-white md:text-5xl lg:text-6xl">
 						Welcome {userInfo.name}!
 					</h1>
-					<p class="mb-8 text-lg font-normal text-gray-300 lg:text-xl sm:px-16 lg:px-48">
+					<p className="mb-8 text-lg font-normal text-gray-300 lg:text-xl sm:px-16 lg:px-48">
 						Here at{" "}
 						<span className="text-custom-brown-2 font-bold">
 							MaizeGaze
@@ -37,7 +37,7 @@ function UserDashboard() {
 						within a blink of an eye. Say goodbye to tiresome human labor
 						and experience the future of agriculture!
 					</p>
-					<div class="flex flex-col space-y-4 sm:flex-row sm:justify-center sm:space-y-0 sm:gap-x-4">
+					<div className="flex flex-col space-y-4 sm:flex-row sm:justify-center sm:space-y-0 sm:gap-x-4">
 						<Button
 							className="bg-custom-green-2 hover:bg-custom-green-1 focus:ring-4 focus:ring-custom-green-3"
 							onClick={() => navigate("/user/detect")}
