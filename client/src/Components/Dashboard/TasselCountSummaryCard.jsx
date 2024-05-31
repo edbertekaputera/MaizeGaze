@@ -60,15 +60,18 @@ function TasselCountSummaryCard({ className }) {
 
 				setData(preprocessed_date);
 
-				const min_date = preprocessed_date.reduce((min, value) =>
-					isBefore(min, value.record_date) ? min : value.record_date
+				const min_date = preprocessed_date.reduce(
+					(min, value) =>
+						isBefore(min, value.record_date) ? min : value.record_date,
+					new Date()
 				);
-				const max_date = preprocessed_date.reduce((max, value) =>
-					isAfter(max, value.record_date) ? max : value.record_date
+				const max_date = preprocessed_date.reduce(
+					(max, value) =>
+						isAfter(max, value.record_date) ? max : value.record_date,
+					0
 				);
 
 				const range_date = differenceInDays(max_date, min_date);
-
 				if (range_date >= 730) {
 					setFilter((prev) => ({ ...prev, unit: "year" }));
 				} else if (range_date >= 180) {
