@@ -12,8 +12,11 @@ from flask import current_app, session
 from hashlib import sha256
 
 class UserDirectory():
-	def __init__(self) -> None:
-		hashed_email = sha256(session["email"].encode('utf-8')).hexdigest()
+	def __init__(self, email=None) -> None:
+		if email:
+			hashed_email = sha256(email.encode('utf-8')).hexdigest()
+		else: 
+			hashed_email = sha256(session["email"].encode('utf-8')).hexdigest()
 		self.__user_directory = os.path.join(current_app.config["LOCAL_STORAGE_PATH"], hashed_email)
 		self.__storage_limit = session["storage_limit"] * 1024 * 1024
 		

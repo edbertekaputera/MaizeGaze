@@ -20,7 +20,7 @@ function UserDashboard() {
 					src={background_jumbotron}
 					className="z-0 absolute w-full opacity-20"
 				/>
-				<div className="relative z-10 px-4 mx-auto max-w-screen-xl text-center py-12 lg:py-24">
+				<div className="relative px-4 mx-auto max-w-screen-xl text-center py-12 lg:py-24">
 					<h1 className="mb-4 text-4xl font-extrabold tracking-tight leading-none text-white md:text-5xl lg:text-6xl">
 						Welcome {userInfo.name}!
 					</h1>
@@ -72,7 +72,7 @@ function UserDashboard() {
 						View more
 					</a>
 				</div>
-				<TasselCountSummaryCard className=""/>
+				<TasselCountSummaryCard />
 			</div>
 		</div>
 	);

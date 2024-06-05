@@ -1,11 +1,8 @@
 # Libraries
-from flask import current_app
 from typing_extensions import Self # type: ignore
-from datetime import date
 
 # Local dependencies
 from .sqlalchemy import db
-from .detection_result import DetectionResult
 
 # Views Schema
 class Farm(db.Model):

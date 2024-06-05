@@ -8,7 +8,6 @@ import HomePage from "./Pages/HomePage";
 import UserDashboard from "./Pages/UserDashboard";
 import AdminHomePage from "./Pages/AdminHomePage";
 import ActivateEmailPage from "./Pages/ActivateEmailPage";
-import NavigationBar from "./Components/NavigationBar";
 import DetectionPage from "./Pages/DetectionPage";
 import ResultHistoryPage from "./Pages/ResultHistoryPage";
 
