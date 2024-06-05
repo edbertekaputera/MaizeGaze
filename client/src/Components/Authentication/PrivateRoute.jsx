@@ -6,6 +6,7 @@ import { Footer, Spinner } from "flowbite-react";
 import ResendActivatioNCard from "../Login/ResendActivationCard";
 import NavigationBar from "../NavigationBar";
 import logo from "../../assets/logo.png";
+import SuspendedCard from "../Login/SuspendedCard";
 
 // Context for authentication
 export const AuthContext = createContext();
@@ -20,6 +21,7 @@ const PrivateRoute = ({ admin_only = false, user_only = false, children }) => {
 		is_admin: false,
 		detection_quota_limit: 0,
 		storage_limit: 0,
+		suspended: false
 	});
 
 	const navigate = useNavigate();
@@ -45,6 +47,7 @@ const PrivateRoute = ({ admin_only = false, user_only = false, children }) => {
 						is_admin: res.data.data.is_admin,
 						detection_quota_limit: res.data.data.detection_quota_limit,
 						storage_limit: res.data.data.storage_limit,
+						suspended: res.data.data.suspended
 					}));
 				} else {
 					console.log(`${res.data.status_code}: ${res.data.message}`);
@@ -84,10 +87,20 @@ const PrivateRoute = ({ admin_only = false, user_only = false, children }) => {
 		);
 	}
 
-	if (userInfo.type == "anonymous") {
+	if (userInfo.type == "anonymous") {	// Not authenticated
 		return <Navigate to="/login" />;
-	} else if (checkPermission()) {
-		if (!userInfo.activated) {
+	
+	} else if (userInfo.suspended) { // Suspended
+		return (
+			<AuthContext.Provider value={{ userInfo, logout }}>
+				<NavigationBar />
+				<div className="flex justify-center items-center h-screen">
+					<SuspendedCard />
+				</div>
+			</AuthContext.Provider>
+		);
+	} else if (checkPermission()) { // Valid permissions
+		if (!userInfo.activated) { // Not activated
 			return (
 				<AuthContext.Provider value={{ userInfo, logout }}>
 					<NavigationBar />
@@ -97,7 +110,7 @@ const PrivateRoute = ({ admin_only = false, user_only = false, children }) => {
 				</AuthContext.Provider>
 			);
 		}
-		return (
+		return ( // Valid permissions with activated email
 			<AuthContext.Provider value={{ userInfo, logout }}>
 				<div className="flex flex-col">
 					<NavigationBar />
@@ -117,9 +130,9 @@ const PrivateRoute = ({ admin_only = false, user_only = false, children }) => {
 				</div>
 			</AuthContext.Provider>
 		);
-	} else if (userInfo.is_admin) {
+	} else if (userInfo.is_admin) { // Go to admin  home
 		return <Navigate to="/administrator" />;
-	} else {
+	} else { // Go to user home
 		return <Navigate to="/user" />;
 	}
 };

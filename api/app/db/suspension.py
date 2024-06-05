@@ -1,7 +1,7 @@
 # Libraries
 from flask import current_app
-from datetime import date # type: ignore
-from typing_extensions import Self # type: ignore
+from datetime import datetime
+from typing_extensions import Self
 
 # Local dependencies
 from .sqlalchemy import db
@@ -9,10 +9,10 @@ from .user import User
 
 # Suspension Schema
 class Suspension(db.Model):
-	__tablename__ = "suspension"
+	__tablename__ = "Suspension"
 	# attributes
-	start = db.Column(db.Date(), nullable=False, primary_key=True)
-	end = db.Column(db.Date())
+	start = db.Column(db.DateTime(), nullable=False, primary_key=True)
+	end = db.Column(db.DateTime())
 	reason = db.Column(db.String(250), nullable=False)
 
 	# Part of composite key (qualifier)
@@ -21,7 +21,7 @@ class Suspension(db.Model):
 								  foreign_keys="Suspension.user")
 	
 	@classmethod
-	def createSuspension(cls, email:str, reason:str, start:date|None=None, end:date|None=None) -> bool:
+	def createSuspension(cls, email:str, reason:str, start:datetime|None=None, end:datetime|None=None) -> bool:
 		"""
 		Creates a new Suspension by passing arguments:
 			- email:str, 
@@ -33,7 +33,7 @@ class Suspension(db.Model):
 		try:
 			# Default value management
 			if not start:
-				start = date.today()
+				start = datetime.now()
 			# Invalid Dates
 			if end and end < start:
 				return False
@@ -61,7 +61,7 @@ class Suspension(db.Model):
 			- email:str
 		returns bool.
 		"""
-		all_ongoing_suspensions = cls.query.filter(cls.user == email, cls.start <= date.today(), cls.end is None or cls.end >= date.today()).all() # type: ignore
+		all_ongoing_suspensions = cls.query.filter(cls.user == email, cls.start <= datetime.now(), cls.end is None or cls.end >= datetime.now()).all() # type: ignore
 		if len(all_ongoing_suspensions) == 0:
 			return None
 

@@ -19,7 +19,7 @@ def get_suspension() -> dict[str, dict[str,str]|bool]:
 		return {
 			"success": True, 
 			"data": {
-				"end": suspension.end.strftime("%Y-%m-%d"),
+				"end": suspension.end.strftime("%Y-%m-%d %H:%M:%S"),
 				"reason": suspension.reason
 			}
 		}
