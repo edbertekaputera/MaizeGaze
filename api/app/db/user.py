@@ -1,7 +1,6 @@
 # Libraries
 from flask import current_app
 from typing_extensions import Self # type: ignore
-from enum import Enum # type: ignore
 
 from .sqlalchemy import db
 from .farm import Farm
@@ -24,10 +23,16 @@ class User(db.Model):
 									foreign_keys="DetectionQuota.user")
 	userToFarmRel = db.relationship("Farm", back_populates="farmToUserRel", cascade="all, delete, save-update",
 									foreign_keys="Farm.user")
+	userToSuspensionRel = db.relationship("Suspension", back_populates="suspensionToUserRel", cascade='all, delete, save-update',
+								  foreign_keys="Suspension.user")
 	
 	@classmethod
 	def get(cls, email:str) -> Self|None:
 		return cls.query.filter_by(email=email).one_or_none()
+	
+	@classmethod
+	def query_all_users(cls) -> list[Self]:
+		return cls.query.all()
 
 	@classmethod
 	def register_new_user(cls, email:str, name:str, hashed_password:bytes|None=None, email_is_verified:bool|None=None) -> Self | None:
@@ -68,3 +73,13 @@ class User(db.Model):
 				db.session.commit()
 				return {'status_code' : 200, 'message' : 'User account is activated'}
 		return {'status_code' : 400, 'message' : 'Invalid Token'}
+
+	@classmethod
+	def update_password(cls, email:str, new_hashed_password:bytes) -> bool:
+		with current_app.app_context():
+			current_user = User.get(email)
+			if not current_user:
+				return False
+			current_user.password = new_hashed_password
+			db.session.commit()
+			return True

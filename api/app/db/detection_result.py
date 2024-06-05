@@ -1,7 +1,6 @@
 # Libraries
 from flask import current_app
 from typing_extensions import Self # type: ignore
-from datetime import date
 
 # Local dependencies
 from .sqlalchemy import db

@@ -2,7 +2,7 @@
 from flask import session
 from functools import wraps
 # Local dependencies
-from app.db import User, TypeOfUser
+from app.db import User, Suspension
 
 # Require-login route wrapper
 def login_required(function):
@@ -17,6 +17,12 @@ def login_required(function):
 # Verified User-specific route wrapper
 def permissions_required(is_admin=False, is_user=False):
 	'''Function wrapper for verified role-protected routes'''
+	def check_if_user_suspended(user:User) -> bool:
+		suspension = Suspension.getOngoingSuspension(user.email)
+		if not suspension:
+			return False
+		return True
+	
 	def decorator(function):
 		@wraps(function)
 		@login_required
@@ -26,6 +32,8 @@ def permissions_required(is_admin=False, is_user=False):
 				return {"status_code" : 401, 'message' : 'Unauthorized Access'}
 			if not current_user.email_is_verified:
 				return {"status_code" : 401, 'message' : 'Unverified Email'}
+			if check_if_user_suspended(current_user):
+				return {"status_code" : 401, 'message' : 'Suspended Account'}
 			if (is_admin and (not session['is_admin'])):
 				return {"status_code" : 401, 'message' : 'Unauthorized Access'}
 			if (is_user and (session['is_admin'])):
