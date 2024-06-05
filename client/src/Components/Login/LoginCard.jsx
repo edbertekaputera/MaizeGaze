@@ -79,7 +79,7 @@ function LoginCard() {
 						}
 					/>
 					<div className="flex justify-end">
-						<Link className="text-sm font-medium text-blue-600 hover:underline dark:text-blue-500">
+						<Link to="/reset_password" className="text-sm font-medium text-blue-600 hover:underline dark:text-blue-500">
 							Forgot password?
 						</Link>
 					</div>

@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import axios from "axios";
 import { Card, Label, TextInput, Button } from "flowbite-react";
 import { useNavigate, Link } from "react-router-dom";
@@ -11,16 +11,31 @@ function SignUpCard() {
 	const [email, setEmail] = useState("");
 	const [emailError, setemailError] = useState("");
 	const [nameError, setNameError] = useState("");
-	const [isLoading, setIsLoading] = useState(false);
+	const [passwordError, setPasswordError] = useState("");
 
+	const [isLoading, setIsLoading] = useState(false);
 	const navigate = useNavigate();
+
+	useEffect(() => {
+		if (password.trim() !== "") {
+			setPasswordError(passwordCheck());
+		} else {
+			setPasswordError("");
+		}
+	}, [password]);
 
 	const validateSubmit = async (event) => {
 		event.preventDefault();
 		await validateEmail();
 		validateName();
 		// If no error
-		if (nameError === "" && emailError === "") {
+		if (
+			nameError === "" &&
+			emailError === "" &&
+			password.trim() !== "" &&
+			password === rePassword &&
+			passwordError == ""
+		) {
 			setIsLoading(true);
 			await axios
 				.post("/api/authentication/register", {
@@ -70,22 +85,49 @@ function SignUpCard() {
 		}
 	};
 
+	const passwordCheck = () => {
+		let bool_flag = true;
+		let checks = [];
+		//  Check if more than 8 characters
+		if (password.trim().length < 8) {
+			checks.push("8 characters long");
+		}
+		// Check if has an uppercase alphabet
+		if (!/[A-Z]+/.test(password)) {
+			checks.push("one uppercase alphabet");
+		}
+		// Check if has a number
+		if (!/[\d]+/.test(password)) {
+			checks.push("one number");
+		}
+		// Set the error message
+		if (checks.length > 0) {
+			if (checks.length === 1) {
+				return `Password must have at least ${checks[0]}.`;
+			} else if (checks.length === 2) {
+				return `Password must have at least ${checks[0]} and ${checks[1]}.`;
+			} else {
+				const allButLast = checks.slice(0, -1).join(", ");
+				const last = checks[checks.length - 1];
+				return `Password must have at least ${allButLast}, and ${last}.`;
+			}
+		}
+		return "";
+	};
+
 	return (
 		<>
 			<LoadingCard show={isLoading}>
 				Registering your account... Please wait!
 			</LoadingCard>
-			<Card className="bg-custom-white">
-				<div className="mb-2 text-center block w-96 mx-4">
+			<Card className="bg-custom-white w-96 sm:w-128">
+				<div className="mb-2 text-center block mx-4">
 					<Label
 						className="text-xl font-semibold"
 						value="Create an account"
 					/>
 				</div>
-				<form
-					className="flex flex-col gap-4 w-full"
-					onSubmit={validateSubmit}
-				>
+				<form className="flex flex-col gap-4" onSubmit={validateSubmit}>
 					<div>
 						<div className="mb-2 block">
 							<Label htmlFor="userName" value="Name" />
@@ -94,6 +136,7 @@ function SignUpCard() {
 							id="userName"
 							placeholder="John Doe"
 							required={true}
+							autoComplete="name"
 							onBlur={() => validateName()}
 							onChange={(event) => {
 								setName(event.target.value);
@@ -113,6 +156,7 @@ function SignUpCard() {
 						<TextInput
 							id="email"
 							placeholder="john_doe@gmail.com"
+							autoComplete="email"
 							required={true}
 							onBlur={(event) => {
 								validateEmail();
@@ -135,9 +179,13 @@ function SignUpCard() {
 						<TextInput
 							id="password"
 							type="password"
+							autoComplete="new-password"
 							required={true}
-							color={"white"}
-							onBlur={(event) => setPassword(event.target.value)}
+							color={passwordError === "" ? "white" : "failure"}
+							onChange={(event) => setPassword(event.target.value)}
+							helperText={
+								<span className="font-medium">{passwordError}</span>
+							}
 						/>
 					</div>
 					<div>
@@ -147,6 +195,7 @@ function SignUpCard() {
 						<TextInput
 							id="rePassword"
 							type="password"
+							autoComplete="new-password"
 							required={true}
 							onChange={(event) => setRePassword(event.target.value)}
 							color={
@@ -171,7 +220,7 @@ function SignUpCard() {
 					</div>
 					<Button
 						type="submit"
-						className="mt-2 bg-custom-green-1 hover:bg-custom-green-2"
+						className="mt-2 bg-custom-green-1 hover:bg-custom-green-2 ring-inset ring-custom-green-1 hover:ring-custom-green-2 "
 					>
 						Create Account
 					</Button>

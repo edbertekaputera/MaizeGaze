@@ -201,18 +201,17 @@ def init_reset_password() -> dict[str, str|int]:
 		<a href='{current_app.config["CLIENT_SERVER_URL"]}/new_password/{token}'>Reset Password</a>
 		"""
 	)
-	return {'status_code' : 200, 'message' : 'Reset password email has been resent.'}
+	return {'status_code' : 200, 'message' : 'Reset password email has been sent.'}
 
 
 # Verify Token Route
 @router.route('/verify_token', methods=['GET'])
 def verify_token() -> dict[str, bool|str]:
 	"""
-	Route to verify a token; Takes in arguments through json:
+	Route to verify a token; Takes in arguments through args:
 		- token:str, 
 	"""
-	json = request.get_json()
-	token = json.get('token', None)
+	token = request.args.get("token")
 	extracted_email = extract_email_from_token(token)
 	if not extracted_email:
 		return {'valid' : False, 'message' : 'Invalid Token'} 
