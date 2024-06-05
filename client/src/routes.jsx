@@ -10,6 +10,8 @@ import AdminHomePage from "./Pages/AdminHomePage";
 import ActivateEmailPage from "./Pages/ActivateEmailPage";
 import DetectionPage from "./Pages/DetectionPage";
 import ResultHistoryPage from "./Pages/ResultHistoryPage";
+import ResetPasswordPage from "./Pages/ResetPasswordPage";
+import NewPasswordPage from "./Pages/NewPasswordPage";
 
 export default function AppRouter() {
 	return (
@@ -45,12 +47,40 @@ export default function AppRouter() {
 						</UnAuthenticatedRoute>
 					}
 				/>
+				{/* Register Page Route */}
+				<Route
+					exact
+					path="/register"
+					element={
+						<UnAuthenticatedRoute>
+							<SignupPage />
+						</UnAuthenticatedRoute>
+					}
+				/>
 
-				{/* Activation Email Route */}
+				{/* Reset Password Page Route */}
+				<Route
+					exact
+					path="/reset_password"
+					element={
+						<UnAuthenticatedRoute>
+							<ResetPasswordPage />
+						</UnAuthenticatedRoute>
+					}
+				/>
+
+				{/* TOKEN Activation Email Route */}
 				<Route
 					exact
 					path="/activate_account/:token"
 					element={<ActivateEmailPage />}
+				/>
+
+				{/* TOKEN New Password Route */}
+				<Route
+					exact
+					path="/new_password/:token"
+					element={<NewPasswordPage />}
 				/>
 
 				{/* Admin Routes */}
