@@ -2,7 +2,7 @@
 from flask import session, request, current_app, Blueprint
 from flask_bcrypt import Bcrypt
 # Local dependencies
-from app.db import User, TypeOfUser
+from app.db import User, TypeOfUser,  Suspension
 from .email import generate_token_from_email, extract_email_from_token, send_email
 from .utils import login_required
 
@@ -147,6 +147,7 @@ def whoami():
 	if 'email' in session:
 		current_user = User.get(session["email"])
 		if current_user:
+			suspension = Suspension.getOngoingSuspension(session["email"])
 			return {
 				'status_code': 200, 
 				'data': {
@@ -157,12 +158,14 @@ def whoami():
 					'is_admin': session['is_admin'],
 					'detection_quota_limit': session['detection_quota_limit'],
 					'storage_limit': session['storage_limit'],
+					'suspended': True if suspension else False
 			}}
 	return {'status_code': 200, "data": {'type': "anonymous"}}
 
 # Check exist email Route
 @router.route("/check_exist_email/<email>", methods=['GET'])
 def check_exist_email(email:str):
+	""""""
 	if email.strip() == "":
 		return {'status_code': 400, "message": "Bad request."}
 	
@@ -170,3 +173,67 @@ def check_exist_email(email:str):
 	if current_user:
 		return {'status_code': 200, "value": True}
 	return {'status_code': 200, "value": False}
+
+# Initialize reset password route
+@router.route('/init_reset_password', methods=['POST'])
+def init_reset_password() -> dict[str, str|int]:
+	"""
+	Route to initialize a reset password; Takes in arguments through json:
+		- email:str, 
+	"""
+	email = request.get_json()["email"]
+	user = User.get(email)
+	if not user:
+		return {'status_code' : 400, 'message' : 'Invalid email'}
+	if not user.email_is_verified:
+		return {'status_code' : 401, 'message' : 'Please activate your account first.'}
+	
+	# Send Email verification
+	token = generate_token_from_email(user.email)
+
+	send_email(
+		to=user.email,
+		subject="MaizeGaze Reset Password",
+		html=f"""
+		Hello {user.name}! It seems you have requested for a Password Reset...<br/>
+		If this was not you, then please do NOT proceed. <br/>
+		If you want to proceed, then please click the link below...<br/><br/>
+		<a href='{current_app.config["CLIENT_SERVER_URL"]}/new_password/{token}'>Reset Password</a>
+		"""
+	)
+	return {'status_code' : 200, 'message' : 'Reset password email has been sent.'}
+
+
+# Verify Token Route
+@router.route('/verify_token', methods=['GET'])
+def verify_token() -> dict[str, bool|str]:
+	"""
+	Route to verify a token; Takes in arguments through args:
+		- token:str, 
+	"""
+	token = request.args.get("token")
+	extracted_email = extract_email_from_token(token)
+	if not extracted_email:
+		return {'valid' : False, 'message' : 'Invalid Token'} 
+	return {'valid' : True, 'message' : 'Valid Token'} 
+
+# Reset Email Route
+@router.route('/update_password', methods=['POST'])
+def update_password() -> dict[str, str|int|bool]:
+	"""
+	Route to update an account's password; Takes in arguments through json:
+		- token:str, 
+		- password:str
+	returns bool
+	"""
+	json = request.get_json()
+	token = json['token']
+	password = json['password']
+	extracted_email = extract_email_from_token(token)
+	if not extracted_email:
+		return {'success' : False, 'message' : 'Invalid Token.'} 
+	hashed_password = bcrypt.generate_password_hash(password)
+	success = User.update_password(extracted_email, hashed_password)
+	if not success:
+		return {'success' : False, 'message' : 'Failed to update password.'} 
+	return {'success' : True, 'message' : 'Password is successfully updated!'} 

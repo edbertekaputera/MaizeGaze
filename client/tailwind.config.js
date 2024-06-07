@@ -10,6 +10,11 @@ export default {
 				'128': '32rem',
 				'138': '36rem',
 				'192': '48rem',
+				'216' : '54rem',
+				'256': '64rem',
+			},
+			backgroundImage: {
+				'farmer-cartoon': "url('./src/assets/dashboard_bg.png')"
 			}
 		},
 		colors: {

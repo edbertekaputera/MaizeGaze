@@ -13,6 +13,7 @@ from app.detect import router as detect_router
 from app.storage import router as storage_router
 from app.user import router as user_router
 from app.routes import router as main_router
+from app.admin import router as admin_router
 
 # Initialize Flask App
 flask_app = Flask(__name__)
@@ -95,4 +96,5 @@ flask_app.register_blueprint(auth_router, url_prefix="/api/authentication")
 flask_app.register_blueprint(detect_router, url_prefix="/api/detect")
 flask_app.register_blueprint(storage_router, url_prefix="/api/storage")
 flask_app.register_blueprint(user_router, url_prefix="/api/user")
+flask_app.register_blueprint(admin_router, url_prefix="/api/admin")
 flask_app.register_blueprint(main_router, url_prefix="/api")

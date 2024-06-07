@@ -1,25 +1,31 @@
-import React, { useEffect, useState, useRef  } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Card, Select } from "flowbite-react";
+import { Card, Label, Select, Spinner } from "flowbite-react";
 import {
+	differenceInDays,
+	isAfter,
+	isBefore,
 	isThisMonth,
 	isThisQuarter,
 	isThisWeek,
 	isThisYear,
-	isToday,
 	subDays,
-    eachDayOfInterval,
-    format
 } from "date-fns";
-import Chart from "chart.js/auto";
+import TasselCountChart from "./TasselCountChart";
+import DoubleDatePicker from "../DoubleDatePicker";
+import { GiCorn } from "react-icons/gi";
+import { PiFarmFill } from "react-icons/pi";
 
 function TasselCountSummaryCard({ className }) {
 	const [data, setData] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
-	const [selectedFarm, setSelectedFarm] = useState("all");
 	const [farm, setFarm] = useState([]);
-	const chartRef = useRef(null); 
-    const chartInstance = useRef(null);
+	const [filter, setFilter] = useState({
+		farm_name: "all",
+		startDate: -1,
+		endDate: new Date(),
+		unit: "day",
+	});
 
 	useEffect(() => {
 		axios
@@ -42,17 +48,37 @@ function TasselCountSummaryCard({ className }) {
 		axios
 			.get("/api/storage/query_daily_statistics")
 			.then((res) => {
-				setData(() =>
-					res.data.result.map((items) => {
-						const splitted_date = items.record_date.split("-");
-						const date_obj = new Date(
-							splitted_date[0],
-							parseInt(splitted_date[1]) - 1,
-							splitted_date[2]
-						);
-						return { ...items, record_date: date_obj };
-					})
+				const preprocessed_date = res.data.result.map((items) => {
+					const splitted_date = items.record_date.split("-");
+					const date_obj = new Date(
+						splitted_date[0],
+						parseInt(splitted_date[1]) - 1,
+						splitted_date[2]
+					);
+					return { ...items, record_date: date_obj };
+				});
+
+				setData(preprocessed_date);
+
+				const min_date = preprocessed_date.reduce(
+					(min, value) =>
+						isBefore(min, value.record_date) ? min : value.record_date,
+					new Date()
 				);
+				const max_date = preprocessed_date.reduce(
+					(max, value) =>
+						isAfter(max, value.record_date) ? max : value.record_date,
+					0
+				);
+
+				const range_date = differenceInDays(max_date, min_date);
+				if (range_date >= 730) {
+					setFilter((prev) => ({ ...prev, unit: "year" }));
+				} else if (range_date >= 180) {
+					setFilter((prev) => ({ ...prev, unit: "quarter" }));
+				} else if (range_date >= 60) {
+					setFilter((prev) => ({ ...prev, unit: "month" }));
+				}
 			})
 			.catch((error) => {
 				console.log(error);
@@ -65,7 +91,7 @@ function TasselCountSummaryCard({ className }) {
 		return data.reduce((total, result) => {
 			return (total =
 				isThisWeek(result.record_date) &&
-				(selectedFarm == "all" || selectedFarm == result.farm_name)
+				(filter.farm_name == "all" || filter.farm_name == result.farm_name)
 					? total + result.tassel_count
 					: total);
 		}, 0);
@@ -75,7 +101,7 @@ function TasselCountSummaryCard({ className }) {
 		return data.reduce((total, result) => {
 			return (total =
 				isThisMonth(result.record_date) &&
-				(selectedFarm == "all" || selectedFarm == result.farm_name)
+				(filter.farm_name == "all" || filter.farm_name == result.farm_name)
 					? total + result.tassel_count
 					: total);
 		}, 0);
@@ -85,7 +111,7 @@ function TasselCountSummaryCard({ className }) {
 		return data.reduce((total, result) => {
 			return (total =
 				isThisQuarter(result.record_date) &&
-				(selectedFarm == "all" || selectedFarm == result.farm_name)
+				(filter.farm_name == "all" || filter.farm_name == result.farm_name)
 					? total + result.tassel_count
 					: total);
 		}, 0);
@@ -95,21 +121,21 @@ function TasselCountSummaryCard({ className }) {
 		return data.reduce((total, result) => {
 			return (total =
 				isThisYear(result.record_date) &&
-				(selectedFarm == "all" || selectedFarm == result.farm_name)
+				(filter.farm_name == "all" || filter.farm_name == result.farm_name)
 					? total + result.tassel_count
 					: total);
 		}, 0);
 	};
 
 	const getFilteredData = () => {
-		return data.filter((result) => {
-			return selectedFarm == "all" || selectedFarm == result.farm_name;
-		});
+		return data.filter(
+			(result) =>
+				filter.farm_name == "all" || filter.farm_name == result.farm_name
+		);
 	};
 
 	const getDailyAverage = () => {
 		let filtered_data = getFilteredData();
-		console.log(filtered_data);
 		return (
 			Math.round(
 				(filtered_data.reduce((a, b) => a + b.tassel_count, 0) /
@@ -119,85 +145,22 @@ function TasselCountSummaryCard({ className }) {
 		).toFixed(2);
 	};
 
-	const getchartData = (startDate, endDate) => {
-        const daysArray = eachDayOfInterval({ start: startDate, end: endDate });
-
-        const formattedDaysArray = daysArray.map((day) => format(day, "yyyy-MM-dd"));
-        const countsByDate = Object.fromEntries(
-            formattedDaysArray.map((date) => [date, 0])
-        );
-
-        getFilteredData().forEach((record) => {
-            const formattedDate = format(record.record_date, "yyyy-MM-dd");
-            if (formattedDate in countsByDate) {
-                countsByDate[formattedDate] = record.tassel_count;
-            }
-        });
-
-        return {
-            labels: formattedDaysArray,
-            datasets: [
-                {
-                    label: "Tassel Count",
-                    data: Object.values(countsByDate),
-                    backgroundColor: "rgba(54, 162, 235, 0.6)",
-                },
-            ],
-        };
-    };
-
-	useEffect(() => {
-        if (chartInstance.current) {
-            chartInstance.current.destroy(); 
-        }
-
-        const ctx = chartRef.current.getContext("2d");
-
-		const startDate = subDays(new Date(), 6) // put start date here
-		const endDate = new Date() // put end date here
-
-        const chartData = getchartData(startDate,endDate);
-
-        chartInstance.current = new Chart(ctx, {
-            type: "bar",
-            data: chartData,
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                    },
-                },
-            },
-        });
-
-		const resizeChart = () => {
-            chartInstance.current.resize();
-        };
-        window.addEventListener("resize", resizeChart);
-
-        return () => {
-            if (chartInstance.current) {
-                chartInstance.current.destroy();
-            }
-        };
-    }, [data, selectedFarm]);
-
 	return (
 		<>
-			<Card
-				className={
-					"relative my-6 mx-4 lg:my:10 lg:mx-16 shadow-lg border xl:mb-20 " +
-					className
-				}
-			>
-				<header className="flex flex-wrap flex-row gap-2 justify-between shadow-b border-b-2 pb-5 border-black">
-					<h1 className="text-4xl font-extrabold">Tassel Count Summary</h1>
+			<Card className={"shadow-lg border " + className}>
+				<header className="flex flex-wrap flex-row gap-2 justify-end items-center shadow-b pb-2 border-black">
 					<Select
+						icon={PiFarmFill}
 						id="farm_input"
-						value={selectedFarm}
+						value={filter.farm_name}
 						color="success"
 						className="shadow drop-shadow-md rounded-lg hover:outline outline-custom-green-2"
-						onChange={(ev) => setSelectedFarm(ev.target.value)}
+						onChange={(ev) =>
+							setFilter((prev) => ({
+								...prev,
+								farm_name: ev.target.value,
+							}))
+						}
 					>
 						<option key={"all"} value={"all"}>
 							All
@@ -209,50 +172,112 @@ function TasselCountSummaryCard({ className }) {
 						))}
 					</Select>
 				</header>
-				<section className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="bg-white shadow p-4 rounded-lg flex flex-col justify-center items-center text-center">
-                        <h2 className="text-xl mb-3 font-bold drop-shadow-sm">
-							Week
-						</h2>
-                        <span className="text-3xl font-semibold text-custom-green-1">
-							{getThisWeekTotal()}
-						</span>
-                    </div>
-                        <div className="bg-white shadow p-4 rounded-lg flex flex-col justify-center items-center text-center">
-                        <h2 className="text-xl mb-3 font-bold drop-shadow-sm">
-							Month
-						</h2>
-                        <span className="text-3xl font-semibold text-custom-green-1">
-								{getThisMonthTotal()}
-						</span>
-                    </div>
-                        <div className="bg-white shadow p-4 rounded-lg flex flex-col justify-center items-center text-center">
-                        <h2 className="text-xl mb-3 font-bold drop-shadow-sm">
-							Quarter
-						</h2>
-                        <span className="text-3xl font-semibold text-custom-green-1">
-								{getThisQuarterTotal()}
-						</span>
-                    </div>
-                        <div className="bg-white shadow p-4 rounded-lg flex flex-col justify-center items-center text-center">
-                        <h2 className="text-xl mb-3 font-bold drop-shadow-sm">
-							Year
-						</h2>
-						<span className="text-3xl font-semibold text-custom-green-1">
-							{getThisYearTotal()}000
-						</span>
-                    </div>
-                </section>
+				{isLoading ? (
+					<div className="flex justify-center py-4">
+						<Spinner size={"xl"} color={"success"} />
+					</div>
+				) : getFilteredData().length == 0 ? (
+					<div className="flex justify-center py-4">
+						No Detection Results yet.
+					</div>
+				) : (
+					<>
+						<section className="grid grid-cols-2 md:grid-cols-4 gap-4">
+							<div className="bg-custom-green-3 shadow p-4 rounded-lg flex flex-col justify-center items-center text-center">
+								<h2 className="text-xl mb-3 font-bold drop-shadow-sm">
+									Week
+								</h2>
+								<span className="flex flex-row items-center gap-1 text-3xl font-semibold text-custom-green-1">
+									{getThisWeekTotal()}
+									<GiCorn />
+								</span>
+							</div>
+							<div className="bg-custom-green-3 shadow p-4 rounded-lg flex flex-col justify-center items-center text-center">
+								<h2 className="text-xl mb-3 font-bold drop-shadow-sm">
+									Month
+								</h2>
+								<span className="flex flex-row items-center gap-1 text-3xl font-semibold text-custom-green-1">
+									{getThisMonthTotal()}
+									<GiCorn />
+								</span>
+							</div>
+							<div className="bg-custom-green-3 shadow p-4 rounded-lg flex flex-col justify-center items-center text-center">
+								<h2 className="text-xl mb-3 font-bold drop-shadow-sm">
+									Quarter
+								</h2>
+								<span className="flex flex-row items-center gap-1 text-3xl font-semibold text-custom-green-1">
+									{getThisQuarterTotal()}
+									<GiCorn />
+								</span>
+							</div>
+							<div className="bg-custom-green-3 shadow p-4 rounded-lg flex flex-col justify-center items-center text-center">
+								<h2 className="text-xl mb-3 font-bold drop-shadow-sm">
+									Year
+								</h2>
+								<span className="flex flex-row items-center gap-1 text-3xl font-semibold text-custom-green-1">
+									{getThisYearTotal()}
+									<GiCorn />
+								</span>
+							</div>
+						</section>
+						<section className="flex flex-col sm:flex-row w-full justify-between sm:items-center mt-2 gap-4">
+							<div className="flex flex-col items-start">
+								<span className="text-lg">Daily Average :</span>
+								<span className="text-2xl font-bold">
+									{getDailyAverage()}
+								</span>
+							</div>
+							<div className="flex flex-col sm:flex-row gap-4">
+								<DoubleDatePicker
+									filter={filter}
+									setFilter={setFilter}
+									min_date_key="startDate"
+									max_date_key="endDate"
+								/>
+								<div>
+									<Label className="mb-1 text-sm font-semibold">
+										Time Unit:
+									</Label>
+									<Select
+										id="unit_input"
+										value={filter.unit}
+										color="gray"
+										className="rounded-lg hover:outline outline-1"
+										onChange={(ev) =>
+											setFilter((prev) => ({
+												...prev,
+												unit: ev.target.value,
+											}))
+										}
+									>
+										<option key={"day"} value={"day"}>
+											Day
+										</option>
+										<option key={"month"} value={"month"}>
+											Month
+										</option>
+										<option key={"quarter"} value={"quarter"}>
+											Quarter
+										</option>
+										<option key={"year"} value={"year"}>
+											Year
+										</option>
+									</Select>
+								</div>
+							</div>
+						</section>
 
-				<section className="flex flex-col w-full mt-6">
-					<span className="text-lg">Daily Average :</span>
-					<span className="text-2xl font-bold">
-						{getDailyAverage()}
-					</span>
-				</section>
-				<section className="mt-8 w-full">
-					<canvas ref={chartRef} />
-				</section>
+						<section className="mt-8 w-full">
+							<TasselCountChart
+								data={getFilteredData()}
+								startDate={filter.startDate}
+								endDate={filter.endDate}
+								unit={filter.unit}
+								daily_average={getDailyAverage()}
+							/>
+						</section>
+					</>
+				)}
 			</Card>
 		</>
 	);
