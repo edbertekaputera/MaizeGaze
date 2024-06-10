@@ -4,7 +4,7 @@ from typing_extensions import Self # type: ignore
 from datetime import date
 
 # Local dependencies
-from .sqlalchemy import db
+from .sqlalchemy import db, func
 
 # Views Schema
 class DetectionQuota(db.Model):
@@ -46,3 +46,10 @@ class DetectionQuota(db.Model):
 				detection_quota.quota = detection_quota.quota + 1
 			db.session.commit()
 		return True
+	
+	@classmethod
+	def query_total_detection(cls, email:str) -> int:
+
+		total = db.session.query(func.sum(cls.quota)).filter_by(user=email).scalar()
+		
+		return total if total is not None else 0
