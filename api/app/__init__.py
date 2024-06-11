@@ -14,6 +14,7 @@ from app.storage import router as storage_router
 from app.user import router as user_router
 from app.routes import router as main_router
 from app.admin import router as admin_router
+from app.weather import router as weather_router
 
 # Initialize Flask App
 flask_app = Flask(__name__)
@@ -64,8 +65,8 @@ with flask_app.app_context():
 	if not TypeOfUser.get("FREE_USER"):
 		free_user = TypeOfUser(
             name="FREE_USER",
-            detection_quota_limit = 25,
-			storage_limit = 5
+            detection_quota_limit = 10,
+			storage_limit = 25
 		) # type: ignore
 		db.session.add(free_user)
 		db.session.commit()
@@ -97,4 +98,5 @@ flask_app.register_blueprint(detect_router, url_prefix="/api/detect")
 flask_app.register_blueprint(storage_router, url_prefix="/api/storage")
 flask_app.register_blueprint(user_router, url_prefix="/api/user")
 flask_app.register_blueprint(admin_router, url_prefix="/api/admin")
+flask_app.register_blueprint(weather_router, url_prefix="/api/weather")
 flask_app.register_blueprint(main_router, url_prefix="/api")
