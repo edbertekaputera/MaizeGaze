@@ -4,7 +4,6 @@ import UnAuthenticatedRoute from "./Components/Authentication/UnauthenticatedRou
 import PrivateRoute from "./Components/Authentication/PrivateRoute";
 import LoginPage from "./Pages/LoginPage";
 import SignupPage from "./Pages/SignupPage";
-import HomePage from "./Pages/HomePage";
 import UserDashboard from "./Pages/UserDashboard";
 import AdminHomePage from "./Pages/AdminHomePage";
 import ActivateEmailPage from "./Pages/ActivateEmailPage";
@@ -12,6 +11,7 @@ import DetectionPage from "./Pages/DetectionPage";
 import ResultHistoryPage from "./Pages/ResultHistoryPage";
 import ResetPasswordPage from "./Pages/ResetPasswordPage";
 import NewPasswordPage from "./Pages/NewPasswordPage";
+import LandingPage from "./Pages/LandingPage";
 
 export default function AppRouter() {
 	return (
@@ -23,7 +23,7 @@ export default function AppRouter() {
 					path="/"
 					element={
 						<UnAuthenticatedRoute>
-							<HomePage />
+							<LandingPage />
 						</UnAuthenticatedRoute>
 					}
 				/>
@@ -70,18 +70,10 @@ export default function AppRouter() {
 				/>
 
 				{/* TOKEN Activation Email Route */}
-				<Route
-					exact
-					path="/activate_account/:token"
-					element={<ActivateEmailPage />}
-				/>
+				<Route exact path="/activate_account/:token" element={<ActivateEmailPage />} />
 
 				{/* TOKEN New Password Route */}
-				<Route
-					exact
-					path="/new_password/:token"
-					element={<NewPasswordPage />}
-				/>
+				<Route exact path="/new_password/:token" element={<NewPasswordPage />} />
 
 				{/* Admin Routes */}
 				<Route
@@ -135,7 +127,14 @@ export default function AppRouter() {
 				/> */}
 
 				{/* Other routes */}
-				<Route path="*" element={<HomePage />} />
+				<Route
+					path="*"
+					element={
+						<UnAuthenticatedRoute>
+							<LandingPage />
+						</UnAuthenticatedRoute>
+					}
+				/>
 			</Routes>
 		</BrowserRouter>
 	);

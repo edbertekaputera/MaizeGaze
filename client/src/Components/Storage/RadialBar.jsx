@@ -40,7 +40,7 @@ const RadialBar = ({ data }) => {
                         }
                     }
                 },
-                labels: ['Accuracy'],
+                labels: ['mAP50'],
                 colors: ['#019A6C'],
                 tooltip: {
                     enabled: true,
