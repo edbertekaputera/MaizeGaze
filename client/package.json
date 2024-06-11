@@ -15,6 +15,7 @@
 		"chartjs-adapter-date-fns": "^3.0.0",
 		"date-fns": "^3.6.0",
 		"flowbite-react": "^0.9.0",
+		"openmeteo": "^1.1.4",
 		"react": "^18.2.0",
 		"react-dom": "^18.2.0",
 		"react-dropzone": "^14.2.3",
