@@ -52,27 +52,30 @@ def queryUser()-> dict[str, int|str|float|bool]:
 
 @router.route("/search_users", methods=["GET"])
 @permissions_required(is_admin=True)
-def searchUsers() -> dict[str, list[dict[str, str|int|bool]]]:
+def searchUsers() -> dict[str, list[dict[str, str|int|bool|list[dict[str, str]]]]]:
 	users = User.query_all_users()
 
-	activeUsers = []
+	resultList = []
+
 	for user in users:
 		suspension = Suspension.getOngoingSuspension(user_email=user.email)
 		if suspension is None:
-			activeUsers.append(user)
+			suspended_info = None
+		else:
+			suspended_info = {
+				"end_date": suspension.end,
+				"reason": suspension.reason
+			}
 
-	resultList = []
-	for user in activeUsers:
-		result_json = {	
-		"email": user.email,
-		"name": user.name,
-		"email_is_verified": bool(user.email_is_verified),
-		"password": user.password,
-		"user_type": user.user_type
+		result_json = {
+			"email": user.email,
+			"name": user.name,
+			"email_is_verified": bool(user.email_is_verified),
+			"password": user.password,
+			"user_type": user.user_type,
+			"suspended": suspended_info
 		}
 
 		resultList.append(result_json)
 
 	return {"result": resultList}
-	
-	
