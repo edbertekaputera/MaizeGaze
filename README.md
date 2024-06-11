@@ -54,6 +54,9 @@ GOOGLE_REDIRECT_URI = http://localhost:5000/api/authentication/oauth/login/googl
 GITHUB_CLIENT_ID = 'YOUR_GITHUB_CLIENT_ID'
 GITHUB_CLIENT_SECRET = 'YOUR_GITHUB_CLIENT_SECRET'
 GITHUB_REDIRECT_URI = http://localhost:5000/api/authentication/oauth/login/github/authorized
+
+# Reverse Geocode API (https://geocode.maps.co/)
+REVERSE_GEOCODE_API = 'YOUR_API_KEY'
 ```
 
 To run the server, simply run `application.py` as followed, and it should be hosted locally at `port 5000`
