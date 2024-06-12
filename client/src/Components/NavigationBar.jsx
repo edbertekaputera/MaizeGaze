@@ -23,7 +23,7 @@ export default function NavigationBar() {
 
 	const drawerRoutes = {
 		ADMINISTRATOR: [
-			{ icon: MdSpaceDashboard, link: "/administrator", name: "Dashboard" },
+			// { icon: MdSpaceDashboard, link: "/administrator", name: "Dashboard" },
 			{ icon: MdManageAccounts, link: "/administrator/user_management", name: "User Management" },
 
 		],
