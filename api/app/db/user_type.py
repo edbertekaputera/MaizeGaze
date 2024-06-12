@@ -19,3 +19,7 @@ class TypeOfUser(db.Model):
 	@classmethod
 	def get(cls, name:str) -> Self|None:
 		return cls.query.filter_by(name=name).one_or_none()
+	
+	@classmethod
+	def queryAll(cls) -> list[Self]:
+		return cls.query.all()

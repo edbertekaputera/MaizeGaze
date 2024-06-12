@@ -93,15 +93,14 @@ function TasselCountChart({
 					data: getchartData(),
 					backgroundColor: "rgba(54, 162, 235, 0.6)",
 				},
-				{
-					label: "Daily Average",
-					data: [daily_average],
-					borderColor: "red",
-					borderDash: [5, 5],
-					backgroundColor: "red",
-					showLine: true,
-					pointRadius: 0,
-				},
+				// {
+				// 	label: "Daily Average",
+				// 	borderColor: "red",
+				// 	borderDash: [5, 5],
+				// 	backgroundColor: "red",
+				// 	showLine: true,
+				// 	pointRadius: 0,
+				// },
 			],
 		};
 
@@ -242,7 +241,6 @@ function TasselCountChart({
 			}));
 		}
 	};
-
 	return <canvas ref={chartRef} />;
 }
 

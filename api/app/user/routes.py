@@ -3,7 +3,7 @@ from flask import session, Blueprint
 
 # Local dependencies
 from app.db import Suspension
-from app.authentication import permissions_required, login_required
+from app.authentication import login_required
 
 # Initialize
 router = Blueprint("user", __name__)

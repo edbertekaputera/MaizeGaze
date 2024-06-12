@@ -5,7 +5,7 @@ function ConfirmationModal({ state, setState, action, icon, children }) {
 	return (
 		<Modal
 			show={state}
-			size="md"
+			size="sm"
 			onClose={() => setState(false)}
 			popup
 		>
