@@ -5,6 +5,7 @@ import { FaChevronDown } from "react-icons/fa";
 import axios from "axios";
 import MessageModal from "../MessageModal";
 import ConfirmationModal from "../ConfirmationModal";
+import LoadingCard from "../LoadingCard";
 
 function SuspendUserModal({ state, setState, selected }) {
 	const [durationUnit, setDurationUnit] = useState("Days");
@@ -14,6 +15,7 @@ function SuspendUserModal({ state, setState, selected }) {
 	const [messageModal, setMessageModal] = useState(false);
 	const [failedList, setFailedList] = useState([]);
 	const [confirmationModal, setConfirmationModal] = useState(false);
+	const [isSuspendLoading, setIsSuspendLoading] = useState(false);
 
 	const onCloseModal = (x) => {
 		setMessageModal(x);
@@ -22,6 +24,7 @@ function SuspendUserModal({ state, setState, selected }) {
 
 	const handleSuspend = () => {
 		const final_duration = durationUnit === "Days" ? duration : durationUnit === "Weeks" ? duration * 7 : duration * 30;
+		setIsSuspendLoading(true);
 		selected.forEach((email) => {
 			axios
 				.post("/api/admin/user_management/suspend_user", {
@@ -48,6 +51,7 @@ function SuspendUserModal({ state, setState, selected }) {
 			setState(false);
 			setMessageModal(true);
 		}
+		setIsSuspendLoading(false);
 	};
 
 	const displayMessageModal = () => {
@@ -95,9 +99,10 @@ function SuspendUserModal({ state, setState, selected }) {
 	return (
 		<>
 			{displayMessageModal()}
+			<LoadingCard show={isSuspendLoading}>Suspending Selected Users...</LoadingCard>
 			<ConfirmationModal state={confirmationModal} setState={setConfirmationModal} action={handleSuspend}>
 				Confirm suspension on the following accounts:
-				<div className="my-4 w-full max-h-28 overflow-auto px-4 py-2 outline-1 outline-gray-400 outline rounded-lg shadow-lg drop-shadow-sm text-2xl font-medium text-gray-900 ">
+				<div className=" mx-auto my-4 w-5/6 max-h-28 overflow-auto px-4 py-2 outline-1 outline-gray-400 outline rounded-lg shadow-lg drop-shadow-sm text-2xl font-medium text-gray-900 ">
 					{displayListOfSelectedEmails()}
 				</div>
 			</ConfirmationModal>

@@ -26,7 +26,7 @@ function LoginCard() {
 			if (!response.data.is_admin) {
 				navigate("/user");
 			} else {
-				navigate("/administrator");
+				navigate("/administrator/user_management");
 			}
 		} else {
 			setInvalidMsg(response.data.message);

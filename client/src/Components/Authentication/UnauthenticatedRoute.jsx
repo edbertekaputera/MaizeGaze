@@ -49,7 +49,7 @@ const UnAuthenticatedRoute = ({ children }) => {
 	if (authType.type == "anonymous") {
 		return children;
 	} else if (authType.is_admin) {
-		return <Navigate to="/administrator" />;
+		return <Navigate to="/administrator/user_management" />;
 	} else {
 		return <Navigate to="/user" />;
 	}

@@ -15,7 +15,6 @@ function AdminUserManagementPage() {
 	const [users, setUsers] = useState([]);
 	const [selected, setSelected] = useState(new Set());
 	const [showSuspendModal, setShowSuspendModal] = useState(false);
-	const [isSuspendLoading, setIsSuspendLoading] = useState(false);
 	const [isLoading, setIsLoading] = useState(true);
 	const [search, setSearch] = useState("");
 	const [filter, setFilter] = useState({
@@ -94,14 +93,15 @@ function AdminUserManagementPage() {
 			// Tier Filter
 			const tier_bool = filter.tier[user.user_type];
 			// Status Filter
-			let status = "Unverified";
-			if (user.email_is_verified) {
-				if (user.suspended) {
-					status = "Suspended";
-				} else {
-					status = "Active";
-				}
+			let status;
+			if (user.suspended) {
+				status = "Suspended";
+			} else if (user.email_is_verified) {
+				status = "Unverified"
+			} else {
+				status = "Active";
 			}
+
 			const status_bool = filter.status[status];
 			// Search keyword
 			const keyword = search.toLowerCase().trim();
@@ -114,14 +114,13 @@ function AdminUserManagementPage() {
 		return filtered_list;
 	};
 
-	console.log(users);
+	
 	return (
 		<div className="min-h-screen">
 			{/* Loading Cards */}
 			<LoadingCard show={isLoading}>Loading User Accounts...</LoadingCard>
-			<LoadingCard show={isSuspendLoading}>Suspending Selected Users...</LoadingCard>
 			{/* Modals */}
-			<SuspendUserModal state={showSuspendModal} setState={setShowSuspendModal} selected={selected}/>
+			<SuspendUserModal state={showSuspendModal} setState={setShowSuspendModal} selected={selected} />
 			{/* Page Card */}
 			<Card className="my-6 mx-4 lg:my:10 lg:mx-16 shadow-lg border xl:mb-20">
 				<header className="flex flex-wrap flex-row gap-2 justify-between shadow-b border-b-2 pb-5 border-black">

@@ -131,7 +131,7 @@ const PrivateRoute = ({ admin_only = false, user_only = false, children }) => {
 			</AuthContext.Provider>
 		);
 	} else if (userInfo.is_admin) { // Go to admin  home
-		return <Navigate to="/administrator" />;
+		return <Navigate to="/administrator/user_management" />;
 	} else { // Go to user home
 		return <Navigate to="/user" />;
 	}

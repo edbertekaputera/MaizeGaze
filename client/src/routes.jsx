@@ -77,7 +77,7 @@ export default function AppRouter() {
 				<Route exact path="/new_password/:token" element={<NewPasswordPage />} />
 
 				{/* Admin Routes */}
-				<Route
+				{/* <Route
 					exact
 					path="/administrator"
 					element={
@@ -85,7 +85,7 @@ export default function AppRouter() {
 							<AdminHomePage />
 						</PrivateRoute>
 					}
-				/>
+				/> */}
 				<Route
 					exact
 					path="/administrator/user_management"

@@ -49,56 +49,18 @@ function UserManagementTable({ results, selected, setSelected }) {
 					</Table.HeadCell>
 				</Table.Head>
 				<Table.Body className="divide-y">
-					{results.map((r, index) => {
-						if (!r.email_is_verified) {
-							return (
-								<UserManagementTableRow
-									key={index}
-									email={r.email}
-									name={r.name}
-									tier={r.user_type}
-									status="Unverified"
-									selected={selected.has(r.email)}
-									setSelected={setSelected}
-								/>
-							);
-						} else if (!r.suspended) {
-							return (
-								<UserManagementTableRow
-									key={index}
-									email={r.email}
-									name={r.name}
-									tier={r.user_type}
-									status="Active"
-									selected={selected.has(r.email)}
-									setSelected={setSelected}
-								/>
-							);
-						} else {
-							const splitted = r.suspended.end_date.split(" ");
-							const splitted_date = splitted[0].split("-");
-							const splitted_time = splitted[1].split(":");
-							const date_obj = new Date(
-								splitted_date[0],
-								parseInt(splitted_date[1]) - 1,
-								splitted_date[2],
-								splitted_time[0],
-								splitted_time[1],
-								splitted_time[2]
-							);
-							return (
-								<UserManagementTableRow
-									key={index}
-									email={r.email}
-									name={r.name}
-									tier={r.user_type}
-									status={!r.suspended ? "Active" : `Suspended until ${format(date_obj, "dd MMM yyyy")}`}
-									selected={selected.has(r.email)}
-									setSelected={setSelected}
-								/>
-							);
-						}
-					})}
+					{results.map((r, index) => (
+						<UserManagementTableRow
+							key={index}
+							email={r.email}
+							name={r.name}
+							tier={r.user_type}
+							suspension_details={r.suspended}
+							email_verified={r.email_is_verified}
+							selected={selected.has(r.email)}
+							setSelected={setSelected}
+						/>
+					))}
 					{results.length == 0 && (
 						<Table.Row>
 							<Table.Cell colSpan={6}>
