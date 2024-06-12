@@ -12,6 +12,7 @@ import ResultHistoryPage from "./Pages/ResultHistoryPage";
 import ResetPasswordPage from "./Pages/ResetPasswordPage";
 import NewPasswordPage from "./Pages/NewPasswordPage";
 import LandingPage from "./Pages/LandingPage";
+import AdminUserManagementPage from "./Pages/AdminUserManagementPage";
 
 export default function AppRouter() {
 	return (
@@ -82,6 +83,15 @@ export default function AppRouter() {
 					element={
 						<PrivateRoute admin_only>
 							<AdminHomePage />
+						</PrivateRoute>
+					}
+				/>
+				<Route
+					exact
+					path="/administrator/user_management"
+					element={
+						<PrivateRoute admin_only>
+							<AdminUserManagementPage />
 						</PrivateRoute>
 					}
 				/>

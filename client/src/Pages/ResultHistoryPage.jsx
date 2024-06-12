@@ -36,6 +36,7 @@ function ResultHistoryPage() {
 	const [showDownloadModal, setShowDownloadModal] = useState(false);
 	const [showDeleteModal, setShowDeleteModal] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
+	const [isLoadingResults, setIsLoadingResults] = useState(true);
 	const [isDeleteLoading, setIsDeleteLoading] = useState(false);
 	const [search, setSearch] = useState("");
 	const [filter, setFilter] = useState({
@@ -112,7 +113,8 @@ function ResultHistoryPage() {
 			.catch((err) => {
 				console.log(err);
 				alert("Something went wrong! Please Reload the page.");
-			});
+			})
+			.then(() => setIsLoadingResults(false));
 	}, []);
 
 	const handleDownload = () => {
@@ -290,6 +292,7 @@ function ResultHistoryPage() {
 
 			{/* Loading Cards */}
 			<LoadingCard show={isLoading}>Initiating Download...</LoadingCard>
+			<LoadingCard show={isLoadingResults}>Loading Results...</LoadingCard>
 			<LoadingCard show={isDeleteLoading}>
 				Initiating Deletion...
 			</LoadingCard>
@@ -326,7 +329,7 @@ function ResultHistoryPage() {
 			</MessageModal>
 
 			{/* Page Card */}
-			<Card className="my-6 mx-4 lg:my:10 lg:mx-16 shadow-lg border xl:mb-20">
+			<Card className="my-6 mx-4 lg:my:10 lg:mx-16 shadow-lg border xl:mb-20 pb-5">
 				<header className="flex flex-wrap flex-row gap-2 justify-between shadow-b border-b-2 pb-5 border-black">
 					<h1 className="text-4xl font-extrabold">
 						Detection Results History
@@ -461,7 +464,6 @@ function ResultHistoryPage() {
 						setSelected={setSelected}
 					/>
 				</section>
-				<div className="flex flex-row justify-end"></div>
 			</Card>
 		</div>
 	);

@@ -5,7 +5,7 @@ import datetime
 # Local dependencies
 from app.db import User, Suspension, TypeOfUser, DetectionQuota
 from app.authentication import permissions_required
-from storage.utils import UserDirectory
+from app.storage import UserDirectory
 
 # Initialize
 router = Blueprint("user_management", __name__)
@@ -27,10 +27,15 @@ def suspend_user() -> dict[str, int|str]:
 
 @router.route("/query_user", methods=["GET"])
 @permissions_required(is_admin=True)
-def queryUser()-> dict[str, int|str|float|bool]:
+def queryUser()-> dict[str, int|str|dict[str, str|bool|int|float]]:
 	email = request.args["email"]
 	user = User.get(email = email)
+	if not user:
+		return {"status_code": 400, "message": "User not found"}
 	userType = TypeOfUser.get(name = user.user_type)
+	if not userType:
+		return {"status_code": 400, "message": "User Type not found"}
+
 	totalDetections = DetectionQuota.query_total_detection(email = email)
 	user_directory = UserDirectory(email = email)
 	totalSize = user_directory.get_size()
@@ -39,7 +44,6 @@ def queryUser()-> dict[str, int|str|float|bool]:
 		"name": user.name,
 		"email": user.email,
 		"email_is_verified": bool(user.email_is_verified),
-		"password": user.password,
 		"user_type": userType.name,
 		"detection_quota_limit": int(userType.detection_quota_limit),
 		"storage_limit": int(userType.storage_limit),
@@ -48,7 +52,7 @@ def queryUser()-> dict[str, int|str|float|bool]:
 		"total_size": float(f"{totalSize:.2f}")
 	}
 
-	return {"result": result_json}
+	return {"status_code": 200, "result": result_json}
 
 @router.route("/search_users", methods=["GET"])
 @permissions_required(is_admin=True)
@@ -58,20 +62,19 @@ def searchUsers() -> dict[str, list[dict[str, str|int|bool|list[dict[str, str]]]
 	resultList = []
 
 	for user in users:
-		suspension = Suspension.getOngoingSuspension(user_email=user.email)
+		suspension = Suspension.getOngoingSuspension(email=user.email)
 		if suspension is None:
 			suspended_info = None
 		else:
 			suspended_info = {
-				"end_date": suspension.end,
+				"end_date": suspension.end.strftime("%Y-%m-%d %H:%M:%S"),
 				"reason": suspension.reason
 			}
 
 		result_json = {
 			"email": user.email,
 			"name": user.name,
-			"email_is_verified": bool(user.email_is_verified),
-			"password": user.password,
+			"email_is_verified": user.email_is_verified,
 			"user_type": user.user_type,
 			"suspended": suspended_info
 		}

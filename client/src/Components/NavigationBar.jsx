@@ -8,7 +8,7 @@ import {
 } from "flowbite-react";
 import { RiMenu2Fill } from "react-icons/ri";
 import { GiCorn } from "react-icons/gi";
-import { MdLogout, MdSpaceDashboard, MdOutlineWorkHistory } from "react-icons/md";
+import { MdLogout, MdSpaceDashboard, MdOutlineWorkHistory, MdManageAccounts } from "react-icons/md";
 import { LuUserCircle2 } from "react-icons/lu";
 
 import logo from "../assets/full_logo.png";
@@ -23,7 +23,9 @@ export default function NavigationBar() {
 
 	const drawerRoutes = {
 		ADMINISTRATOR: [
-			{ icon: MdSpaceDashboard, link: "/admin/user_management", name: "User Management" },
+			{ icon: MdSpaceDashboard, link: "/administrator", name: "Dashboard" },
+			{ icon: MdManageAccounts, link: "/administrator/user_management", name: "User Management" },
+
 		],
 		FREE_USER: [
 			{ icon: MdSpaceDashboard, link: "/user", name: "Dashboard" },

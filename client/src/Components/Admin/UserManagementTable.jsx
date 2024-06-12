@@ -1,0 +1,115 @@
+import { Checkbox, Table } from "flowbite-react";
+import React, { useEffect, useState } from "react";
+import UserManagementTableRow from "./UserManagementTableRow";
+import { format } from "date-fns";
+
+function UserManagementTable({ results, selected, setSelected }) {
+	useEffect(() => {
+		selected.forEach((val) => {
+			let flag = false;
+			results.forEach((result) => {
+				if (result.email == val) {
+					flag = true;
+					return;
+				}
+			});
+			if (!flag) {
+				setSelected((prev) => {
+					let new_set = new Set(prev);
+					new_set.delete(val);
+					return new_set;
+				});
+			}
+		});
+	}, [results]);
+
+	const handleAllCheckbox = () => {
+		if (selected.size != 0 && selected.size === results.length) {
+			setSelected(new Set());
+		} else {
+			results.forEach((r) => {
+				setSelected((prev) => new Set(prev).add(r.email));
+			});
+		}
+	};
+
+	return (
+		<div className="max-h-screen overflow-x-auto overflow-y-auto rounded-lg shadow-lg outline-gray-700">
+			<Table hoverable>
+				<Table.Head>
+					<Table.HeadCell className="bg-custom-brown-1 text-white p-4">
+						<Checkbox checked={selected.size != 0 && selected.size === results.length} onChange={handleAllCheckbox} />
+					</Table.HeadCell>
+					<Table.HeadCell className="bg-custom-brown-1 text-white p-4">Name</Table.HeadCell>
+					<Table.HeadCell className="bg-custom-brown-1 text-white p-4">Email</Table.HeadCell>
+					<Table.HeadCell className="bg-custom-brown-1 text-white p-4">Tier</Table.HeadCell>
+					<Table.HeadCell className="bg-custom-brown-1 text-white p-4">Status</Table.HeadCell>
+					<Table.HeadCell className="bg-custom-brown-1 text-white p-4">
+						<span className="sr-only">View</span>
+					</Table.HeadCell>
+				</Table.Head>
+				<Table.Body className="divide-y">
+					{results.map((r, index) => {
+						if (!r.email_is_verified) {
+							return (
+								<UserManagementTableRow
+									key={index}
+									email={r.email}
+									name={r.name}
+									tier={r.user_type}
+									status="Unverified"
+									selected={selected.has(r.email)}
+									setSelected={setSelected}
+								/>
+							);
+						} else if (!r.suspended) {
+							return (
+								<UserManagementTableRow
+									key={index}
+									email={r.email}
+									name={r.name}
+									tier={r.user_type}
+									status="Active"
+									selected={selected.has(r.email)}
+									setSelected={setSelected}
+								/>
+							);
+						} else {
+							const splitted = r.suspended.end_date.split(" ");
+							const splitted_date = splitted[0].split("-");
+							const splitted_time = splitted[1].split(":");
+							const date_obj = new Date(
+								splitted_date[0],
+								parseInt(splitted_date[1]) - 1,
+								splitted_date[2],
+								splitted_time[0],
+								splitted_time[1],
+								splitted_time[2]
+							);
+							return (
+								<UserManagementTableRow
+									key={index}
+									email={r.email}
+									name={r.name}
+									tier={r.user_type}
+									status={!r.suspended ? "Active" : `Suspended until ${format(date_obj, "dd MMM yyyy")}`}
+									selected={selected.has(r.email)}
+									setSelected={setSelected}
+								/>
+							);
+						}
+					})}
+					{results.length == 0 && (
+						<Table.Row>
+							<Table.Cell colSpan={6}>
+								<span className="flex justify-center w-full">No matching user accounts found</span>
+							</Table.Cell>
+						</Table.Row>
+					)}
+				</Table.Body>
+			</Table>
+		</div>
+	);
+}
+
+export default UserManagementTable;

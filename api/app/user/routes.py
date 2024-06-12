@@ -10,7 +10,7 @@ router = Blueprint("user", __name__)
 # All routes under user would be  /api/user/*
 
 @router.route("/get_suspension", methods=["GET"])
-@login_required
+@permissions_required(is_user=True)
 def get_suspension() -> dict[str, dict[str,str]|bool]:
 		suspension = Suspension.getOngoingSuspension(session["email"])
 		if not suspension:
