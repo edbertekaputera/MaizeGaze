@@ -96,7 +96,7 @@ function AdminUserManagementPage() {
 			let status;
 			if (user.suspended) {
 				status = "Suspended";
-			} else if (user.email_is_verified) {
+			} else if (!user.email_is_verified) {
 				status = "Unverified"
 			} else {
 				status = "Active";
