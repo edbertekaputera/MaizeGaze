@@ -110,7 +110,10 @@ def authorized(provider:str):
 		user = User.get(email)
 	if not user:
 		abort(500)
-		
+	# Activate User if not yet
+	if not user.email_is_verified:
+		User.activate_new_user(email, email)
+
 	# Get Type
 	user_type = TypeOfUser.get(user.user_type)
 	if not user_type:
