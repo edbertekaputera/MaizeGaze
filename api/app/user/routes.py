@@ -31,6 +31,7 @@ def get_suspension() -> dict[str, dict[str,str]|bool]:
 @permissions_required(is_user=True)
 def update_profile() -> dict[str, int|str]:
     details = request.get_json()
+    details["email"] = session["email"]
     success = User.update(details=details)
     if not success:
         return {"status_code": 400, "message": f"Failed to update profile '{details['email']}'."}
@@ -40,7 +41,7 @@ def update_profile() -> dict[str, int|str]:
 @permissions_required(is_user=True)
 def update_password() -> dict[str, str|int|bool]:
     json = request.get_json()
-    email = request.get_json()["email"]
+    email = session["email"]
     current_password = json["current_password"]
     new_password = json["new_password"]
     

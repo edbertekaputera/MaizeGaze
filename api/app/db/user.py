@@ -101,10 +101,6 @@ class User(db.Model):
 					if new_name.strip() == "":
 						return False
 					current_user.name = new_name
-				# Password
-				new_hashed_password = details.get("hashed_password")
-				if new_hashed_password:
-					current_user.password = new_hashed_password
 				db.session.commit()
 				return True
 		except:
