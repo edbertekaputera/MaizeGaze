@@ -66,7 +66,8 @@ with flask_app.app_context():
 		free_user = TypeOfUser(
             name="FREE_USER",
             detection_quota_limit = 10,
-			storage_limit = 25
+			storage_limit = 25,
+			price=0
 		) # type: ignore
 		db.session.add(free_user)
 		db.session.commit()
@@ -75,7 +76,8 @@ with flask_app.app_context():
 			name="ADMINISTRATOR",
 			is_admin = True,
 			detection_quota_limit = 100,
-			storage_limit = 100
+			storage_limit = 100,
+			price=0
 		) # type: ignore
 		db.session.add(admin_type)
 		db.session.commit()
