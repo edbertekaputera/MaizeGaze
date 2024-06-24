@@ -98,7 +98,7 @@ class User(db.Model):
 				# Name
 				new_name = details.get("name")
 				if new_name and new_name != current_user.name:
-					if new_name.strip() != "":
+					if new_name.strip() == "":
 						return False
 					current_user.name = new_name
 				# Password
