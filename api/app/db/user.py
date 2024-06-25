@@ -98,13 +98,9 @@ class User(db.Model):
 				# Name
 				new_name = details.get("name")
 				if new_name and new_name != current_user.name:
-					if new_name.strip() != "":
+					if new_name.strip() == "":
 						return False
 					current_user.name = new_name
-				# Password
-				new_hashed_password = details.get("hashed_password")
-				if new_hashed_password:
-					current_user.password = new_hashed_password
 				db.session.commit()
 				return True
 		except:
