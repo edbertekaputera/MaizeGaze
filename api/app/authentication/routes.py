@@ -1,13 +1,14 @@
 # Libraries
 from flask import session, request, current_app, Blueprint
+from flask_bcrypt import Bcrypt
 
 # Local dependencies
 from app.db import User, TypeOfUser,  Suspension
 from .email import generate_token_from_email, extract_email_from_token, send_email
 from .utils import login_required
-from app.authentication import bcrypt
 
 # Initialize
+bcrypt = Bcrypt()  # Used to hash passwords
 router = Blueprint("authentication", __name__)
 # Note: All routes here will have a prefix of /api/authentication
 
