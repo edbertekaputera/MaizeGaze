@@ -1,14 +1,12 @@
 # Libraries
 from flask import session, Blueprint, request
-from flask_bcrypt import Bcrypt
 
 # Local dependencies
 from app.db import Suspension
-from app.authentication import login_required, permissions_required
+from app.authentication import login_required, permissions_required, bcrypt
 from app.db import User
 
 # Initialize
-bycrypt = Bcrypt()  # Used to hash passwords
 router = Blueprint("user", __name__)
 # All routes under user would be  /api/user/*
 
@@ -49,10 +47,10 @@ def update_password() -> dict[str, str|int|bool]:
     if not user:
         return {"status_code": 400, "message": "User not found."}
     
-    if not bycrypt.check_password_hash(pw_hash=user.password, password=current_password):
+    if not bcrypt.check_password_hash(pw_hash=user.password, password=current_password):
         return {"status_code": 400, "message": "Current password incorrect"}
     
-    hashed_password = bycrypt.generate_password_hash(new_password)
+    hashed_password = bcrypt.generate_password_hash(new_password)
     
     success = User.update_password(email, hashed_password)
     if not success:
