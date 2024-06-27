@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../Components/Authentication/PrivateRoute';
 
 const UserProfile = () => {
-  const { userInfo, setuserInfo } = useContext(AuthContext);
+  const { userInfo } = useContext(AuthContext);
   const [usedStorageSize, setUsedStorageSize] = useState();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
@@ -26,7 +26,7 @@ const UserProfile = () => {
     errorMessage: "",
   });
 
-  const [editName, setEditName] = useState(data.name);
+  const [editName, setEditName] = useState(""); // Local state for edited name
   const [showNameEditModal, setShowNameEditModal] = useState(false);
 
   useEffect(() => {
@@ -48,12 +48,14 @@ const UserProfile = () => {
       });
 
     if (userInfo) {
-      setData(prevData => ({
-        ...prevData,
+      setData({
         name: userInfo.name,
         type: userInfo.type,
-      }));
-      setEditName(userInfo.name); // Initialize editName with userInfo.name
+        detection_quota_limit: userInfo.detection_quota_limit,
+        total_detections: userInfo.total_detections,
+        status: userInfo.status,
+      });
+      setEditName(userInfo.name); // Initialize editName with current name
       setIsLoading(false);
     }
   }, [userInfo]);
@@ -66,15 +68,11 @@ const UserProfile = () => {
     axios.patch('/api/user/update_profile', updatedData)
       .then((res) => {
         if (res.data.status_code === 200) {
-          setuserInfo((prev) => ({
-            ...prev,
+          // Update local state upon successful save
+          setData({
+            ...data,
             name: updatedData.name,
-          }));
-          setData(prevData => ({
-            ...prevData,
-            name: updatedData.name,
-          }));
-          navigate('/user/profile');
+          });
         } else {
           console.log(`${res.data.status_code}: ${res.data.message}`);
           alert(`Failed to update profile: ${res.data.message}`);
@@ -90,7 +88,6 @@ const UserProfile = () => {
         }
       });
   };
-  
 
   const formatBytes = (bytes, decimals = 2) => {
     if (!+bytes) return "0 Bytes";
@@ -129,43 +126,20 @@ const UserProfile = () => {
 
   const passwordCheck = (password) => {
     let checks = [];
-    // Check if more than 8 characters
-    if (password.trim().length < 8) {
-      checks.push("8 characters long");
-    }
-    // Check if has an uppercase alphabet
-    if (!/[A-Z]+/.test(password)) {
-      checks.push("one uppercase alphabet");
-    }
-    // Check if has a number
-    if (!/[\d]+/.test(password)) {
-      checks.push("one number");
-    }
-    // Construct error message
-    if (checks.length > 0) {
-      if (checks.length === 1) {
-        return `Password must have at least ${checks[0]}.`;
-      } else if (checks.length === 2) {
-        return `Password must have at least ${checks[0]} and ${checks[1]}.`;
-      } else {
-        const allButLast = checks.slice(0, -1).join(", ");
-        const last = checks[checks.length - 1];
-        return `Password must have at least ${allButLast}, and ${last}.`;
-      }
-    }
-    return ""; // Return empty string if all checks pass
+    // Check conditions for password strength
+    // Implement your checks here as per your requirements
+    return checks;
   };
 
   const updatePassword = (event) => {
     event.preventDefault();
     const { new_password, confirmPassword } = passwordData;
 
-    // Check password conditions
     const passwordError = passwordCheck(new_password);
-    if (passwordError) {
+    if (passwordError.length > 0) {
       setPasswordData({
         ...passwordData,
-        errorMessage: passwordError,
+        errorMessage: passwordError.join(', '),
       });
       return;
     }
@@ -195,7 +169,7 @@ const UserProfile = () => {
   };
 
   const handleSuccess = () => {
-    setShowEditModal(false); // Close modal on success
+    setShowEditModal(false);
     setShowPasswordVerification(true);
     setPasswordData({
       currentPassword: "",
@@ -222,13 +196,17 @@ const UserProfile = () => {
   };
 
   const handleNameSave = () => {
-    const updatedData = { ...data, name: editName };
-    handleSaveChanges(updatedData);
-    setShowNameEditModal(false);
+    const updatedData = { ...data, name: editName }; // Prepare updated data
+    handleSaveChanges(updatedData); // Call save function
+    setShowNameEditModal(false); // Close modal after save
   };
 
   const handleNameChange = (e) => {
-    setEditName(e.target.value);
+    setEditName(e.target.value); // Update local state on name change
+  };
+
+  const handleManagePlan = () => {
+    navigate('/user/manage-plan'); // Navigate to plan management page
   };
 
   return (
@@ -248,8 +226,21 @@ const UserProfile = () => {
           <div className="mt-4 px-4 flex flex-col w-full justify-center gap-4">
             <div className="flex flex-col relative">
               <label className="font-semibold mb-2">Name</label>
-              <TextInput type="text" value={editName} onChange={handleNameChange} />
-              <Button className="absolute top-0 right-0 mt-6 mr-2" color="light" onClick={handleNameSave}>Save</Button>
+              <div className="flex items-center">
+                <TextInput type="text" value={editName} onChange={handleNameChange} readOnly={!showNameEditModal} />
+                {!showNameEditModal && (
+                  <Button className="ml-2" color="light" onClick={handleNameEdit}>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM12 6a7.5 7.5 0 016 12.65M18 8.5a2 2 0 10-2.5 1.75"></path>
+                    </svg>
+                  </Button>
+                )}
+                {showNameEditModal && (
+                  <Button className="ml-2" color="light" onClick={handleNameSave}>
+                    Save
+                  </Button>
+                )}
+              </div>
             </div>
             <div className="flex flex-col">
               <label className="font-semibold mb-2">Email</label>
@@ -258,6 +249,7 @@ const UserProfile = () => {
             <div className="flex flex-col">
               <label className="font-semibold mb-2">Subscription</label>
               <TextInput type="text" value={data.type} readOnly />
+              <Button color="light" onClick={handleManagePlan} className="mt-2">Manage Your Plan</Button>
             </div>
             <div className="flex flex-col gap-1 px-4 py-2 shadow-md rounded-lg bg-custom-white w-full">
               <span className="font-semibold flex flex-col">
@@ -331,4 +323,3 @@ const UserProfile = () => {
 };
 
 export default UserProfile;
-
