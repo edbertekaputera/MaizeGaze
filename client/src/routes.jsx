@@ -13,6 +13,7 @@ import ResetPasswordPage from "./Pages/ResetPasswordPage";
 import NewPasswordPage from "./Pages/NewPasswordPage";
 import LandingPage from "./Pages/LandingPage";
 import AdminUserManagementPage from "./Pages/AdminUserManagementPage";
+import UserProfile from "./Pages/UserProfile";
 
 export default function AppRouter() {
 	return (
@@ -135,6 +136,17 @@ export default function AppRouter() {
 						</PrivateRoute>
 					}
 				/> */}
+
+				{/* User Profile Route */}
+				<Route
+					exact
+					path="/user/profile"
+					element={
+						<PrivateRoute user_only>
+							<UserProfile />
+						</PrivateRoute>
+					}
+				/>
 
 				{/* Other routes */}
 				<Route
