@@ -124,49 +124,82 @@ const UserProfile = () => {
       });
   };
 
-  const passwordCheck = (password) => {
-    let checks = [];
-    // Check conditions for password strength
-    // Implement your checks here as per your requirements
-    return checks;
-  };
-
-  const updatePassword = (event) => {
-    event.preventDefault();
-    const { new_password, confirmPassword } = passwordData;
-
-    const passwordError = passwordCheck(new_password);
-    if (passwordError.length > 0) {
-      setPasswordData({
-        ...passwordData,
-        errorMessage: passwordError.join(', '),
-      });
-      return;
+// Modified passwordCheck function
+const passwordCheck = (password) => {
+  let checks = [];
+  // Check if it's at least 8 characters long
+  if (password.trim().length < 8) {
+    checks.push("at least 8 characters");
+  }
+  // Check if it has at least one uppercase letter
+  if (!/[A-Z]+/.test(password)) {
+    checks.push("one uppercase letter");
+  }
+  // Check if it has at least one digit
+  if (!/\d+/.test(password)) {
+    checks.push("one digit");
+  }
+  // Set error message
+  if (checks.length > 0) {
+    if (checks.length === 1) {
+      return `Password must include ${checks[0]}.`;
+    } else if (checks.length === 2) {
+      return `Password must include ${checks[0]} and ${checks[1]}.`;
+    } else {
+      const allButLast = checks.slice(0, -1).join(", ");
+      const last = checks[checks.length - 1];
+      return `Password must include ${allButLast}, and ${last}.`;
     }
+  }
+  return "";
+};
 
-    if (new_password !== confirmPassword) {
-      setPasswordData({
-        ...passwordData,
-        errorMessage: "Passwords do not match",
-      });
-      return;
-    }
+// Modified updatePassword function
+const updatePassword = (event) => {
+  event.preventDefault();
+  const { new_password, confirmPassword } = passwordData;
 
-    axios.patch('/api/user/update_password', {
+  const passwordError = passwordCheck(new_password);
+  if (passwordError.length > 0) {
+    setPasswordData({
+      ...passwordData,
+      errorMessage: passwordError,
+    });
+    return;
+  }
+
+  if (new_password !== confirmPassword) {
+    setPasswordData({
+      ...passwordData,
+      errorMessage: "Passwords do not match.",
+    });
+    return;
+  }
+
+  axios
+    .patch("/api/user/update_password", {
       new_password,
     })
-      .then((response) => {
-        if (response.data.success) {
-          handleSuccess();
-        } else {
-          alert(response.data.message);
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-        alert("Failed to update password. Please try again.");
+    .then((response) => {
+      if (response.data.success) {
+        handleSuccess();
+      } else {
+        setPasswordData({
+          ...passwordData,
+          errorMessage: response.data.message,
+        });
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+      setPasswordData({
+        ...passwordData,
+        errorMessage: "Failed to update password. Please try again.",
       });
-  };
+    });
+};
+
+
 
   const handleSuccess = () => {
     setShowEditModal(false);
