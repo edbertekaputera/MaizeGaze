@@ -199,8 +199,6 @@ const updatePassword = (event) => {
     });
 };
 
-
-
   const handleSuccess = () => {
     setShowEditModal(false);
     setShowPasswordVerification(true);
@@ -254,6 +252,8 @@ const updatePassword = (event) => {
           <div className="flex flex-col w-full sm:w-1/2 justify-center items-center">
             <Avatar rounded placeholderInitials={data.name ? data.name.split(" ").map((val) => val[0].toUpperCase()).join("") : ""} size="xl" className="text-6xl" />
             <br></br>
+            <Button color="light" onClick={handleManagePlan} className="mt-4 sm:mt-0">Manage Your Plan</Button>
+            <br></br>
             <Button color="failure" onClick={handlePassword}>Change Password</Button>
           </div>
           <div className="mt-4 px-4 flex flex-col w-full justify-center gap-4">
@@ -279,11 +279,16 @@ const updatePassword = (event) => {
               <label className="font-semibold mb-2">Email</label>
               <TextInput type="text" value={userInfo.email} readOnly />
             </div>
-            <div className="flex flex-col">
-              <label className="font-semibold mb-2">Subscription</label>
-              <TextInput type="text" value={data.type} readOnly />
-              <Button color="light" onClick={handleManagePlan} className="mt-2">Manage Your Plan</Button>
-            </div>
+            <div className="flex flex-row justify-between gap-4">
+									<div className="flex flex-col w-1/2">
+										<label className="font-semibold mb-2">Subscription</label>
+										<TextInput type="text" value={data.type} readOnly />
+									</div>
+									<div className="flex flex-col w-1/2">
+										<label className="font-semibold mb-2">Total Detections</label>
+										<TextInput type="text" value={data.total_detections} readOnly />
+									</div>
+						</div>
             <div className="flex flex-col gap-1 px-4 py-2 shadow-md rounded-lg bg-custom-white w-full">
               <span className="font-semibold flex flex-col">
                 <h2 className="font-bold text-lg">Storage used</h2>
