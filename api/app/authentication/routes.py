@@ -241,4 +241,33 @@ def update_password() -> dict[str, str|int|bool]:
 	success = User.update_password(extracted_email, hashed_password)
 	if not success:
 		return {'success' : False, 'message' : 'Failed to update password.'} 
-	return {'success' : True, 'message' : 'Password is successfully updated!'} 
+	return {'success' : True, 'message' : 'Password is successfully updated!'}
+
+# Login route
+@router.route('/verify_password', methods=["POST"])
+def verify_password():
+    """
+        - password:str
+    """
+    json_data = request.get_json()
+    password = json_data.get("password")
+
+    # Get user's email from session
+    email = session.get("email")
+    
+    # Retrieve user from database based on email
+    user = User.query.filter_by(email=email).first()
+    
+    if not user:
+        return {'status_code': 401, 'message': 'User not found'}
+    
+    # Check if user has a password set
+    if not user.password:
+        return {'status_code': 401, 'message': 'Password not set for this user'}
+    
+    # Check if the provided password matches the user's password
+    if not bcrypt.check_password_hash(user.password, password):
+        return {'status_code': 401, 'message': 'Incorrect password'}
+    
+    # If everything is correct, return success
+    return {'status_code': 202, 'message': 'Password verified successfully'}

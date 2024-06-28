@@ -150,7 +150,9 @@ function UserDashboard() {
 									<HiArrowNarrowRight className="text-center ml-2" size={24} />
 								</div>
 							</Button>
-							<Button className="hover:text-gray-900 items-center py-1 px-1 sm:ms-4 text-base font-medium text-center text-white rounded-lg border border-white hover:bg-gray-100 focus:ring-4 focus:ring-gray-400">
+							<Button className="hover:text-gray-900 items-center py-1 px-1 sm:ms-4 text-base font-medium text-center text-white rounded-lg border border-white hover:bg-gray-100 focus:ring-4 focus:ring-gray-400"
+							onClick={() => navigate("/user/profile")}>
+								
 								<div className="flex flex-row justify-center items-center align-middle py-1 px-1 rounded-lg ">
 									<span className="text-lg font-medium">View My Profile</span>
 								</div>

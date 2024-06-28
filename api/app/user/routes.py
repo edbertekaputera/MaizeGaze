@@ -1,5 +1,5 @@
 # Libraries
-from flask import session, Blueprint, request
+from flask import session, Blueprint, request, jsonify, session
 
 # Local dependencies
 from app.db import Suspension
@@ -40,15 +40,15 @@ def update_profile() -> dict[str, int|str]:
 def update_password() -> dict[str, str|int|bool]:
     json = request.get_json()
     email = session["email"]
-    current_password = json["current_password"]
+    #current_password = json["current_password"]
     new_password = json["new_password"]
     
     user = User.get(email=email)
     if not user:
         return {"status_code": 400, "message": "User not found."}
     
-    if not bcrypt.check_password_hash(pw_hash=user.password, password=current_password):
-        return {"status_code": 400, "message": "Current password incorrect"}
+    # if not bcrypt.check_password_hash(pw_hash=user.password, password=current_password):
+    #     return {"status_code": 400, "message": "Current password incorrect"}
     
     hashed_password = bcrypt.generate_password_hash(new_password)
     
