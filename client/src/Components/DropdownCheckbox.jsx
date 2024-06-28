@@ -2,36 +2,28 @@ import React from "react";
 import { Checkbox, Dropdown, Label } from "flowbite-react";
 import { BsArrowDownShort } from "react-icons/bs";
 
-function DropdownCheckbox({
-	filter,
-	setFilter,
-	update_key,
-	label,
-	icon = null,
-}) {
+function DropdownCheckbox({ filter, setFilter, update_key, label, icon = null }) {
 	return (
-		<div className="flex flex-col sm:w-1/2 md:w-fit">
+		<div className="flex flex-col w-full sm:w-1/2 md:w-fit">
 			<Label className="mb-1 text-sm font-semibold">{label}:</Label>
 			<Dropdown
 				label="Dropdown button"
-				className="drop-shadow-md"
+				className="drop-shadow-md "
 				renderTrigger={() => (
-					<div className="w-full flex p-2.5 pl-3 flex-row gap-2 justify-start items-center align-middle bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg hover:ring-custom-green-1 hover:border-custom-green-1">
-						{icon}
-						{label}
+					<div className="w-full flex p-2.5 pl-3 flex-row gap-2 justify-between items-center align-middle bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg hover:ring-custom-green-1 hover:border-custom-green-1">
+						<div className="flex flex-row gap-2">
+							{icon}
+							{label}
+						</div>
 						<BsArrowDownShort size={20} />
 					</div>
 				)}
 			>
-				<div className="flex gap-2 my-2 mx-2">
+				<div className="flex flex-row gap-2 my-2 mx-2 items-center w-full">
 					<Checkbox
-						checked={Object.values(filter[update_key]).every(
-							(value) => value === true
-						)}
+						checked={Object.values(filter[update_key]).every((value) => value === true)}
 						onChange={() => {
-							const allChecked = Object.values(filter[update_key]).every(
-								(value) => value === true
-							);
+							const allChecked = Object.values(filter[update_key]).every((value) => value === true);
 							if (allChecked) {
 								Object.keys(filter[update_key]).forEach((key) => {
 									setFilter((prevFilter) => ({
@@ -55,12 +47,12 @@ function DropdownCheckbox({
 							}
 						}}
 					/>
-					<Label htmlFor="buyer" className="flex">
+					<Label htmlFor="buyer" className="grow">
 						All
 					</Label>
 				</div>
 				{Object.keys(filter[update_key]).map((key) => (
-					<div key={key} className="flex gap-2 my-2 mx-2">
+					<div key={key} className="flex flex-row flex-grow gap-2 my-2 mx-2 items-center w-full">
 						<Checkbox
 							id={key}
 							checked={filter[update_key][key]}
@@ -74,7 +66,7 @@ function DropdownCheckbox({
 								});
 							}}
 						/>
-						<Label htmlFor="buyer" className="flex">
+						<Label htmlFor="buyer" className="grow">
 							{key}
 						</Label>
 					</div>

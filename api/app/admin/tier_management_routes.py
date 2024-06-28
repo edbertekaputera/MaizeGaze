@@ -15,10 +15,8 @@ router = Blueprint("tier_management", __name__)
 @permissions_required(is_admin=True)
 def create_tier() -> dict[str, int|str]:
 	details = request.get_json()
-	success = TypeOfUser.createTypeOfUser(details=details)
-	if not success:
-		return {"status_code": 400, "message": f"Failed to create new tier '{details['name']}'."}
-	return {"status_code": 201, "message": f"Successfully created new tier '{details['name']}'."}
+	success, message = TypeOfUser.createTypeOfUser(details=details)
+	return {"status_code": 201 if success else 400, "message": message}
 
 @router.route("/update_tier", methods=["PATCH"])
 @permissions_required(is_admin=True)
