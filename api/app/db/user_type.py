@@ -30,7 +30,7 @@ class TypeOfUser(db.Model):
 		return cls.query.all()
 	
 	@classmethod
-	def createTypeOfUser(cls, details:dict[str,str|int|bool]) -> bool:
+	def createTypeOfUser(cls, details:dict[str,str|int|bool]) -> tuple[bool, str]:
 		"""Create a new type of user.
 
 		Args:
@@ -52,15 +52,17 @@ class TypeOfUser(db.Model):
 				new_tier = cls(**details)
 				# Cannot make admin tier
 				if new_tier.is_admin:
-					return False
+					return False, "The creation of Tier with administrator privileges is prohibited."
 				# Exists already or has invalid numerical features
-				if cls.get(new_tier.name) or new_tier.price <= 0 or new_tier.detection_quota_limit <= 0 or new_tier.storage_limit <=0:
-					return False
+				if cls.get(new_tier.name):
+					return False, f"Tier '{details['name']}' already exists."
+				if new_tier.price <= 0 or new_tier.detection_quota_limit <= 0 or new_tier.storage_limit <= 0:
+					return False, f"Tier attributes contain invalid numerical value."
 				db.session.add(new_tier)
 				db.session.commit()
-			return True
+			return True, f"Successfully created new tier '{details['name']}'."
 		except:
-			return False
+			return False, f"Failed to create new tier '{details['name']}'."
 	
 	@classmethod
 	def updateTypeOfUser(cls, details:dict[str,str|int|bool]) -> bool:

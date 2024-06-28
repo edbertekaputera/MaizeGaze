@@ -45,7 +45,7 @@ function CreateTierModal({ state, setState }) {
 				if (res.data.status_code === 201) {
 					setMessageModal(true);
 				} else {
-					alert("Failed to create tier, please try again...");
+					alert(res.data.message);
 				}
 			})
 			.catch((error) => {
