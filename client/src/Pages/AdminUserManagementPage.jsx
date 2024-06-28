@@ -164,7 +164,7 @@ function AdminUserManagementPage() {
 					</div>
 				</section>
 				<section>
-					<UserManagementTable results={searchFilter()} selected={selected} setSelected={setSelected} />
+					<UserManagementTable users={searchFilter()} selected={selected} setSelected={setSelected} />
 				</section>
 			</Card>
 		</div>

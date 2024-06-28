@@ -3,11 +3,11 @@ import React, { useEffect, useState } from "react";
 import UserManagementTableRow from "./UserManagementTableRow";
 import { format } from "date-fns";
 
-function UserManagementTable({ results, selected, setSelected }) {
+function UserManagementTable({ users, selected, setSelected }) {
 	useEffect(() => {
 		selected.forEach((val) => {
 			let flag = false;
-			results.forEach((result) => {
+			users.forEach((result) => {
 				if (result.email == val) {
 					flag = true;
 					return;
@@ -21,13 +21,13 @@ function UserManagementTable({ results, selected, setSelected }) {
 				});
 			}
 		});
-	}, [results]);
+	}, [users]);
 
 	const handleAllCheckbox = () => {
-		if (selected.size != 0 && selected.size === results.length) {
+		if (selected.size != 0 && selected.size === users.length) {
 			setSelected(new Set());
 		} else {
-			results.forEach((r) => {
+			users.forEach((r) => {
 				setSelected((prev) => new Set(prev).add(r.email));
 			});
 		}
@@ -38,7 +38,7 @@ function UserManagementTable({ results, selected, setSelected }) {
 			<Table hoverable>
 				<Table.Head>
 					<Table.HeadCell className="bg-custom-brown-1 text-white p-4">
-						<Checkbox checked={selected.size != 0 && selected.size === results.length} onChange={handleAllCheckbox} />
+						<Checkbox checked={selected.size != 0 && selected.size === users.length} onChange={handleAllCheckbox} />
 					</Table.HeadCell>
 					<Table.HeadCell className="bg-custom-brown-1 text-white p-4">Name</Table.HeadCell>
 					<Table.HeadCell className="bg-custom-brown-1 text-white p-4">Email</Table.HeadCell>
@@ -49,7 +49,7 @@ function UserManagementTable({ results, selected, setSelected }) {
 					</Table.HeadCell>
 				</Table.Head>
 				<Table.Body className="divide-y">
-					{results.map((r, index) => (
+					{users.map((r, index) => (
 						<UserManagementTableRow
 							key={index}
 							email={r.email}
@@ -61,7 +61,7 @@ function UserManagementTable({ results, selected, setSelected }) {
 							setSelected={setSelected}
 						/>
 					))}
-					{results.length == 0 && (
+					{users.length == 0 && (
 						<Table.Row>
 							<Table.Cell colSpan={6}>
 								<span className="flex justify-center w-full">No matching user accounts found</span>

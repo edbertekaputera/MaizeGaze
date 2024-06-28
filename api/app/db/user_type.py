@@ -50,6 +50,9 @@ class TypeOfUser(db.Model):
 		try:
 			with current_app.app_context():
 				new_tier = cls(**details)
+				# Cannot make admin tier
+				if new_tier.is_admin:
+					return False
 				# Exists already or has invalid numerical features
 				if cls.get(new_tier.name) or new_tier.price <= 0 or new_tier.detection_quota_limit <= 0 or new_tier.storage_limit <=0:
 					return False
