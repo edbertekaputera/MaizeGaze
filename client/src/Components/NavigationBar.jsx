@@ -29,7 +29,7 @@ export default function NavigationBar() {
 			{ icon: MdManageAccounts, link: "/administrator/user_management", name: "User Management" },
 			{ icon: GoSponsorTiers, link: "/administrator/tier_management", name: "Tier Management" },
 		],
-		FREE_USER: [
+		USER: [
 			{ icon: MdSpaceDashboard, link: "/user", name: "Dashboard" },
 			{ icon: GiCorn, link: "/user/detect", name: "Detect and Count" },
 			{ icon: MdOutlineWorkHistory, link: "/user/result_history", name: "Result History" },
@@ -102,7 +102,7 @@ export default function NavigationBar() {
 							<div>
 								<Sidebar.Items>
 									<Sidebar.ItemGroup>
-										{drawerRoutes[userInfo.type].map((item) => (
+										{drawerRoutes[userInfo.is_admin ? "ADMINISTRATOR" : "USER"].map((item) => (
 											<Sidebar.Item
 												key={item.name}
 												href={item.link}
