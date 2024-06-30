@@ -163,7 +163,8 @@ def whoami():
 					'is_admin': session['is_admin'],
 					'detection_quota_limit': session['detection_quota_limit'],
 					'storage_limit': session['storage_limit'],
-					'suspended': True if suspension else False
+					'suspended': True if suspension else False,
+					'has_password': current_user.password is not None
 			}}
 	return {'status_code': 200, "data": {'type': "anonymous"}}
 
@@ -245,6 +246,7 @@ def update_password() -> dict[str, str|int|bool]:
 
 # Login route
 @router.route('/verify_password', methods=["POST"])
+@login_required
 def verify_password():
     """
         - password:str
