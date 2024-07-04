@@ -29,7 +29,6 @@ class DetectionResult(db.Model):
 											back_populates="farmToDetectionResultRel",
 											cascade="all, delete, save-update")
 
-	
 	@classmethod
 	def queryAllResultHistory(cls, email:str) -> list[Self]:
 		return cls.query.filter_by(farm_user=email).all()
@@ -82,7 +81,22 @@ class DetectionResult(db.Model):
 			.group_by(cls.farm_name, db.func.date(cls.record_date)) \
 			.all()
 		
- 
- 
+	@classmethod
+	def update(cls, farm_user:str, farm_name:str, id:str, tassel_count:int) -> bool:
+		try:
+			with current_app.app_context():
+				current_result = DetectionResult.queryResult(str(farm_user), str(farm_name), str(id))
+				if not current_result:
+					return False
+				
+				if int(tassel_count) and tassel_count != current_result.tassel_count:
+					current_result.tassel_count = int(tassel_count)
+		
+				db.session.commit()
+			return True
+		except BaseException as e:
+			print(e)
+			return False
+
 	
 	

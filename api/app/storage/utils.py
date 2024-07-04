@@ -198,6 +198,30 @@ class UserDirectory():
 				zip_file.write(txt_path, f"labels/{r.farm_name}_{r.id}.txt")
 		return zip_buffer
 
+	def replace(self, farm_name:str, id:str, annotations:list[dict[str, float]]) -> bool:
+		
+		# retrieve image
+		path = os.path.join(self.__user_directory, "images", f"{farm_name}_{id}.jpg")
+		img = Image.open(path)
+
+		image_pil = Image.open(BytesIO(img.stream.read()))
+		# Get image size
+		image_bytes = BytesIO()
+		image_size = len(image_bytes.getvalue())
+		estimated_txt_size = len(annotations) * 18
+
+		# Check storage budget
+		if self.__size + image_size + estimated_txt_size > self.__storage_limit:
+			return False
+		try:
+			# Replace txt
+			with open(os.path.join(self.__user_directory, "labels", f"{farm_name}_{id}.txt"), "w") as f:
+				for a in annotations:
+					f.write(f"0 {a['x']} {a['y']} {a['width']} {a['height']}\n")
+		except BaseException as err:
+			print(err)
+			return False
+		return True
 	
 
 
