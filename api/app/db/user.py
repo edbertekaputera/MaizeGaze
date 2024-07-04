@@ -83,3 +83,25 @@ class User(db.Model):
 			current_user.password = new_hashed_password
 			db.session.commit()
 			return True
+	
+	@classmethod
+	def getNumOfUserByTier(cls, tier_name:str) -> int:
+		return cls.query.filter_by(user_type=tier_name).count()
+	
+	@classmethod
+	def update(cls, details:dict[str, str|bytes]) -> bool:
+		try:
+			with current_app.app_context():
+				current_user = User.get(str(details["email"]))
+				if not current_user:
+					return False
+				# Name
+				new_name = details.get("name")
+				if new_name and new_name != current_user.name:
+					if new_name.strip() == "":
+						return False
+					current_user.name = new_name
+				db.session.commit()
+				return True
+		except:
+			return False

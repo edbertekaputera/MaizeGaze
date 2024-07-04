@@ -124,4 +124,7 @@ def authorized(provider:str):
 	session["is_admin"] = user_type.is_admin
 	session["detection_quota_limit"] = user_type.detection_quota_limit
 	session["storage_limit"] = user_type.storage_limit
+	session["can_reannotate"] = user_type.can_reannotate
+	session["can_active_learn"] = user_type.can_active_learn
+	session["can_chatbot"] = user_type.can_chatbot
 	return redirect(current_app.config["CLIENT_SERVER_URL"])

@@ -25,6 +25,7 @@ function SuspendUserModal({ state, setState, selected }) {
 	const handleSuspend = () => {
 		const final_duration = durationUnit === "Days" ? duration : durationUnit === "Weeks" ? duration * 7 : duration * 30;
 		setIsSuspendLoading(true);
+		setFailedList([]);
 		selected.forEach((email) => {
 			axios
 				.post("/api/admin/user_management/suspend_user", {

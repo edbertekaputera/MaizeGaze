@@ -13,6 +13,9 @@ import ResetPasswordPage from "./Pages/ResetPasswordPage";
 import NewPasswordPage from "./Pages/NewPasswordPage";
 import LandingPage from "./Pages/LandingPage";
 import AdminUserManagementPage from "./Pages/AdminUserManagementPage";
+import UserProfile from "./Pages/UserProfile";
+import AdminTierManagementPage from "./Pages/AdminTierManagementPage";
+
 
 export default function AppRouter() {
 	return (
@@ -96,6 +99,16 @@ export default function AppRouter() {
 					}
 				/>
 
+				<Route
+					exact
+					path="/administrator/tier_management"
+					element={
+						<PrivateRoute admin_only>
+							<AdminTierManagementPage />
+						</PrivateRoute>
+					}
+				/>
+
 				{/* User Routes */}
 				<Route
 					exact
@@ -135,6 +148,17 @@ export default function AppRouter() {
 						</PrivateRoute>
 					}
 				/> */}
+
+				{/* User Profile Route */}
+				<Route
+					exact
+					path="/user/profile"
+					element={
+						<PrivateRoute user_only>
+							<UserProfile />
+						</PrivateRoute>
+					}
+				/>
 
 				{/* Other routes */}
 				<Route
