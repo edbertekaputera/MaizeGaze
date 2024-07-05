@@ -85,7 +85,7 @@ class DetectionResult(db.Model):
 	def update(cls, farm_user:str, farm_name:str, id:str, tassel_count:int) -> bool:
 		try:
 			with current_app.app_context():
-				current_result = DetectionResult.queryResult(str(farm_user), str(farm_name), str(id))
+				current_result = cls.queryResult(str(farm_user), str(farm_name), str(id))
 				if not current_result:
 					return False
 				
