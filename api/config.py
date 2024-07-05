@@ -66,3 +66,7 @@ class Config(object):
 
 	# Geocoding API
 	REVERSE_GEOCODE_API = os.environ.get('REVERSE_GEOCODE_API')
+
+	# Stripe
+	STRIPE_API_KEY = os.environ["STRIPE_API_KEY"]
+	STRIPE_ENDPOINT_SECRET = os.environ["STRIPE_ENDPOINT_SECRET"]

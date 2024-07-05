@@ -58,6 +58,9 @@ GITHUB_REDIRECT_URI = http://localhost:5000/api/authentication/oauth/login/githu
 
 # Reverse Geocode API (https://geocode.maps.co/)
 REVERSE_GEOCODE_API = 'YOUR_API_KEY'
+
+# Stripe
+STRIPE_API_KEY = 'YOUR_API_KEY'
 ```
 
 To run the server, simply run `application.py` as followed, and it should be hosted locally at `port 5000`

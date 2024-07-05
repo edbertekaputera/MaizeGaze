@@ -6,6 +6,8 @@ from flask_cors import CORS
 from config import Config
 from celery import Celery, Task
 from sqlalchemy import event
+import stripe
+
 # Local dependencies
 from app.db import db, User, TypeOfUser
 from app.authentication import oauth, bcrypt, mail, router as auth_router
@@ -30,6 +32,9 @@ mail.init_app(flask_app)
 oauth.init_app(flask_app)
 # Encryption
 bcrypt.init_app(flask_app)
+
+# Stripe
+stripe.api_key = flask_app.config["STRIPE_API_KEY"]
 
 # Celery
 def celery_init_app(app: Flask) -> Celery:

@@ -17,3 +17,5 @@ ultralytics==8.2.*
 dill==0.3.8
 # Task Queue
 celery==5.4.*
+# Stripe
+stripe==10.1.*
