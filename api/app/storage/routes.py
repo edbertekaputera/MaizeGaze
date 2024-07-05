@@ -182,42 +182,25 @@ def queryDailyStatistics() -> dict[str, list[dict[str, str|int]]]:
 
 	return {"result": resultList}
 
-@router.route("/reannotate_result", method=["POST", "GET"])
+@router.route("/reannotate_result", methods=["POST"])
 @permissions_required(is_user=True)
-def reannotateResult() -> dict[]:
-	farm_user = session["email"]
-	farm_name = request.args["farm_name"]
-	id = request.args["id"]
-	updated_result = request.get_json()["updated_result"]
+def reannotateResult() -> dict[str, int | str]:
+	# Get Updated Result
+	data = request.get_json()
+	if not data or "updated_result" not in data:
+        	return {"status_code": 400, "message": "Invalid input data."}
+		
+	updated_result = data["updated_result"]
 
 	# Update Tassel Count
-	success_update = DetectionResult.update(farm_user, farm_name, id, updated_result.tassel_count)
+	success_update = DetectionResult.update(updated_result["farm_user"], updated_result["farm_name"], updated_result["id"], updated_result["tassel_count"])
 	if not success_update:
-		return {"status_code": 500, "message": "Failed to update tassel count."}
-	
+		return {"status_code": 400, "message": "Failed to update tassel count."}
+
 	# Update Annotation
 	user_directory = UserDirectory()
-	success_replace = user_directory.replace(farm_name, id, updated_result.annotations)
+	success_replace = user_directory.replace(updated_result["farm_name"], updated_result["id"], updated_result["annotations"])
 	if not success_replace:
-		return {"status_code": 500, "message": "Failed to replace annotations."}
+		return {"status_code": 400, "message": "Failed to replace annotations."}
 	
-	# Retrieve Detection Result
-	result = DetectionResult.queryResult(farm_user, farm_name, id)
-
-	# Retrieve Image, Annotations, and Annotated Images
-	resources = user_directory.retrieveResource(result)
-
-	# Add metadata info
-	result_json = {
-		"id": result.id,
-		"tassel_count": int(result.tassel_count),
-		"record_date": result.record_date.strftime("%Y-%m-%d %H:%M:%S"),
-		"name": result.name,
-		"description": result.description,
-		"farm_name": result.farm_name,
-		"farm_user": result.farm_user,
-		"original_image": resources["original_image"],
-		"annotated_image": resources["annotated_image"],
-		"annotations": resources["annotations"]
-	}
-	return {"status_code": 200, "result": result_json}
+	return {"status_code": 200, "message": "Reannotation Successful."}
