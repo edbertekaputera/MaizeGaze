@@ -191,15 +191,17 @@ def reannotateResult() -> dict[str, int | str]:
         	return {"status_code": 400, "message": "Invalid input data."}
 		
 	updated_result = data["updated_result"]
-
+	
 	# Update Tassel Count
 	success_update = DetectionResult.update(updated_result["farm_user"], updated_result["farm_name"], updated_result["id"], updated_result["tassel_count"])
 	if not success_update:
 		return {"status_code": 400, "message": "Failed to update tassel count."}
 
 	# Update Annotation
+	detection_result = DetectionResult.queryResult(updated_result["farm_user"], updated_result["farm_name"], updated_result["id"])
+	
 	user_directory = UserDirectory()
-	success_replace = user_directory.replace(updated_result["farm_name"], updated_result["id"], updated_result["annotations"])
+	success_replace = user_directory.replace(detection_result, updated_result["annotations"])
 	if not success_replace:
 		return {"status_code": 400, "message": "Failed to replace annotations."}
 	
