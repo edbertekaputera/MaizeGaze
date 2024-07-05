@@ -61,6 +61,7 @@ REVERSE_GEOCODE_API = 'YOUR_API_KEY'
 
 # Stripe
 STRIPE_API_KEY = 'YOUR_API_KEY'
+STRIPE_ENDPOINT_SECRET = 'YOUR_STRIPE_ENDPOINT_SECRET'
 ```
 
 To run the server, simply run `application.py` as followed, and it should be hosted locally at `port 5000`
@@ -111,8 +112,26 @@ celery -A app worker --loglevel INFO -c <NUMBER_OF_WORKERS>
 ```
 This will run `<NUMBER_OF_WORKERS>` workers, which can run concurrently to handle tasks in the `celery task queue system`.
 
+### 4. Stripe CLI (for local testing)
+We connected our system to the Stripe API, so if we want the server to run properly in local, we need `Stripe CLI` to forward all of the webhook calls to our local endpoint. So, first make sure you have installed and properly setup the `Stripe CLI`. Check out `https://docs.stripe.com/stripe-cli` if you haven't.
+
+Then, authorize it to your Stripe Account by logging it as followed,
+```bash
+stripe login
+```
+
+Finally, you can forward all of events to your webhook with the following commands,
+```bash
+stripe listen --forward-to localhost:5000/api/user/subscription/stripe_webhook_endpoint
+```
+
+You can also simulate specific events for testing with the following commands,
+```bash
+stripe trigger payment_intent.succeeded
+```
+
 ## Important Note:
-Make sure you have all three servers and the celery workers running at the same time, so that the system can work properly.
+Make sure you have all three servers and the celery workers running at the same time, so that the system can work properly. For local development, make sure the Stripe CLI is also listening and forwarding events to your local endpoint.
 
 If you want to add changes or contribute, please 
 1. create your own `branch`
