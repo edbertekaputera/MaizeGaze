@@ -13,7 +13,7 @@ class User(db.Model):
 	name = db.Column(db.String(250), nullable=False)
 	email_is_verified = db.Column(db.Boolean(), default=False)
 	password = db.Column(db.String(250))
-
+	current_subscription_id = db.Column(db.String(250), nullable=True)
 	# Foreign key
 	user_type = db.Column(db.String(250), db.ForeignKey("TypeOfUser.name"), nullable=False)
 	userToTypeOfUserRel = db.relationship("TypeOfUser", back_populates="typeOfUserToUserRel", cascade="all, delete, save-update",
@@ -104,4 +104,20 @@ class User(db.Model):
 				db.session.commit()
 				return True
 		except:
+			return False
+		
+	@classmethod
+	def updatePlan(cls, email:str, plan:str, subscription_id:str|None) -> bool:
+		try:
+			with current_app.app_context():
+				current_user = User.get(email)
+				if not current_user:
+					return False
+				# Update Plan
+				current_user.user_type = plan
+				current_user.current_subscription_id = subscription_id
+				db.session.commit()
+				return True
+		except Exception as err:
+			print(err)
 			return False

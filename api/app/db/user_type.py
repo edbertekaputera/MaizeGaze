@@ -16,7 +16,8 @@ class TypeOfUser(db.Model):
 	can_reannotate = db.Column(db.Boolean(), default=False)
 	can_chatbot = db.Column(db.Boolean(), default=False)
 	can_active_learn = db.Column(db.Boolean(), default=False)
-
+	stripe_product_id = db.Column(db.String(250), nullable=True, unique=True)
+	
 	# Relationship
 	typeOfUserToUserRel = db.relationship("User", back_populates="userToTypeOfUserRel", cascade="all, delete, save-update",
 									foreign_keys="User.user_type")

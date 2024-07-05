@@ -306,7 +306,7 @@ const UserProfile = () => {
 						<div className="flex flex-col relative">
 							<label className="font-semibold mb-2">Name</label>
 							<div className="flex items-center">
-								<TextInput type="text" value={editName} onChange={handleNameChange} readOnly={!showNameEditModal} color={showNameEditModal ? "white" : "grey"} />
+								<TextInput type="text" value={editName} onChange={handleNameChange} readOnly={!showNameEditModal} color={showNameEditModal ? "white" : "gray"} />
 								{!showNameEditModal && (
 									<Button className="ml-2" color="light" onClick={handleNameEdit}>
 										<MdEdit size={18} />
