@@ -210,10 +210,10 @@ class UserDirectory():
 			return False
 		try:
 			# Replace txt
-			with open(os.path.join(self.__user_directory, "labels", f"{farm_name}_{id}.txt"), "w") as f:
+			with open(os.path.join(self.__user_directory, "labels", f"{result.farm_name}_{result.id}.txt"), "w") as f:
 				for a in annotations:
 					f.write(f"0 {a['x']} {a['y']} {a['width']} {a['height']}\n")
-		except BaseException as err:
+		except Exception as err:
 			print(err)
 			return False
 		return True
