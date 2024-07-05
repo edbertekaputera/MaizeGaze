@@ -181,3 +181,28 @@ def queryDailyStatistics() -> dict[str, list[dict[str, str|int]]]:
 		resultList.append(result_json)
 
 	return {"result": resultList}
+
+@router.route("/reannotate_result", methods=["POST"])
+@permissions_required(is_user=True)
+def reannotateResult() -> dict[str, int | str]:
+	# Get Updated Result
+	data = request.get_json()
+	if not data or "updated_result" not in data:
+        	return {"status_code": 400, "message": "Invalid input data."}
+		
+	updated_result = data["updated_result"]
+	
+	# Update Tassel Count
+	success_update = DetectionResult.update(updated_result["farm_user"], updated_result["farm_name"], updated_result["id"], updated_result["tassel_count"])
+	if not success_update:
+		return {"status_code": 400, "message": "Failed to update tassel count."}
+
+	# Update Annotation
+	detection_result = DetectionResult.queryResult(updated_result["farm_user"], updated_result["farm_name"], updated_result["id"])
+	
+	user_directory = UserDirectory()
+	success_replace = user_directory.replace(detection_result, updated_result["annotations"])
+	if not success_replace:
+		return {"status_code": 400, "message": "Failed to replace annotations."}
+	
+	return {"status_code": 200, "message": "Reannotation Successful."}

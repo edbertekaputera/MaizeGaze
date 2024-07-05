@@ -198,6 +198,25 @@ class UserDirectory():
 				zip_file.write(txt_path, f"labels/{r.farm_name}_{r.id}.txt")
 		return zip_buffer
 
+	def replace(self, result:DetectionResult, annotations:list[dict[str, float]]) -> bool:
+		
+		# retrieve old annotation 
+		old_annotations = self.retrieveAnnotations(result)
+		old_estimated_txt_size = len(old_annotations) * 18
+		new_estimated_txt_size = len(annotations) * 18
+
+		# Check storage budget
+		if self.__size +  new_estimated_txt_size - old_estimated_txt_size > self.__storage_limit:
+			return False
+		try:
+			# Replace txt
+			with open(os.path.join(self.__user_directory, "labels", f"{result.farm_name}_{result.id}.txt"), "w") as f:
+				for a in annotations:
+					f.write(f"0 {a['x']} {a['y']} {a['width']} {a['height']}\n")
+		except Exception as err:
+			print(err)
+			return False
+		return True
 	
 
 
