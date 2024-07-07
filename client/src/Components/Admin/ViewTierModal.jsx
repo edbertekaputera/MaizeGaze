@@ -24,6 +24,7 @@ function ViewTierModal({ state, setState, name }) {
 		can_reannotate: false,
 		can_chatbot: false,
 		can_active_learn: false,
+		can_diagnose: false,
 	});
 
 	// Other misc states
@@ -75,6 +76,7 @@ function ViewTierModal({ state, setState, name }) {
 				can_active_learn: tier_data.can_active_learn,
 				can_reannotate: tier_data.can_reannotate,
 				can_chatbot: tier_data.can_chatbot,
+				can_diagnose: tier_data.can_diagnose,
 			}));
 		}
 	};
@@ -399,6 +401,7 @@ function ViewTierModal({ state, setState, name }) {
 																		can_active_learn: ev.target.checked,
 																		can_reannotate: ev.target.checked,
 																		can_chatbot: ev.target.checked,
+																		can_diagnose: ev.target.checked,
 																	}))
 																}
 															/>
@@ -441,6 +444,18 @@ function ViewTierModal({ state, setState, name }) {
 														/>
 														<Label htmlFor="active_learn" className="flex text-xs">
 															Personalized Active Learning
+														</Label>
+													</div>
+													<div className="flex items-center gap-2">
+														<Checkbox
+															disabled={!isUpdating}
+															color={isUpdating ? "blue" : "failure"}
+															id="diagnosis"
+															checked={permissions.can_diagnose}
+															onChange={(ev) => setPermissions((prev) => ({ ...prev, can_diagnose: ev.target.checked }))}
+														/>
+														<Label htmlFor="diagnosis" className="flex text-xs">
+															Maize Plant Disease Diagnosis
 														</Label>
 													</div>
 												</div>

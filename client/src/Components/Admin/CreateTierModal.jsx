@@ -18,6 +18,7 @@ function CreateTierModal({ state, setState }) {
 		can_reannotate: false,
 		can_chatbot: false,
 		can_active_learn: false,
+		can_diagnose: false,
 	});
 
 	const [messageModal, setMessageModal] = useState(false);
@@ -40,6 +41,7 @@ function CreateTierModal({ state, setState }) {
 				can_reannotate: permissions.can_reannotate,
 				can_chatbot: permissions.can_chatbot,
 				can_active_learn: permissions.can_active_learn,
+				can_diagnose: permissions.can_diagnose,
 			})
 			.then((res) => {
 				if (res.data.status_code === 201) {
@@ -177,6 +179,7 @@ function CreateTierModal({ state, setState }) {
 																	can_active_learn: ev.target.checked,
 																	can_reannotate: ev.target.checked,
 																	can_chatbot: ev.target.checked,
+																	can_diagnose: ev.target.checked,
 																}))
 															}
 														/>
@@ -212,6 +215,16 @@ function CreateTierModal({ state, setState }) {
 														/>
 														<Label htmlFor="active_learn" className="flex text-xs">
 															Personalized Active Learning
+														</Label>
+													</div>
+													<div className="flex items-center gap-2">
+														<Checkbox
+															id="doctor"
+															checked={permissions.can_diagnose}
+															onChange={(ev) => setPermissions((prev) => ({ ...prev, can_diagnose: ev.target.checked }))}
+														/>
+														<Label htmlFor="doctor" className="flex text-xs">
+															Maize Plant Disease Diagnosis
 														</Label>
 													</div>
 												</div>

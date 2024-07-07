@@ -16,7 +16,6 @@ import AdminUserManagementPage from "./Pages/AdminUserManagementPage";
 import UserProfile from "./Pages/UserProfile";
 import AdminTierManagementPage from "./Pages/AdminTierManagementPage";
 
-
 export default function AppRouter() {
 	return (
 		<BrowserRouter>
@@ -136,6 +135,16 @@ export default function AppRouter() {
 					element={
 						<PrivateRoute user_only>
 							<ResultHistoryPage />
+						</PrivateRoute>
+					}
+				/>
+
+				<Route
+					exact
+					path="/user/active_learn"
+					element={
+						<PrivateRoute user_only can_active_learn>
+							<span>TEST ACTIVE LEARN</span>
 						</PrivateRoute>
 					}
 				/>

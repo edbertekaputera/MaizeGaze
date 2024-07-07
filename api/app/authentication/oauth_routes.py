@@ -119,7 +119,7 @@ def authorized(provider:str):
 	if not user_type:
 		return redirect(current_app.config["CLIENT_SERVER_URL"] + "/login")
 	
-	session['email'] = email
+	session["email"] = email
 	session["type"] = user_type.name
 	session["is_admin"] = user_type.is_admin
 	session["detection_quota_limit"] = user_type.detection_quota_limit
@@ -127,4 +127,5 @@ def authorized(provider:str):
 	session["can_reannotate"] = user_type.can_reannotate
 	session["can_active_learn"] = user_type.can_active_learn
 	session["can_chatbot"] = user_type.can_chatbot
+	session["can_diagnose"] = user_type.can_diagnose
 	return redirect(current_app.config["CLIENT_SERVER_URL"])

@@ -108,6 +108,7 @@ def query_tier() -> dict[str, int|str|dict]:
 			"can_reannotate": tier.can_reannotate,
 			"can_chatbot": tier.can_chatbot,
 			"can_active_learn": tier.can_active_learn,
+			"can_diagnose": tier.can_diagnose,
 			"num_users": num_users
 		}
 	}

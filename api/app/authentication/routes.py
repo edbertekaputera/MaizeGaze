@@ -53,13 +53,15 @@ def register() -> dict[str, str|int]:
 
 	# Regenerate session key after login
 	current_app.session_interface.regenerate(session) # type: ignore
-	print("test4")
 	session["email"] = email
 	session["type"] = user_type.name
 	session["is_admin"] = user_type.is_admin
 	session["detection_quota_limit"] = user_type.detection_quota_limit
 	session["storage_limit"] = user_type.storage_limit
-	print("test5")
+	session["can_reannotate"] = user_type.can_reannotate
+	session["can_active_learn"] = user_type.can_active_learn
+	session["can_chatbot"] = user_type.can_chatbot
+	session["can_diagnose"] = user_type.can_diagnose
 
 	return {'status_code' : 201, 'message' : 'User registered'}
 
@@ -99,7 +101,6 @@ def activate_email() -> dict[str, str|int]:
 		return {'status_code' : 400, 'message' : 'Invalid Token'} 
 	return User.activate_new_user(token_email=extracted_email, session_email=session["email"])
 	
-
 # Login route
 @router.route('/login', methods=["POST"])
 def login():
@@ -134,6 +135,7 @@ def login():
 	session["can_reannotate"] = user_type.can_reannotate
 	session["can_active_learn"] = user_type.can_active_learn
 	session["can_chatbot"] = user_type.can_chatbot
+	session["can_diagnose"] = user_type.can_diagnose
 
 	return {'status_code' : 202, 'message' : 'User authorized', 'is_admin': user_type.is_admin}
 
@@ -162,6 +164,10 @@ def whoami():
 					'type': session['type'],
 					'is_admin': session['is_admin'],
 					'detection_quota_limit': session['detection_quota_limit'],
+					'can_reannotate': session['can_reannotate'],
+					'can_active_learn': session['can_active_learn'],
+					'can_chatbot': session['can_chatbot'],
+					'can_diagnose': session['can_diagnose'],
 					'storage_limit': session['storage_limit'],
 					'suspended': True if suspension else False,
 					'has_password': current_user.password is not None

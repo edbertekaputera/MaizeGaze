@@ -1,5 +1,6 @@
 # Libraries
 from flask import session, Blueprint, current_app, redirect, abort, request
+from flask_cors import cross_origin
 import json
 import stripe
 
@@ -11,14 +12,14 @@ from app.authentication import permissions_required
 router = Blueprint("subscsription", __name__)
 # All routes under farm would be  /api/user/subscsription/*
 
-@router.route("/purchase_plan", methods=["POST"])
+@router.route("/purchase_plan", methods=["GET"])
 @permissions_required(is_user=True)
 def purchase_plan():
 	try:
-		tier_name = request.get_json()["name"]
+		tier_name = request.args["name"]
 		tier = TypeOfUser.get(tier_name)
 		if not tier:
-			abort(401)
+			abort(404)
 		product = stripe.Product.retrieve(tier.stripe_product_id)
 		stripe_response = stripe.checkout.Session.create(
 			customer_email=session["email"],
@@ -30,9 +31,10 @@ def purchase_plan():
 				"quantity": 1
 			}]
 		)
+		session.clear()
 	except:
-		abort(401)
-	return redirect(stripe_response.url) # type: ignore
+		abort(404)
+	return {"url": stripe_response.url}
 
 @router.route("/cancel_plan", methods=["POST"])
 @permissions_required(is_user=True)
@@ -45,6 +47,7 @@ def cancel_plan() -> dict[str, int|str]:
 		customer = stripe.Customer.retrieve(str(subscription_cancel_response.customer))
 		success = User.updatePlan(str(customer.email), "FREE_USER", None)
 		if success:
+			session.clear()
 			return {"status_code": 200, "message": "Successfully Cancelled Plan."}
 		return {"status_code": 400, "message": "Failed to cancel Plan."}
 	except:
@@ -52,6 +55,7 @@ def cancel_plan() -> dict[str, int|str]:
 
 
 @router.route("/stripe_webhook_endpoint", methods=["POST"])
+@cross_origin()
 def stripe_webhook_endpoint() -> dict[str, bool]:
 	event = None
 	payload = request.data

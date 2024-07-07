@@ -12,7 +12,15 @@ import SuspendedCard from "../Login/SuspendedCard";
 export const AuthContext = createContext();
 
 // Private Route Wrapper
-const PrivateRoute = ({ admin_only = false, user_only = false, children }) => {
+const PrivateRoute = ({
+	admin_only = false,
+	user_only = false,
+	can_diagnose = false,
+	can_chatbot = false,
+	can_reannotate = false,
+	can_active_learn = false,
+	children,
+}) => {
 	const [userInfo, setuserInfo] = useState({
 		email: "",
 		name: "",
@@ -23,15 +31,22 @@ const PrivateRoute = ({ admin_only = false, user_only = false, children }) => {
 		storage_limit: 0,
 		suspended: false,
 		has_password: false,
+		can_reannotate: false,
+		can_active_learn: false,
+		can_chatbot: false,
+		can_diagnose: false,
 	});
-
 	const navigate = useNavigate();
 
 	const checkPermission = () => {
 		const admin_only_bool = !admin_only || userInfo.is_admin;
 		const user_only_bool = !user_only || !userInfo.is_admin;
+		const diagnose_bool = !can_diagnose || userInfo.can_diagnose;
+		const chatbot_bool = !can_chatbot || userInfo.can_chatbot;
+		const reannotate_bool = !can_reannotate || userInfo.can_reannotate;
+		const active_learn_bool = !can_active_learn || userInfo.can_active_learn;
 
-		return admin_only_bool && user_only_bool;
+		return admin_only_bool && user_only_bool && diagnose_bool && chatbot_bool && reannotate_bool && active_learn_bool;
 	};
 
 	useEffect(() => {
@@ -50,6 +65,10 @@ const PrivateRoute = ({ admin_only = false, user_only = false, children }) => {
 						storage_limit: res.data.data.storage_limit,
 						suspended: res.data.data.suspended,
 						has_password: res.data.data.has_password,
+						can_active_learn: res.data.data.can_active_learn,
+						can_chatbot: res.data.data.can_chatbot,
+						can_diagnose: res.data.data.can_diagnose,
+						can_reannotate: res.data.data.can_reannotate,
 					}));
 				} else {
 					console.log(`${res.data.status_code}: ${res.data.message}`);
