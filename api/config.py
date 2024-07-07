@@ -26,12 +26,6 @@ class Config(object):
 	SESSION_REDIS = redis.from_url(os.environ.get('REDIS_SESSION_URL'))
 	
 	# Celery
-	# CELERY_BROKER_URL = os.environ.get('REDIS_BROKER_URL')
-	# CELERY_RESULT_BACKEND = os.environ.get('REDIS_BROKER_URL')
-	# CELERY_TASK_IGNORE_RESULT = True
-	# CELERY_ACCEPT_CONTENT = ['json']
-	# CELERY_TASK_SERIALIZER = 'json'
-	# CELERY_RESULT_SERIALIZER = 'json'
 	CELERY = dict(
             broker_url= os.environ.get('REDIS_BROKER_URL'),
             result_backend= os.environ.get('REDIS_BROKER_URL'),
@@ -70,3 +64,8 @@ class Config(object):
 	# Stripe
 	STRIPE_API_KEY = os.environ["STRIPE_API_KEY"]
 	STRIPE_ENDPOINT_SECRET = os.environ["STRIPE_ENDPOINT_SECRET"]
+
+	# GEMINI Text Generation
+	GEMINI_API_KEY = os.environ["GEMINI_API_KEY"]
+	DIAGNOSIS_QUOTA_LIMIT = 25
+	CONSULTATION_QUOTA_LIMIT = 25

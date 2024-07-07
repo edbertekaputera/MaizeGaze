@@ -3,7 +3,7 @@ from flask import session, Blueprint, request
 import datetime
 
 # Local dependencies
-from app.db import User, Suspension, TypeOfUser, DetectionQuota
+from app.db import User, Suspension, TypeOfUser, DetectionQuota, DiagnosisQuota, ConsultationQuota
 from app.authentication import permissions_required
 from app.storage import UserDirectory
 
@@ -37,6 +37,8 @@ def queryUser()-> dict[str, int|str|dict[str, str|bool|int|float]]:
 		return {"status_code": 400, "message": "User Type not found"}
 
 	totalDetections = DetectionQuota.query_total_detection(email = email)
+	totalDiagnostics = DiagnosisQuota.query_total_diagnosis(email = email)
+	totalConsultations = ConsultationQuota.query_total_consultation(email = email)
 	user_directory = UserDirectory(email = email)
 	totalSize = user_directory.get_size()
 
@@ -49,6 +51,8 @@ def queryUser()-> dict[str, int|str|dict[str, str|bool|int|float]]:
 		"storage_limit": int(userType.storage_limit),
 		"is_admin":  bool(userType.is_admin),
 		"total_detections": int(totalDetections),
+		"total_consultation": int(totalConsultations),
+		"total_diagnostics": int(totalDiagnostics),
 		"total_size": float(f"{totalSize:.2f}")
 	}
 

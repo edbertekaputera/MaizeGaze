@@ -21,6 +21,11 @@ class User(db.Model):
 	# Other Relationship
 	userToDetectionQuotaRel = db.relationship("DetectionQuota", back_populates="detectionQuotaToUserRel", cascade="all, delete, save-update",
 									foreign_keys="DetectionQuota.user")
+	userToDiagnosisQuotaRel = db.relationship("DiagnosisQuota", back_populates="diagnosisQuotaToUserRel", cascade="all, delete, save-update",
+									foreign_keys="DiagnosisQuota.user")
+	userToConsultationQuotaRel = db.relationship("ConsultationQuota", back_populates="consultationQuotaToUserRel", cascade="all, delete, save-update",
+									foreign_keys="ConsultationQuota.user")
+	
 	userToFarmRel = db.relationship("Farm", back_populates="farmToUserRel", cascade="all, delete, save-update",
 									foreign_keys="Farm.user")
 	userToSuspensionRel = db.relationship("Suspension", back_populates="suspensionToUserRel", cascade='all, delete, save-update',

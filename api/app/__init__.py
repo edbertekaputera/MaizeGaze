@@ -7,6 +7,7 @@ from config import Config
 from celery import Celery, Task
 from sqlalchemy import event
 import stripe
+import google.generativeai as genai
 
 # Local dependencies
 from app.db import db, User, TypeOfUser
@@ -17,6 +18,7 @@ from app.user import router as user_router
 from app.routes import router as main_router
 from app.admin import router as admin_router
 from app.weather import router as weather_router
+from app.chatbot import router as chatbot_router
 
 # Initialize Flask App
 flask_app = Flask(__name__)
@@ -35,6 +37,9 @@ bcrypt.init_app(flask_app)
 
 # Stripe
 stripe.api_key = flask_app.config["STRIPE_API_KEY"]
+
+# Gemini AI
+genai.configure(api_key=flask_app.config["GEMINI_API_KEY"])
 
 # Celery
 def celery_init_app(app: Flask) -> Celery:
@@ -106,4 +111,5 @@ flask_app.register_blueprint(storage_router, url_prefix="/api/storage")
 flask_app.register_blueprint(user_router, url_prefix="/api/user")
 flask_app.register_blueprint(admin_router, url_prefix="/api/admin")
 flask_app.register_blueprint(weather_router, url_prefix="/api/weather")
+flask_app.register_blueprint(chatbot_router, url_prefix="/api/chatbot")
 flask_app.register_blueprint(main_router, url_prefix="/api")
