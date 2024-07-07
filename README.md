@@ -62,6 +62,9 @@ REVERSE_GEOCODE_API = 'YOUR_API_KEY'
 # Stripe
 STRIPE_API_KEY = 'YOUR_API_KEY'
 STRIPE_ENDPOINT_SECRET = 'YOUR_STRIPE_ENDPOINT_SECRET'
+
+# Gemini
+GEMINI_API_KEY = 'YOUR_GEMINI_API_KEEY'
 ```
 
 To run the server, simply run `application.py` as followed, and it should be hosted locally at `port 5000`

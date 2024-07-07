@@ -14,6 +14,9 @@ function ViewUserModal({ state, setState, email, suspension_details }) {
 		detection_quota_limit: 0,
 		storage_limit: 0,
 		total_detections: 0,
+		total_diagnostics: 0,
+		total_consultation: 0,
+
 		total_size: 0,
 		status: "",
 	});
@@ -39,6 +42,8 @@ function ViewUserModal({ state, setState, email, suspension_details }) {
 							detection_quota_limit: res.data.result.detection_quota_limit,
 							storage_limit: res.data.result.storage_limit,
 							total_detections: res.data.result.total_detections,
+							total_consultation: res.data.result.total_consultation,
+							total_diagnostics: res.data.result.total_diagnostics,
 							total_size: res.data.result.total_size,
 							status: suspension_details ? "Suspended" : !res.data.result.email_is_verified ? "Unverified" : "Active",
 						}));
@@ -131,7 +136,16 @@ function ViewUserModal({ state, setState, email, suspension_details }) {
 										<TextInput type="text" value={data.total_detections} readOnly />
 									</div>
 								</div>
-
+								<div className="flex flex-row justify-between gap-4">
+									<div className="flex flex-col w-1/2">
+										<label className="font-semibold mb-2">Total Consultations</label>
+										<TextInput type="text" value={data.total_consultation} readOnly />
+									</div>
+									<div className="flex flex-col w-1/2">
+										<label className="font-semibold mb-2">Total Diagnostics</label>
+										<TextInput type="text" value={data.total_diagnostics} readOnly />
+									</div>
+								</div>
 								<div className="flex flex-col gap-1 px-4 py-2 shadow-md rounded-lg bg-custom-white w-full">
 									<span className="font-semibold flex flex-col">
 										<h2 className="font-bold text-lg">Storage used</h2>

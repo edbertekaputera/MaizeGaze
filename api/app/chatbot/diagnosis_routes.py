@@ -1,15 +1,16 @@
 # Libraries
-from flask import session, Blueprint, request
+from flask import session, Blueprint, request, current_app
 from celery.result import AsyncResult
-from base64 import encodebytes # type: ignore
+from base64 import encodebytes
 from datetime import date 
 # Local dependencies
-from app.db import DetectionQuota
+from app.db import DiagnosisQuota
 from app.authentication import permissions_required
-from .task import detect_and_count
+from .diagnosis_task import diagnose_maize_health
 
 # Initialize
-router = Blueprint("detection", __name__)
+router = Blueprint("diagnosis", __name__)
+# All routes under farm would be  /api/chatbot/diagnosis/*
 
 # Utility function
 def allowed_file(filename:str):
@@ -18,9 +19,11 @@ def allowed_file(filename:str):
 		filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # Initialize detection task route
-@router.route("/init_detection", methods=["POST"])
-@permissions_required(is_user=True)
-def init_detection() -> dict[str, bool|str]:
+@router.route("/init_diagnose", methods=["POST"])
+@permissions_required(is_user=True, can_diagnose=True)
+def init_diagnose() -> dict[str, bool|str]:
+	# Get description
+	description = request.form["description"]
     # Get uploaded file
 	if "image" not in request.files:
 		return {"success": False}
@@ -31,19 +34,20 @@ def init_detection() -> dict[str, bool|str]:
 	# Check file extension
 	if not allowed_file(file.filename):
 		return {"success": False}
+	
 	# Check user
-	success = DetectionQuota.increment_quota(session['email'], session["detection_quota_limit"])
+	success = DiagnosisQuota.increment_quota(session['email'])
 	if not success:
 		return {"success": False}
 	# Initialize task
 	encoded = encodebytes(file.stream.read()).decode("ascii")	
-	result = detect_and_count.delay(encoded) # type: ignore
+	result = diagnose_maize_health.delay(encoded, description) # type: ignore
 	return {"success": True, "result_id": result.id}
 
-# Retrieve detection task results route
-@router.route("/get_detection_result", methods=["GET"])
-@permissions_required(is_user=True)
-def get_detection_result() -> dict[str, str]:
+# Retrieve diagnosis task results route
+@router.route("/get_diagnosis_result", methods=["GET"])
+@permissions_required(is_user=True, can_diagnose=True)
+def get_diagnosis_result() -> dict[str, str]:
 	result_id = request.args["result_id"]
 	result = AsyncResult(result_id)
 	if result.ready():
@@ -62,13 +66,13 @@ def get_detection_result() -> dict[str, str]:
 	else:
 		# Task is still pending
 		return {'status': 'RUNNING'}
-
-# Retrieve detection quota route
-@router.route("/get_detection_quota", methods=["GET"])
-@permissions_required(is_user=True)
-def get_detection_quota() -> dict[str, int]:
+	
+# Retrieve diagnosis quota route
+@router.route("/get_diagnosis_quota", methods=["GET"])
+@permissions_required(is_user=True, can_diagnose=True)
+def get_diagnosis_quota() -> dict[str, int]:
 	today = date.today()
-	dq = DetectionQuota.get(user_email=session['email'], month=today.month, year=today.year)
+	dq = DiagnosisQuota.get(user_email=session['email'], month=today.month, year=today.year)
 	if not dq:
-		return {"quota": session["detection_quota_limit"]}
-	return {"quota":  session["detection_quota_limit"] - dq.quota}
+		return {"quota": current_app.config["DIAGNOSIS_QUOTA_LIMIT"]}
+	return {"quota":  current_app.config["DIAGNOSIS_QUOTA_LIMIT"] - dq.quota}
