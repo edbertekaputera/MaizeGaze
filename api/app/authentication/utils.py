@@ -15,7 +15,13 @@ def login_required(function):
 	return wrapper
 
 # Verified User-specific route wrapper
-def permissions_required(is_admin=False, is_user=False, can_reannotate=False, can_chatbot=False, can_active_learn=False):
+def permissions_required(is_admin=False, 
+						 is_user=False, 
+						 can_reannotate=False, 
+						 can_chatbot=False, 
+						 can_active_learn=False, 
+						 can_diagnose=False):
+	
 	'''Function wrapper for verified role-protected routes'''
 	def check_if_user_suspended(user:User) -> bool:
 		suspension = Suspension.getOngoingSuspension(user.email)
@@ -43,6 +49,8 @@ def permissions_required(is_admin=False, is_user=False, can_reannotate=False, ca
 			if (can_reannotate and (not session['can_reannotate'])):
 				return {"status_code" : 401, 'message' : 'Unauthorized Access'}
 			if (can_active_learn and (not session['can_active_learn'])):
+				return {"status_code" : 401, 'message' : 'Unauthorized Access'}
+			if (can_diagnose and (not session['can_diagnose'])):
 				return {"status_code" : 401, 'message' : 'Unauthorized Access'}
 			return function(*args, **kwargs)
 		return wrapper

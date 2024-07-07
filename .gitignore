@@ -166,3 +166,4 @@ cython_debug/
 
 # Local Storage
 local_storage/
+api/*.jpg

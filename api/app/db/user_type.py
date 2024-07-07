@@ -16,6 +16,7 @@ class TypeOfUser(db.Model):
 	can_reannotate = db.Column(db.Boolean(), default=False)
 	can_chatbot = db.Column(db.Boolean(), default=False)
 	can_active_learn = db.Column(db.Boolean(), default=False)
+	can_diagnose = db.Column(db.Boolean(), default=False)
 	stripe_product_id = db.Column(db.String(250), nullable=True, unique=True)
 	
 	# Relationship
@@ -44,6 +45,7 @@ class TypeOfUser(db.Model):
 				- can_reannotate:bool,
 				- can_chatbot:bool,
 				- can_active_learn:bool,
+				- can_diagnose:bool,
 
 		Returns:
 			bool: successful creation or not.
@@ -78,6 +80,7 @@ class TypeOfUser(db.Model):
 				- can_reannotate:bool = None,
 				- can_chatbot:bool = None,
 				- can_active_learn:bool = None
+				- can_diagnose:bool = None,
 
 		Returns:
 			bool: successful update or not.
@@ -99,6 +102,8 @@ class TypeOfUser(db.Model):
 					tier.can_chatbot = bool(details["can_chatbot"])
 				if details.get("can_active_learn") is not None:
 					tier.can_active_learn = bool(details["can_active_learn"])
+				if details.get("can_diagnose") is not None:
+					tier.can_diagnose = bool(details["can_diagnose"])
 				db.session.commit()
 			return True
 		except:
