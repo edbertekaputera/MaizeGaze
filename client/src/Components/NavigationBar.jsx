@@ -1,6 +1,6 @@
 import { Avatar, Drawer, Dropdown, Navbar, Sidebar, TextInput } from "flowbite-react";
 import { RiMenu2Fill } from "react-icons/ri";
-import { GiCorn } from "react-icons/gi";
+import { GiArtificialIntelligence, GiCorn } from "react-icons/gi";
 import { MdLogout, MdSpaceDashboard, MdOutlineWorkHistory, MdManageAccounts, MdSettings } from "react-icons/md";
 import { GoSponsorTiers } from "react-icons/go";
 
@@ -11,6 +11,7 @@ import { useContext, useState } from "react";
 import { AuthContext } from "./Authentication/PrivateRoute";
 import ConfirmationModal from "./ConfirmationModal";
 import { useNavigate } from "react-router-dom";
+import { FaPersonCircleQuestion, FaUserDoctor } from "react-icons/fa6";
 
 export default function NavigationBar() {
 	const { userInfo, logout } = useContext(AuthContext);
@@ -30,6 +31,17 @@ export default function NavigationBar() {
 			{ icon: MdOutlineWorkHistory, link: "/user/result_history", name: "Result History" },
 		],
 	};
+
+	if (userInfo.can_diagnose) {
+		drawerRoutes.USER.push({ icon: FaUserDoctor, link: "/user/maize_doctor", name: "Maize Doctor" });
+	}
+	if (userInfo.can_chatbot) {
+		drawerRoutes.USER.push({ icon: FaPersonCircleQuestion, link: "/user/consultation", name: "Consultation" });
+	}
+	if (userInfo.can_active_learn) {
+		drawerRoutes.USER.push({ icon: GiArtificialIntelligence, link: "/user/active_learn", name: "Active Learning" });
+	}
+
 
 	return (
 		<>
