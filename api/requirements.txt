@@ -19,3 +19,5 @@ dill==0.3.8
 celery==5.4.*
 # Stripe
 stripe==10.1.*
+# Gemini
+google-generativeai==0.7.*

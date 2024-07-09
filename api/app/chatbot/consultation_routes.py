@@ -54,7 +54,7 @@ def get_consultation_result() -> dict[str, str]:
 @permissions_required(is_user=True, can_chatbot=True)
 def get_consultation_quota() -> dict[str, int]:
 	today = date.today()
-	dq = ConsultationQuota.get(user_email=session['email'], month=today.month, year=today.year)
-	if not dq:
-		return {"quota": current_app.config["CONSULTATION_QUOTA_LIMIT"]}
-	return {"quota":  current_app.config["CONSULTATION_QUOTA_LIMIT"] - dq.quota}
+	cq = ConsultationQuota.get(user_email=session['email'], month=today.month, year=today.year)
+	if not cq:
+		return {"quota": current_app.config["CONSULTATION_QUOTA_LIMIT"], "limit": current_app.config["CONSULTATION_QUOTA_LIMIT"]}
+	return {"quota":  current_app.config["CONSULTATION_QUOTA_LIMIT"] - cq.quota, "limit": current_app.config["CONSULTATION_QUOTA_LIMIT"]}
