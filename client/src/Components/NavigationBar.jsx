@@ -3,6 +3,7 @@ import { RiMenu2Fill } from "react-icons/ri";
 import { GiCorn } from "react-icons/gi";
 import { MdLogout, MdSpaceDashboard, MdOutlineWorkHistory, MdManageAccounts, MdSettings } from "react-icons/md";
 import { GoSponsorTiers } from "react-icons/go";
+import { CgBrowse } from "react-icons/cg";
 
 import { LuUserCircle2 } from "react-icons/lu";
 
@@ -28,6 +29,7 @@ export default function NavigationBar() {
 			{ icon: MdSpaceDashboard, link: "/user", name: "Dashboard" },
 			{ icon: GiCorn, link: "/user/detect", name: "Detect and Count" },
 			{ icon: MdOutlineWorkHistory, link: "/user/result_history", name: "Result History" },
+			{ icon: CgBrowse, link: "/user/plan_management", name: "Plan Management" }
 		],
 	};
 

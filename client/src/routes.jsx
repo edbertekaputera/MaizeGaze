@@ -15,6 +15,8 @@ import LandingPage from "./Pages/LandingPage";
 import AdminUserManagementPage from "./Pages/AdminUserManagementPage";
 import UserProfile from "./Pages/UserProfile";
 import AdminTierManagementPage from "./Pages/AdminTierManagementPage";
+import UserPlanManagementPage from "./Pages/UserPlanManagementPage";
+import PurchasePlanPage from "./Pages/PurchasePlanPage";
 
 export default function AppRouter() {
 	return (
@@ -165,6 +167,27 @@ export default function AppRouter() {
 					element={
 						<PrivateRoute user_only>
 							<UserProfile />
+						</PrivateRoute>
+					}
+				/>
+				{/* User Plan Management Route */}
+				<Route
+					exact
+					path="/user/plan_management"
+					element={
+						<PrivateRoute user_only>
+							<UserPlanManagementPage />
+						</PrivateRoute>
+					}
+				/>
+
+				{/* Purchase Plan Route */}
+				<Route
+					exact
+					path="/user/purchase_plan/:plan_name"
+					element={
+						<PrivateRoute user_only>
+							<PurchasePlanPage />
 						</PrivateRoute>
 					}
 				/>
