@@ -60,71 +60,34 @@ def update_password() -> dict[str, str|int|bool]:
 
 @router.route("/plan_management", methods=["GET"])
 @permissions_required(is_user=True)
-def plan_management() -> dict[str, str|int|bool]:
-    name = request.args["name"]
-    email = session["email"]
-    tier = TypeOfUser.get(name)
-    
-    user = User.get(email)
-    if not user:
-        return {"message": "User not found."}
-    user_type = user.user_type
-    
-    if not tier:
-        return {"message": f"Tier '{name}' not found."}
-    
-    return {
-        "name": tier.name,
-        "detection_quota_limit": tier.detection_quota_limit,
-        "storage_limit": tier.storage_limit,
-        "price": tier.price,
-        "can_reannotate": tier.can_reannotate,
-        "can_chatbot": tier.can_chatbot,
-        "can_active_learn": tier.can_active_learn,
-        "user_type": user_type,
-        "can_diagnose": tier.can_diagnose
-    }
-
-# @router.route("/cancel_plan", methods=["PATCH"])
-# @permissions_required(is_user=True)
-# def create_cancel_plan() -> dict[str, str]:
-#     email = session["email"]
-#     user = User.get(email)
-
-#     if not user:
-#         return {"status_code": 400, "message": "User not found."}
-    
-#     if user.user_type == "FREE_USER":
-#         return {"status_code": 400, "message": "User is already on free tier."}
-    
-#     success = User.update({"email": email, "user_type": "FREE_USER"})
-#     if not success:
-#         return {"status_code": 400, "message": "Failed to cancel plan."}
-#     return {
-#         "status_code": 200, 
-#         "message": "Successfully canceled plan."
-#     }
-    
-@router.route("/get_user_type", methods=["GET"])
-@permissions_required(is_user=True)
-def get_user_type() -> dict[str, str]:
+def plan_management() -> dict[str, list[dict[str, str|int|bool]] | str]:
     email = session["email"]
     user = User.get(email)
     if not user:
         return {"message": "User not found."}
     
-    user_type = user.user_type
-    tier = TypeOfUser.get(user_type)
+    user_type = TypeOfUser.queryAll()
+    print (user_type)
     
-    if not tier:
-        return {"message": "Tier not found."}
+    for user in user_type:
+        if user.is_admin:
+            user_type.remove(user)
     
-    return {
-        "tier": tier.name,
-        "detection_quota_limit": tier.detection_quota_limit,
-        "storage_limit": tier.storage_limit,
-        "can_reannotate": tier.can_reannotate,
-        "can_chatbot": tier.can_chatbot,
-        "can_active_learn": tier.can_active_learn,
-        "can_diagnose": tier.can_diagnose
-    }
+    print (user_type)
+    
+    plans = []
+    
+    for tier in user_type:
+        plans_details = {
+            "tier": tier.name,
+            "detection_quota_limit": tier.detection_quota_limit,
+            "storage_limit": tier.storage_limit,
+            "price": tier.price,
+            "can_reannotate": tier.can_reannotate,
+            "can_chatbot": tier.can_chatbot,
+            "can_active_learn": tier.can_active_learn,
+            "can_diagnose": tier.can_diagnose
+        }
+        plans.append(plans_details)
+        
+    return plans

@@ -1,30 +1,18 @@
-import React, { useEffect } from "react";
-import { Button, Modal, Label, TextInput, Textarea} from "flowbite-react";
+import React, { useContext } from "react";
+import { Button, Modal} from "flowbite-react";
 import { FaCheckCircle } from "react-icons/fa";
-import { useState } from "react";
+import { AuthContext } from "../Authentication/PrivateRoute";
 import axios from "axios";
 
 function CancelPlanModal({ state, setState }) {
-    const [planDetails, setPlanDetails] = useState({});
-
-    useEffect(() => {
-        axios
-            .get("/api/user/get_user_type")
-            .then((res) => {
-                setPlanDetails(res.data);
-            })
-            .catch((error) => {
-                console.log(error);
-            }
-        );
-    }, []);
+    const { userInfo } = useContext(AuthContext);
 
     const handleCancellation = () => {
         axios
         .post("/api/user/subscription/cancel_plan")
         .then((res) => {
             if (res.status === 200) {
-                window.location.replace(res.data.url);
+                window.location.reload();
             } else {
                 alert("Error occured when processing cancellation. Please Try again.");
                 window.location.reload();
@@ -39,7 +27,7 @@ function CancelPlanModal({ state, setState }) {
         return { value: storage, unit: 'MB' };
       };
     
-    const { value: storageValue, unit: storageUnit } = convertStorageLimit(planDetails.storage_limit);
+    const { value: storageValue, unit: storageUnit } = convertStorageLimit(userInfo.storage_limit);
 
         return (
         <>
@@ -50,7 +38,7 @@ function CancelPlanModal({ state, setState }) {
                 <Modal.Body>
                     <div className="px-7 pt-7 flex flex-col justify-center items-center">
                         <ul className=" w-full text-black justify-between">
-                        {planDetails.can_reannotate && (
+                        {userInfo.can_reannotate && (
                             <li className="w-full flex text-left justify-between items-center py-2">
                                 <span>Interactive Model Self-training</span>
                                 <div className="text-custom-green-2 text-xl">
@@ -58,7 +46,7 @@ function CancelPlanModal({ state, setState }) {
                                 </div>
                             </li>
                         )}
-                        {planDetails.can_chatbot && (
+                        {userInfo.can_chatbot && (
                             <li className="w-full flex text-left justify-between items-center py-2">
                             <span>AI-powered Chatbot</span>
                             <div className="text-custom-green-2 text-xl">
@@ -66,7 +54,7 @@ function CancelPlanModal({ state, setState }) {
                             </div>
                             </li>
                         )}
-                        {planDetails.can_active_learn && (
+                        {userInfo.can_active_learn && (
                             <li className="w-full flex text-left justify-between items-center py-2">
                             <span>Personalized Active Learning</span>
                             <div className="text-custom-green-2 text-xl">
@@ -74,7 +62,7 @@ function CancelPlanModal({ state, setState }) {
                             </div>
                             </li>
                         )}
-                        {planDetails.can_diagnose && (
+                        {userInfo.can_diagnose && (
                             <li className="w-full flex text-left justify-between items-center py-2">
                             <span>Diagnose Maize Plant</span>
                             <div className="text-custom-green-2 text-xl">
@@ -84,7 +72,7 @@ function CancelPlanModal({ state, setState }) {
                         )}
                             <li className="w-full flex text-left justify-between items-center py-2">
                             <span>Detection Quota</span>
-                            <div className="text-xl font-bold">{planDetails.detection_quota_limit}</div>
+                            <div className="text-xl font-bold">{userInfo.detection_quota_limit}</div>
                             </li>
                             <li className="w-full flex text-left justify-between items-center py-2">
                             <span>Storage</span>

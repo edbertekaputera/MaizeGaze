@@ -103,17 +103,11 @@ def stripe_webhook_endpoint() -> dict[str, bool]:
 	return {"success": True}
 
 @router.route("/get_plan", methods=["GET"])
+@ permissions_required(is_user=True)
 def get_user() -> dict[str, str]:
     plan_name = request.args["name"]
-    email = session["email"]
-    user = User.get(email)
-    if not user:
-        return {"message": "User not found."}
-    
     tier = TypeOfUser.get(plan_name)
     return {
-        "name": user.name,
-        "email": user.email,
         "plan_name": tier.name,
         "plan_price": tier.price,
 	}
