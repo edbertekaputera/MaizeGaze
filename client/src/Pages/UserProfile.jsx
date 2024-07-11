@@ -263,7 +263,7 @@ const UserProfile = () => {
 	};
 
 	const handleManagePlan = () => {
-		navigate("/user/manage-plan"); // Navigate to plan management page
+		navigate("/user/plan_management"); // Navigate to plan management page
 	};
 	// console.log(userInfo);
 	return (
