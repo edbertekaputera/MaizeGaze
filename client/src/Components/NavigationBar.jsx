@@ -30,7 +30,6 @@ export default function NavigationBar() {
 			{ icon: MdSpaceDashboard, link: "/user", name: "Dashboard" },
 			{ icon: GiCorn, link: "/user/detect", name: "Detect and Count" },
 			{ icon: MdOutlineWorkHistory, link: "/user/result_history", name: "Result History" },
-			{ icon: CgBrowse, link: "/user/plan_management", name: "Plan Management" }
 		],
 	};
 
@@ -43,7 +42,6 @@ export default function NavigationBar() {
 	if (userInfo.can_active_learn) {
 		drawerRoutes.USER.push({ icon: GiArtificialIntelligence, link: "/user/active_learn", name: "Active Learning" });
 	}
-
 
 	return (
 		<>
@@ -64,9 +62,16 @@ export default function NavigationBar() {
 							<span className="block truncate text-sm font-medium">{userInfo.email}</span>
 							<span className="block truncate text-xs text-gray-400">({userInfo.type})</span>
 						</Dropdown.Header>
-						<Dropdown.Item onClick={() => navigate("/user/profile")} icon={MdSettings}>
-							User Profile
-						</Dropdown.Item>
+						{!userInfo.is_admin && (
+							<Dropdown.Item onClick={() => navigate("/user/plan_management")} icon={CgBrowse}>
+								Plan Management
+							</Dropdown.Item>
+						)}
+						{!userInfo.is_admin && (
+							<Dropdown.Item onClick={() => navigate("/user/profile")} icon={MdSettings}>
+								User Profile
+							</Dropdown.Item>
+						)}
 						<Dropdown.Divider />
 						<Dropdown.Item onClick={() => setShowConfirmLogoutModal(true)} icon={MdLogout}>
 							Logout
@@ -89,11 +94,16 @@ export default function NavigationBar() {
 											</Sidebar.Item>
 										))}
 									</Sidebar.ItemGroup>
-									<Sidebar.ItemGroup>
-										<Sidebar.Item onClick={() => navigate("/user/profile")} icon={MdSettings}>
-											User Profile
-										</Sidebar.Item>
-									</Sidebar.ItemGroup>
+									{!userInfo.is_admin && (
+										<Sidebar.ItemGroup>
+											<Sidebar.Item onClick={() => navigate("/user/plan_management")} icon={CgBrowse}>
+												Plan Management
+											</Sidebar.Item>
+											<Sidebar.Item onClick={() => navigate("/user/profile")} icon={MdSettings}>
+												User Profile
+											</Sidebar.Item>
+										</Sidebar.ItemGroup>
+									)}
 									<Sidebar.ItemGroup>
 										<Sidebar.Item onClick={() => setShowConfirmLogoutModal(true)} icon={MdLogout}>
 											Logout
