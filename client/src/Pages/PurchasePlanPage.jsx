@@ -3,7 +3,7 @@ import PurchasePlan from "../Components/Plan/PurchasePlan";
 
 function PurchasePlanPage() {
     return (
-        <div className="h-screen overflow-hidden">
+        <div className="min-h-screen overflow-hidden">
             <PurchasePlan />
         </div>
     );
