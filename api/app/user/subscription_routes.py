@@ -101,3 +101,13 @@ def stripe_webhook_endpoint() -> dict[str, bool]:
 	else:
 		print('Unhandled event type {}'.format(event['type']))
 	return {"success": True}
+
+@router.route("/get_plan", methods=["GET"])
+@ permissions_required(is_user=True)
+def get_plan() -> dict[str, str]:
+    plan_name = request.args["name"]
+    tier = TypeOfUser.get(plan_name)
+    return {
+        "plan_name": tier.name,
+        "plan_price": tier.price,
+	}
