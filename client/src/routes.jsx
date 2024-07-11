@@ -17,6 +17,8 @@ import UserProfile from "./Pages/UserProfile";
 import AdminTierManagementPage from "./Pages/AdminTierManagementPage";
 import UserPlanManagementPage from "./Pages/UserPlanManagementPage";
 import PurchasePlanPage from "./Pages/PurchasePlanPage";
+import MaizeDoctorPage from "./Pages/MaizeDoctorPage";
+import ConsultationPage from "./Pages/ConsultationPage";
 
 export default function AppRouter() {
 	return (
@@ -143,10 +145,30 @@ export default function AppRouter() {
 
 				<Route
 					exact
+					path="/user/maize_doctor"
+					element={
+						<PrivateRoute user_only can_diagnose>
+							<MaizeDoctorPage />
+						</PrivateRoute>
+					}
+				/>
+
+				<Route
+					exact
+					path="/user/consultation"
+					element={
+						<PrivateRoute user_only can_chatbot>
+							<ConsultationPage />
+						</PrivateRoute>
+					}
+				/>
+
+				<Route
+					exact
 					path="/user/active_learn"
 					element={
 						<PrivateRoute user_only can_active_learn>
-							<span>TEST ACTIVE LEARN</span>
+							ACTIVE LEARN
 						</PrivateRoute>
 					}
 				/>
