@@ -104,7 +104,7 @@ def stripe_webhook_endpoint() -> dict[str, bool]:
 
 @router.route("/get_plan", methods=["GET"])
 @ permissions_required(is_user=True)
-def get_user() -> dict[str, str]:
+def get_plan() -> dict[str, str]:
     plan_name = request.args["name"]
     tier = TypeOfUser.get(plan_name)
     return {
