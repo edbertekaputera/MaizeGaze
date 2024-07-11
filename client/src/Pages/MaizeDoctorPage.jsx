@@ -1,5 +1,5 @@
-import { Button, Card, TextInput } from "flowbite-react";
-import React, { useEffect, useRef, useState } from "react";
+import { Avatar, Button, Card, TextInput } from "flowbite-react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { FaStethoscope } from "react-icons/fa6";
 import { IoMdArrowRoundUp } from "react-icons/io";
 import Markdown from "react-markdown";
@@ -8,12 +8,15 @@ import axios from "axios";
 import LoadingCard from "../Components/LoadingCard";
 import ChatBubble from "../Components/Chat/ChatBubble";
 import { format } from "date-fns";
+import { AuthContext } from "../Components/Authentication/PrivateRoute";
 
 function MaizeDoctorPage() {
 	const fileInputRef = useRef(null);
 	const [description, setDescription] = useState("");
 	const [file, setFile] = useState();
 	const [chat, setChat] = useState([]);
+	const { userInfo } = useContext(AuthContext);
+
 	const [quota, setQuota] = useState({
 		quota: 0,
 		limit: 0,
@@ -49,7 +52,19 @@ function MaizeDoctorPage() {
 						setChat((prev) => [
 							...prev,
 							{
-								user: true,
+								name: userInfo.name,
+								icon: (
+									<Avatar
+										rounded
+										placeholderInitials={userInfo.name
+											.split(" ")
+											.map((val) => val[0].toUpperCase())
+											.join("")}
+										bordered
+										color={"success"}
+										className="text-2xl"
+									/>
+								),
 								time: new Date(),
 								image: Object.assign(file, {
 									preview: URL.createObjectURL(file),
@@ -57,7 +72,12 @@ function MaizeDoctorPage() {
 								children: <p>{description}</p>,
 							},
 							{
-								user: false,
+								name: "Maize Doctor",
+								icon: (
+									<div>
+										<FaStethoscope className=" text-custom-green-2  text-4xl" />
+									</div>
+								),
 							},
 						]);
 						setDescription("");
@@ -132,7 +152,12 @@ function MaizeDoctorPage() {
 				setChat((prev) => {
 					const newList = [...prev];
 					newList[newList.length - 1] = {
-						user: false,
+						name: "Maize Doctor",
+						icon: (
+							<div>
+								<FaStethoscope className=" text-custom-green-2  text-4xl" />
+							</div>
+						),
 						time: new Date(),
 						children: "An error occured! Please Try again...",
 					};
@@ -142,7 +167,12 @@ function MaizeDoctorPage() {
 				setChat((prev) => {
 					const newList = [...prev];
 					newList[newList.length - 1] = {
-						user: false,
+						name: "Maize Doctor",
+						icon: (
+							<div>
+								<FaStethoscope className=" text-custom-green-2  text-4xl" />
+							</div>
+						),
 						time: new Date(),
 						children: generateDiagnosisOutput(res.data.data),
 					};
@@ -157,7 +187,12 @@ function MaizeDoctorPage() {
 			setChat((prev) => {
 				const newList = [...prev];
 				newList[newList.length - 1] = {
-					user: false,
+					name: "Maize Doctor",
+					icon: (
+						<div>
+							<FaStethoscope className=" text-custom-green-2  text-4xl" />
+						</div>
+					),
 					time: new Date(),
 					children: "An error occured! Please Try again...",
 				};
@@ -191,7 +226,7 @@ function MaizeDoctorPage() {
 						<div className="flex flex-col text-gray-700 font-medium gap-y-5">
 							{chat.map((c, i) => {
 								return (
-									<ChatBubble key={i} user={c.user} time={c.time} image={c.image}>
+									<ChatBubble key={i} name={c.name} icon={c.icon} time={c.time} image={c.image}>
 										{c.children}
 									</ChatBubble>
 								);
