@@ -42,7 +42,7 @@ def cancel_plan() -> dict[str, int|str]:
 	try:
 		user = User.get(session["email"])
 		if not user or user.user_type == "FREE_USER" or user.current_subscription_id is None:
-			return {"status_code": 400, "message": "Failed to cancel Plan."}
+			return {"status_code": 400, "message": "User has no active plan to cancel."}
 		subscription_cancel_response = stripe.Subscription.cancel(user.current_subscription_id)
 		customer = stripe.Customer.retrieve(str(subscription_cancel_response.customer))
 		success = User.updatePlan(str(customer.email), "FREE_USER", None)
@@ -50,7 +50,8 @@ def cancel_plan() -> dict[str, int|str]:
 			session.clear()
 			return {"status_code": 200, "message": "Successfully Cancelled Plan."}
 		return {"status_code": 400, "message": "Failed to cancel Plan."}
-	except:
+	except BaseException as er:
+		print(er)
 		return {"status_code": 400, "message": "Failed to cancel Plan."}
 
 
@@ -95,9 +96,22 @@ def stripe_webhook_endpoint() -> dict[str, bool]:
 		user = User.get(str(customer.email))
 		if user and user.current_subscription_id:
 			success = User.updatePlan(str(customer.email), "FREE_USER", None)
-		return {"success": success}
+			return {"success": success}
+		return {"success": False}
 
 	# ... handle other event types
 	else:
 		print('Unhandled event type {}'.format(event['type']))
 	return {"success": True}
+
+@router.route("/get_plan", methods=["GET"])
+@ permissions_required(is_user=True)
+def get_plan() -> dict[str, str]:
+	plan_name = request.args["name"]
+	tier = TypeOfUser.get(plan_name)
+	if not tier:
+		abort(404)
+	return {
+		"plan_name": tier.name,
+		"plan_price": tier.price,
+	}

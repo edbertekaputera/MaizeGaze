@@ -5,6 +5,7 @@ from flask import session, Blueprint, request, jsonify, session
 from app.db import Suspension
 from app.authentication import login_required, permissions_required, bcrypt
 from app.db import User
+from app.db import TypeOfUser
 
 # Initialize
 router = Blueprint("user", __name__)
@@ -56,3 +57,37 @@ def update_password() -> dict[str, str|int|bool]:
     if not success:
         return {"status_code": 400, "message": "Failed to update password."}
     return {"status_code": 200, "message": "Password is successfully updated!"}
+
+@router.route("/plan_management", methods=["GET"])
+@permissions_required(is_user=True)
+def plan_management() -> dict[str, list[dict[str, str|int|bool]] | str]:
+    email = session["email"]
+    user = User.get(email)
+    if not user:
+        return {"message": "User not found."}
+    
+    user_type = TypeOfUser.queryAll()
+    print (user_type)
+    
+    for user in user_type:
+        if user.is_admin:
+            user_type.remove(user)
+    
+    print (user_type)
+    
+    plans = []
+    
+    for tier in user_type:
+        plans_details = {
+            "tier": tier.name,
+            "detection_quota_limit": tier.detection_quota_limit,
+            "storage_limit": tier.storage_limit,
+            "price": tier.price,
+            "can_reannotate": tier.can_reannotate,
+            "can_chatbot": tier.can_chatbot,
+            "can_active_learn": tier.can_active_learn,
+            "can_diagnose": tier.can_diagnose
+        }
+        plans.append(plans_details)
+        
+    return plans

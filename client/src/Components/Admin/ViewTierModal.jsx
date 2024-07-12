@@ -394,7 +394,7 @@ function ViewTierModal({ state, setState, name }) {
 														<div className="flex items-center gap-2">
 															<Checkbox
 																id="select_all_permissions"
-																checked={permissions.can_active_learn && permissions.can_chatbot && permissions.can_reannotate}
+																checked={permissions.can_active_learn && permissions.can_chatbot && permissions.can_reannotate && permissions.can_diagnose}
 																onChange={(ev) =>
 																	setPermissions((prev) => ({
 																		...prev,

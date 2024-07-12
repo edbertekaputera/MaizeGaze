@@ -74,5 +74,5 @@ def get_diagnosis_quota() -> dict[str, int]:
 	today = date.today()
 	dq = DiagnosisQuota.get(user_email=session['email'], month=today.month, year=today.year)
 	if not dq:
-		return {"quota": current_app.config["DIAGNOSIS_QUOTA_LIMIT"]}
-	return {"quota":  current_app.config["DIAGNOSIS_QUOTA_LIMIT"] - dq.quota}
+		return {"quota": current_app.config["DIAGNOSIS_QUOTA_LIMIT"], "limit": current_app.config["DIAGNOSIS_QUOTA_LIMIT"]}
+	return {"quota":  current_app.config["DIAGNOSIS_QUOTA_LIMIT"] - dq.quota, "limit": current_app.config["DIAGNOSIS_QUOTA_LIMIT"]}
