@@ -4,13 +4,15 @@ import { useNavigate } from "react-router-dom";
 import DropImageInput from "../Components/DropImageInput";
 import { GrPowerReset } from "react-icons/gr";
 import { GiCorn } from "react-icons/gi";
-import { MdCancel, MdOutlineSaveAlt } from "react-icons/md";
+import { MdCancel, MdOutlineSaveAlt, MdAddBox } from "react-icons/md";
 import { ImPencil2 } from "react-icons/im";
+import { v4 as uuidv4 } from 'uuid';
 
 import axios from "axios";
 import LoadingCard from "../Components/LoadingCard";
 import SaveResultModal from "../Components/Storage/SaveResultModal";
 import { AuthContext } from "../Components/Authentication/PrivateRoute";
+import BBoxAnnotator from "../Components/Storage/BBoxAnnotator";
 
 function DetectionPage() {
 	const { userInfo } = useContext(AuthContext);
@@ -18,11 +20,17 @@ function DetectionPage() {
 	const [status, setStatus] = useState("");
 	const [result, setResult] = useState({});
 	const [showSaveModal, setShowSaveModal] = useState(false);
+	const [showReannotate, setShowReannotate] = useState(false);
+	const [annotations, setAnnotations] = useState([]);
 	const [quota, setQuota] = useState(0);
 	const [showToolTip, setShowToolTip] = useState(false);
 	const navigate = useNavigate();
 
 	useEffect(() => {
+		if (result.annotations) {
+			setAnnotations(result.annotations);
+		}
+	
 		axios
 			.get("/api/detect/get_detection_quota")
 			.then((res) => {
@@ -32,7 +40,7 @@ function DetectionPage() {
 				console.log(error);
 				alert("ERROR");
 			});
-	}, [status]);
+	}, [result, status]);
 
 	const handleSubmit = (event) => {
 		event.preventDefault();
@@ -68,11 +76,44 @@ function DetectionPage() {
 		setStatus("");
 	};
 
+	const handleReannotateSave = (newAnnotations) => {
+		const updatedResult = {
+		  ...result,
+		  annotations: newAnnotations,
+		  tassel_count: newAnnotations.length,
+		  farm_user: userInfo.email,
+		  farm_name: "Corn Farm", //should be modified later 
+		  id: result.id || uuidv4(), // 임의로 uid 설정(update함수가 id를 매개로 받기 때문에)
+		//   tassel_count: result.tassel_count,
+		};
+	
+		axios
+		  .post("/api/storage/reannotate_result", {
+			updated_result: updatedResult,
+		  })
+		  .then((response) => {
+			if (response.data.status_code == 200) {
+			  setResult(updatedResult);
+			  setAnnotations(newAnnotations);
+			  alert("Reannotation Successful");
+			  setShowReannotate(false);
+			} else {
+			  console.log(response.data.message);
+			  alert("Failed to update tassel count.");
+			}
+		  })
+		  .catch((error) => {
+			console.error("There was an error reannotating the result!", error);
+			alert("ERROR");
+		  });
+	  };
+
 	const fetchDetectionResult = async (resultID) => {
 		try {
 			const res = await axios.get(
 				`/api/detect/get_detection_result?result_id=${resultID}`
 			);
+			console.log(res.data);  // 여기서 응답 데이터를 콘솔에 출력합니다.
 			if (res.data.status === "ERROR") {
 				setStatus(res.data.status);
 				alert("ERROR");
@@ -147,6 +188,14 @@ function DetectionPage() {
 								src={"data:image/png;base64," + result.annotated_image}
 							/>
 						)}
+                        {status === "SUCCESS" && showReannotate && (
+                            <BBoxAnnotator
+                                url={"data:image/png;base64," + result.annotated_image}
+                                inputMethod="fixed"
+                                onChange={(newAnnotations) => setAnnotations(newAnnotations)}
+                                borderWidth={2}
+                            />
+                        )}						
 					</section>
 					{status !== "SUCCESS" && (
 						<section className="flex flex-col lg:flex-row justify-end gap-8 mt-3">
@@ -199,18 +248,44 @@ function DetectionPage() {
 					)}
 					{status == "SUCCESS" && (
 						<section className="flex flex-col lg:flex-row justify-between gap-4 mt-2">
-							<Button
-								disabled
-								className="bg-custom-brown-1 hover:bg-custom-brown-2 pl-6 pr-8 py-2 shadow w-100 lg:w-56"
-								onClick={handleReset}
-							>
-								<div className="flex flex-row justify-center items-center ">
-									<ImPencil2 size={16} />
-									<span className="ml-2 font-bold text-center">
-										Reannotate
-									</span>
-								</div>
-							</Button>
+                            {!showReannotate ? (
+                                <Button
+                                    className="bg-custom-brown-1 hover:bg-custom-brown-2 pl-6 pr-8 py-2 shadow w-100 lg:w-56"
+                                    onClick={() => setShowReannotate(true)}
+                                >
+                                    <div className="flex flex-row justify-center items-center ">
+                                        <ImPencil2 size={16} />
+                                        <span className="ml-2 font-bold text-center">
+                                            Reannotate
+                                        </span>
+                                    </div>
+                                </Button>
+                            ) : (
+                                <>
+                                    <Button
+                                        className="bg-custom-green-1 hover:bg-custom-green-2 pl-6 pr-8 py-2 shadow w-100 lg:w-56"
+                                        onClick={() => handleReannotateSave(annotations)}
+                                    >
+                                        <div className="flex flex-row justify-center items-center ">
+                                            <MdOutlineSaveAlt size={16} />
+                                            <span className="ml-2 font-bold text-center">
+                                                Save Changes
+                                            </span>
+                                        </div>
+                                    </Button>
+                                    <Button
+                                        className="bg-custom-blue-1 hover:bg-custom-blue-2 pl-6 pr-8 py-2 shadow w-100 lg:w-56"
+                                        onClick={() => setShowReannotate(false)}
+                                    >
+                                        <div className="flex flex-row justify-center items-center ">
+                                            <MdCancel size={16} />
+                                            <span className="ml-2 font-bold text-center">
+                                                Cancel
+                                            </span>
+                                        </div>
+                                    </Button>
+                                </>
+                            )}
 							<div className="flex flex-col lg:flex-row justify-end gap-4 lg:gap-8">
 								<Button
 									className="bg-red-500 hover:bg-red-800 pl-6 pr-8 py-2 shadow w-100 lg:w-56"
