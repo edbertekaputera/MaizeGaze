@@ -188,10 +188,9 @@ def reannotateResult() -> dict[str, int | str]:
 	# Get Updated Result
 	data = request.get_json()
 	if not data or "updated_result" not in data:
-        	return {"status_code": 400, "message": "Invalid input data."}
-		
+		return {"status_code": 400, "message": "Invalid input data."}
 	updated_result = data["updated_result"]
-	
+ 
 	# Update Tassel Count
 	success_update = DetectionResult.update(updated_result["farm_user"], updated_result["farm_name"], updated_result["id"], updated_result["tassel_count"])
 	if not success_update:
@@ -199,10 +198,46 @@ def reannotateResult() -> dict[str, int | str]:
 
 	# Update Annotation
 	detection_result = DetectionResult.queryResult(updated_result["farm_user"], updated_result["farm_name"], updated_result["id"])
-	
+ 
 	user_directory = UserDirectory()
 	success_replace = user_directory.replace(detection_result, updated_result["annotations"])
 	if not success_replace:
 		return {"status_code": 400, "message": "Failed to replace annotations."}
 	
 	return {"status_code": 200, "message": "Reannotation Successful."}
+
+ 
+# @router.route("/reannotate_result", methods=["POST"])
+# @permissions_required(is_user=True)
+# def reannotateResult() -> dict[str, int | str]:
+#     data = request.get_json()
+#     if not data or "updated_result" not in data:
+#         return {"status_code": 400, "message": "Invalid input data."}
+
+#     updated_result = data["updated_result"]
+
+#     # Ensure all required keys are present
+#     required_keys = ["farm_user", "farm_name", "tassel_count", "annotations"]
+#     for key in required_keys:
+#         if key not in updated_result:
+#             return {"status_code": 400, "message": f"Missing key: {key}"}
+
+#     # Update Tassel Count
+#     success_update = DetectionResult.update_by_farm_user_and_name(
+#         updated_result["farm_user"], 
+#         updated_result["farm_name"], 
+#         updated_result["tassel_count"]
+#     )
+#     if not success_update:
+#         return {"status_code": 400, "message": "Failed to update tassel count."}
+
+#     # Update Annotation
+#     success_replace = DetectionResult.update_annotations(
+#         updated_result["farm_user"], 
+#         updated_result["farm_name"], 
+#         updated_result["annotations"]
+#     )
+#     if not success_replace:
+#         return {"status_code": 400, "message": "Failed to replace annotations."}
+
+#     return {"status_code": 200, "message": "Reannotation Successful."}
