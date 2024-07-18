@@ -12,7 +12,7 @@ class Farm(db.Model):
 	city = db.Column(db.String(250), nullable=False)
 	country = db.Column(db.String(250), nullable=False)
 	address = db.Column(db.String(250), nullable=False)
-	land_size = db.Column(db.Float(), nullable=False)
+	description = db.Column(db.String(250), nullable=False)
 
 	# Part of composite key (qualifier)
 	user = db.Column(db.String(250), db.ForeignKey("User.email"), nullable=False, primary_key=True)
@@ -20,8 +20,8 @@ class Farm(db.Model):
 									foreign_keys="Farm.user")
 	
 	# Relationship
-	farmToDetectionResultRel = db.relationship("DetectionResult", 
-											back_populates="detectionResultToFarmRel", 
+	farmToCropPatchRel = db.relationship("CropPatch", 
+											back_populates="cropPatchToFarmRel", 
 											cascade="all, delete, save-update")
 	
 	@classmethod

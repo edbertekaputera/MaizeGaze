@@ -11,7 +11,7 @@ import ConfirmationModal from "../ConfirmationModal";
 import MessageModal from "../MessageModal";
 import { MdDelete, MdFileDownload } from "react-icons/md";
 
-function ViewResultModal({ state, setState, id, farm_name }) {
+function ViewResultModal({ state, setState, id, farm_name, farm_patch_id, farm_patch_name }) {
 	const [isLoading, setIsLoading] = useState(true);
 	const [showDownloadToast, setShowDownloadToast] = useState(false);
 	const [showMessageModal, setShowMessageModal] = useState(false);
@@ -37,6 +37,7 @@ function ViewResultModal({ state, setState, id, farm_name }) {
 					params: {
 						id: id,
 						farm_name: farm_name,
+						farm_patch_id: farm_patch_id,
 					},
 				})
 				.then((res) => {
@@ -82,6 +83,7 @@ function ViewResultModal({ state, setState, id, farm_name }) {
 				{
 					id: id,
 					farm_name: farm_name,
+					farm_patch_id: farm_patch_id,
 				},
 			],
 		};
@@ -94,9 +96,7 @@ function ViewResultModal({ state, setState, id, farm_name }) {
 			.then((res) => {
 				if (res.status === 200) {
 					const blob = new Blob([res.data], { type: "application/zip" });
-					const fileName =
-						res.headers["content-disposition"]?.split("=")[1] ||
-						"files.zip";
+					const fileName = res.headers["content-disposition"]?.split("=")[1] || "files.zip";
 					// Create a temporary URL for the Blob
 					const url = window.URL.createObjectURL(blob);
 
@@ -132,6 +132,7 @@ function ViewResultModal({ state, setState, id, farm_name }) {
 				{
 					id: id,
 					farm_name: farm_name,
+					farm_patch_id: farm_patch_id,
 				},
 			],
 		};
@@ -161,41 +162,22 @@ function ViewResultModal({ state, setState, id, farm_name }) {
 					<div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-custom-green-3 bg-opacity-80 text-custom-green-1">
 						<MdFileDownload className="h-5 w-5" />
 					</div>
-					<div className="ml-3 text-sm font-semibold text-white">
-						Result Records downloaded successfully.
-					</div>
-					<Toast.Toggle
-						className="text-white bg-transparent"
-						onDismiss={() => setShowDownloadToast(false)}
-					/>
+					<div className="ml-3 text-sm font-semibold text-white">Result Records downloaded successfully.</div>
+					<Toast.Toggle className="text-white bg-transparent" onDismiss={() => setShowDownloadToast(false)} />
 				</Toast>
 			)}
 
 			{/* Loading Cards */}
-			<LoadingCard show={isDownloadLoading}>
-				Initiating Download...
-			</LoadingCard>
-			<LoadingCard show={isDeleteLoading}>
-				Initiating Deletion...
-			</LoadingCard>
+			<LoadingCard show={isDownloadLoading}>Initiating Download...</LoadingCard>
+			<LoadingCard show={isDeleteLoading}>Initiating Deletion...</LoadingCard>
 
 			{/* Download Confirmation Modal */}
-			<ConfirmationModal
-				state={showDownloadModal}
-				setState={setShowDownloadModal}
-				action={handleDownload}
-				icon={<MdFileDownload size={64} />}
-			>
+			<ConfirmationModal state={showDownloadModal} setState={setShowDownloadModal} action={handleDownload} icon={<MdFileDownload size={64} />}>
 				Are you sure you want to download these detection results?
 			</ConfirmationModal>
 
 			{/* Delete Confirmation Modal */}
-			<ConfirmationModal
-				state={showDeleteModal}
-				setState={setShowDeleteModal}
-				action={handleDelete}
-				icon={<MdDelete size={64} />}
-			>
+			<ConfirmationModal state={showDeleteModal} setState={setShowDeleteModal} action={handleDelete} icon={<MdDelete size={64} />}>
 				Are you sure you want to delete these detection results?
 			</ConfirmationModal>
 
@@ -216,34 +198,19 @@ function ViewResultModal({ state, setState, id, farm_name }) {
 						<LoadingCard show={isLoading}>Loading Image...</LoadingCard>
 						<div className="p-5">
 							<div className="flex justify-center">
-								<img
-									className="max-h-138 rounded-sm"
-									src={"data:image/png;base64," + data.annotated_image}
-									alt="Annotated Image"
-								/>
+								<img className="max-h-138 rounded-sm" src={"data:image/png;base64," + data.annotated_image} alt="Annotated Image" />
 							</div>
 							<div className="mt-5">
 								<div className="flex flex-wrap items-start">
 									<div className="flex-1">
-										<h1 className="text-2xl font-bold">
-											{data.name}
-										</h1>
-										<h2 className="text-gray-700 font-medium text-sm w-5/6 text-justify mt-1">
-											{data.description}
-										</h2>
+										<h1 className="text-2xl font-bold">{data.name}</h1>
+										<h2 className="text-gray-700 font-medium text-sm w-5/6 text-justify mt-1">{data.description}</h2>
 									</div>
 									<div className="flex items-start gap-5 ml-auto">
-										<Button
-											className="px-2"
-											color="failure"
-											onClick={() => setShowDeleteModal(true)}
-										>
+										<Button className="px-2" color="failure" onClick={() => setShowDeleteModal(true)}>
 											<FiTrash2 size={25} />
 										</Button>
-										<Button
-											className="px-2 bg-custom-green-1 hover:bg-custom-green-2"
-											onClick={() => setShowDownloadModal(true)}
-										>
+										<Button className="px-2 bg-custom-green-1 hover:bg-custom-green-2" onClick={() => setShowDownloadModal(true)}>
 											<IoMdDownload size={25} />
 										</Button>
 									</div>
@@ -254,7 +221,9 @@ function ViewResultModal({ state, setState, id, farm_name }) {
 											{" "}
 											<PiFarmFill />{" "}
 										</span>
-										<span className="ml-2">{farm_name}</span>
+										<span className="ml-2">
+											{farm_name} | {farm_patch_name}
+										</span>
 									</div>
 									<div className="flex items-center ml-auto">
 										<span>{format(data.record_date, "HH:mm:ss")}</span>
@@ -270,12 +239,7 @@ function ViewResultModal({ state, setState, id, farm_name }) {
 									</div>
 									<div className="flex items-center ml-auto">
 										<span>
-											<i>
-												{format(
-													data.record_date,
-													"EEEE, do MMMM yyy"
-												)}
-											</i>
+											<i>{format(data.record_date, "EEEE, do MMMM yyy")}</i>
 										</span>
 									</div>
 								</div>
