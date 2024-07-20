@@ -8,7 +8,7 @@ function DetectionResultTable({ results, selected, setSelected }) {
 			const splitted = val.split("_");
 			let flag = false;
 			results.forEach((result) => {
-				if (result.id == splitted[1] && result.farm_name == splitted[0]) {
+				if (result.id == splitted[2] && result.farm_patch_id == splitted[1] && result.farm_name == splitted[0]) {
 					flag = true;
 					return;
 				}
@@ -28,7 +28,7 @@ function DetectionResultTable({ results, selected, setSelected }) {
 			setSelected(new Set());
 		} else {
 			results.forEach((r) => {
-				setSelected((prev) => new Set(prev).add(`${r.farm_name}_${r.id}`));
+				setSelected((prev) => new Set(prev).add(`${r.farm_name}_${r.farm_patch_id}_${r.id}`));
 			});
 		}
 	};
@@ -52,6 +52,9 @@ function DetectionResultTable({ results, selected, setSelected }) {
 						Farm
 					</Table.HeadCell>
 					<Table.HeadCell className="bg-custom-brown-1 text-white p-4">
+						Patch
+					</Table.HeadCell>
+					<Table.HeadCell className="bg-custom-brown-1 text-white p-4">
 						Tassel Count
 					</Table.HeadCell>
 					<Table.HeadCell className="bg-custom-brown-1 text-white p-4">
@@ -71,9 +74,11 @@ function DetectionResultTable({ results, selected, setSelected }) {
 							id={r.id}
 							name={r.name}
 							farm_name={r.farm_name}
+							farm_patch_id={r.farm_patch_id}
+							farm_patch_name={r.farm_patch_name}
 							tassel_count={r.tassel_count}
 							date={r.record_date}
-							selected={selected.has(`${r.farm_name}_${r.id}`)}
+							selected={selected.has(`${r.farm_name}_${r.farm_patch_id}_${r.id}`)}
 							setSelected={setSelected}
 						/>
 					))}

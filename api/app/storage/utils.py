@@ -44,11 +44,12 @@ class UserDirectory():
 	def get_size(self) -> int:
 		return self.__size
 	
-	def save(self, farm_name:str, id:str, image:FileStorage, annotations:list[dict[str, float]]) -> bool:
+	def save(self, farm_name:str, farm_patch_id:str, id:str, image:FileStorage, annotations:list[dict[str, float]]) -> bool:
 		"""Saves detection result files into bucket storage
 
 		Args:
 			farm_name (str): farm name
+			farm_patch_id (str): farm patch id
 			id (str): detection result id
 			image (FileStorage): image passed through request.
 			annotations (list[dict[str, float]]): list of annotations.
@@ -67,9 +68,9 @@ class UserDirectory():
 			return False
 		try:
 			# Save image
-			image_pil.save(os.path.join(self.__user_directory, "images", f"{farm_name}_{id}.jpg"), format="JPEG")
+			image_pil.save(os.path.join(self.__user_directory, "images", f"{farm_name}_{farm_patch_id}_{id}.jpg"), format="JPEG")
 			# Save txt
-			with open(os.path.join(self.__user_directory, "labels", f"{farm_name}_{id}.txt"), "w") as f:
+			with open(os.path.join(self.__user_directory, "labels", f"{farm_name}_{farm_patch_id}_{id}.txt"), "w") as f:
 				for a in annotations:
 					f.write(f"0 {a['x']} {a['y']} {a['width']} {a['height']}\n")
 		except BaseException as err:
@@ -88,10 +89,10 @@ class UserDirectory():
 		"""
 		try:
 			# Delete image
-			image_path = os.path.join(self.__user_directory, "images", f"{result.farm_name}_{result.id}.jpg")
+			image_path = os.path.join(self.__user_directory, "images", f"{result.farm_name}_{result.farm_patch_id}_{result.id}.jpg")
 			os.remove(image_path)		
 			# Delete txt
-			txt_path = os.path.join(self.__user_directory, "labels", f"{result.farm_name}_{result.id}.txt")
+			txt_path = os.path.join(self.__user_directory, "labels", f"{result.farm_name}_{result.farm_patch_id}_{result.id}.txt")
 			os.remove(txt_path)
 		except BaseException as err:
 			print(err)
@@ -106,13 +107,13 @@ class UserDirectory():
 	
 	def retrieveImage(self, result:DetectionResult) -> Image.Image:
 		"""Retrieves image (PIL.Image.Image) given result (DetectionResult)."""
-		path = os.path.join(self.__user_directory, "images", f"{result.farm_name}_{result.id}.jpg")
+		path = os.path.join(self.__user_directory, "images", f"{result.farm_name}_{result.farm_patch_id}_{result.id}.jpg")
 		img = Image.open(path)
 		return img
 	
 	def retrieveAnnotations(self, result:DetectionResult) -> list[dict[str, float]]:
 		"""Retrieves annotations given result (DetectionResult)."""
-		path = os.path.join(self.__user_directory, "labels", f"{result.farm_name}_{result.id}.txt")
+		path = os.path.join(self.__user_directory, "labels", f"{result.farm_name}_{result.farm_patch_id}_{result.id}.txt")
 		list_of_annots = []
 		with open(path, "r") as f:
 			for line in f.readlines():
@@ -192,10 +193,10 @@ class UserDirectory():
 			zip_file.writestr("images/", "")
 			zip_file.writestr("labels/", "")
 			for r in results:
-				image_path = os.path.join(self.__user_directory, "images", f"{r.farm_name}_{r.id}.jpg")
-				zip_file.write(image_path, f"images/{r.farm_name}_{r.id}.jpg")
-				txt_path = os.path.join(self.__user_directory, "labels", f"{r.farm_name}_{r.id}.txt")	
-				zip_file.write(txt_path, f"labels/{r.farm_name}_{r.id}.txt")
+				image_path = os.path.join(self.__user_directory, "images", f"{r.farm_name}_{r.farm_patch_id}_{r.id}.jpg")
+				zip_file.write(image_path, f"images/{r.farm_name}_{r.farm_patch_id}_{r.id}.jpg")
+				txt_path = os.path.join(self.__user_directory, "labels", f"{r.farm_name}_{r.farm_patch_id}_{r.id}.txt")	
+				zip_file.write(txt_path, f"labels/{r.farm_name}_{r.farm_patch_id}_{r.id}.txt")
 		return zip_buffer
 
 	def replace(self, result:DetectionResult, annotations:list[dict[str, float]]) -> bool:
@@ -210,7 +211,7 @@ class UserDirectory():
 			return False
 		try:
 			# Replace txt
-			with open(os.path.join(self.__user_directory, "labels", f"{result.farm_name}_{result.id}.txt"), "w") as f:
+			with open(os.path.join(self.__user_directory, "labels", f"{result.farm_name}_{result.farm_patch_id}_{result.id}.txt"), "w") as f:
 				for a in annotations:
 					f.write(f"0 {a['x']} {a['y']} {a['width']} {a['height']}\n")
 		except Exception as err:

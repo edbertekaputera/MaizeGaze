@@ -4,7 +4,8 @@ from typing_extensions import Self # type: ignore
 
 from .sqlalchemy import db
 from .farm import Farm
-
+from .crop_patch import CropPatch
+from uuid import uuid4
 
 # User Schema
 class User(db.Model):
@@ -55,11 +56,12 @@ class User(db.Model):
 		) # type: ignore
 		
 		# TEMPORARY only for hardcoded FARM
-		temp_farm = Farm(name="Corn Farm", city="city",address="test address", country="country", land_size=1000, user=email) # type: ignore
-		
+		temp_farm = Farm(name="Corn Farm", city="city",address="test address", country="country", user=email, description="My Corn Farm.") # type: ignore
+		temp_crop_patch = CropPatch(patch_id=str(uuid4()), name="Crop Patch #1", land_size=1000, farm_name="Corn Farm", farm_user=email) # type: ignore
 		with current_app.app_context():
 			db.session.add(new_user)
 			db.session.add(temp_farm)
+			db.session.add(temp_crop_patch)
 			db.session.commit()
 		
 		inputted_user = cls.get(email)

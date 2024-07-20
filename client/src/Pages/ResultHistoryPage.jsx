@@ -113,8 +113,9 @@ function ResultHistoryPage() {
 		selected.forEach((val) => {
 			const splitted_val = val.split("_");
 			data.results_pk.push({
-				id: splitted_val[1],
+				id: splitted_val[2],
 				farm_name: splitted_val[0],
+				farm_patch_id: splitted_val[1]
 			});
 		});
 		setIsLoading(true);
@@ -161,8 +162,9 @@ function ResultHistoryPage() {
 		selected.forEach((val) => {
 			const splitted_val = val.split("_");
 			data.results_pk.push({
-				id: splitted_val[1],
+				id: splitted_val[2],
 				farm_name: splitted_val[0],
+				farm_patch_id: splitted_val[1]
 			});
 		});
 		setIsDeleteLoading(true);
@@ -235,7 +237,7 @@ function ResultHistoryPage() {
 			// Search keyword
 			const keyword = search.toLowerCase().trim();
 
-			const search_bool = keyword_bool(keyword, result.name) || keyword_bool(keyword, result.farm_name);
+			const search_bool = keyword_bool(keyword, result.name) || keyword_bool(keyword, result.farm_name) || keyword_bool(keyword, result.farm_patch_name);
 
 			if (date_bool && farm_bool && tassel_count_bool && search_bool) {
 				filtered_list.push(result);
