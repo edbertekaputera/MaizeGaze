@@ -1,247 +1,262 @@
-import {
-	eachDayOfInterval,
-	eachMonthOfInterval,
-	eachQuarterOfInterval,
-	eachYearOfInterval,
-	format,
-	isBefore,
-	subDays,
-} from "date-fns";
-import { Chart, registerables } from "chart.js/auto";
-import React, { useEffect, useRef, useState } from "react";
-import "chartjs-adapter-date-fns";
+import { format, isSameDay, max, startOfMonth, startOfYear, subMonths, subYears } from "date-fns";
+import React, { useEffect, useState } from "react";
+import ReactApexChart from "react-apexcharts";
+import ApexCharts from "apexcharts";
+import { Button, Label, Select } from "flowbite-react";
+import DoubleDatePicker from "../DoubleDatePicker";
 
-const HorizontalLinePlugin = {
-	id: "horizontalLine",
-	afterDatasetsDraw: (chart, args, options) => {
-		const {
-			ctx,
-			scales: { y },
-		} = chart;
-		const {
-			y: yValue,
-			label,
-			color,
-			lineWidth,
-			drawTime = "beforeDatasetsDraw",
-		} = options;
+function TasselCountChart({ data, interpolated_data, daily_average, interpolated_daily_average, show_labels = true }) {
+	const [type, setType] = useState("area");
+	const [selection, setSelection] = useState("all");
+	const [filter, setFilter] = useState({
+		start_date: -1,
+		end_date: new Date(),
+	});
 
-		if (drawTime === "afterDatasetsDraw") {
-			// Check if the y-value is within the chart area
-			if (yValue >= y.min && yValue <= y.max) {
-				// Calculate the y-coordinate of the line
-				const yCoordinate = y.getPixelForValue(yValue);
-
-				// Draw the line
-				ctx.beginPath();
-				ctx.moveTo(chart.chartArea.left, yCoordinate);
-				ctx.lineTo(chart.chartArea.right, yCoordinate);
-				ctx.strokeStyle = color || "black";
-				ctx.lineWidth = lineWidth || 1;
-				ctx.setLineDash([5, 5]); // Set the line dash pattern for a dotted line
-				ctx.stroke();
-				ctx.closePath();
-
-				// Draw the label
-				if (label) {
-					ctx.font = "12px Arial";
-					ctx.fillStyle = color || "black";
-					ctx.fillText(label, chart.chartArea.left - 10, yCoordinate);
-				}
-			}
-		}
-
-		// Return a dataset object representing the horizontal line
-		return {
-			label: label || "Horizontal Line",
-			data: [yValue],
-			borderColor: color || "black",
-			borderDash: [5, 5],
-			borderWidth: lineWidth || 1,
-			showLine: true,
-			pointRadius: 0,
-		};
-	},
-};
-
-// Register the necessary Chart.js components
-Chart.register(...registerables);
-Chart.register(HorizontalLinePlugin);
-
-function TasselCountChart({
-	data,
-	startDate,
-	endDate,
-	daily_average,
-	type = "bar",
-	unit = "day",
-}) {
-	const chartRef = useRef(null);
-	const chartInstance = useRef(null);
-
+	// Handle Datepicker filter
 	useEffect(() => {
-		if (chartInstance.current) {
-			chartInstance.current.destroy();
+		if (selection == "custom") {
+			updateData(selection);
 		}
+	}, [filter]);
+	// Handle Button Filter
+	useEffect(() => {
+		updateData(selection);
+	}, [selection]);
 
-		const ctx = chartRef.current.getContext("2d");
-
-		const chartData = {
-			datasets: [
-				{
-					label: "Tassel Count",
-					data: getchartData(),
-					backgroundColor: "rgba(54, 162, 235, 0.6)",
-				},
-				// {
-				// 	label: "Daily Average",
-				// 	borderColor: "red",
-				// 	borderDash: [5, 5],
-				// 	backgroundColor: "red",
-				// 	showLine: true,
-				// 	pointRadius: 0,
-				// },
-			],
-		};
-
-		const option = {
-			plugins: {
-				legend: {
-					display: true,
-					position: "top",
-				},
-				horizontalLine: {
-					y: daily_average, // y-value where the line should be drawn
-					color: "red", // Optional color for the line and label
-					lineWidth: 1, // Optional line width
-					drawTime: "afterDatasetsDraw",
-				},
-			},
-			scales: {
-				y: {
-					beginAtZero: true,
-				},
-				x: {
-					type: "timeseries",
-					time: {
-						unit: unit,
-						minUnit: "day",
-						displayFormats: {
-							day: "dd MMM yyyy",
-							quarter: "QQQ yyyy",
-						},
-					},
-				},
-			},
-		};
-
-		chartInstance.current = new Chart(ctx, {
-			type: type,
-			data: chartData,
-			options: option,
-		});
-
-		const resizeChart = () => {
-			chartInstance.current.resize();
-		};
-		window.addEventListener("resize", resizeChart);
-
-		return () => {
-			if (chartInstance.current) {
-				chartInstance.current.destroy();
-			}
-		};
-	}, [data]);
-
-	const getchartData = () => {
-		let startTickerDate = startDate;
-		if (startDate === -1) {
-			startTickerDate = data.reduce(
-				(min, value) =>
-					isBefore(min, value.record_date) ? min : value.record_date,
-				new Date()
-			);
-		}
-
-		if (unit == "day") {
-			const interval = eachDayOfInterval({
-				start: startTickerDate,
-				end: endDate,
-			});
-			let tickerArray = Object.fromEntries(
-				interval.map((date) => [format(date, "yyyy-MM-dd"), 0])
-			);
-			data.forEach((record) => {
-				const formattedDate = format(record.record_date, "yyyy-MM-dd");
-				if (formattedDate in tickerArray) {
-					tickerArray[formattedDate] += record.tassel_count;
+	const updateData = (timeline) => {
+		switch (timeline) {
+			case "one_month":
+				ApexCharts.exec("area-datetime", "zoomX", subMonths(new Date(), 1).getTime(), new Date().getTime());
+				break;
+			case "six_months":
+				ApexCharts.exec("area-datetime", "zoomX", subMonths(new Date(), 6).getTime(), new Date().getTime());
+				break;
+			case "one_year":
+				ApexCharts.exec("area-datetime", "zoomX", subYears(new Date(), 1).getTime(), new Date().getTime());
+				break;
+			case "ytd":
+				ApexCharts.exec("area-datetime", "zoomX", startOfYear(new Date()).getTime(), new Date().getTime());
+				break;
+			case "all":
+				ApexCharts.exec("area-datetime", "resetSeries");
+				break;
+			case "custom":
+				if (filter.start_date == -1) {
+					ApexCharts.exec("area-datetime", "zoomX", data[0].record_date.getTime(), filter.end_date.getTime());
+				} else {
+					ApexCharts.exec("area-datetime", "zoomX", filter.start_date.getTime(), filter.end_date.getTime());
 				}
-			});
-			return Object.entries(tickerArray).map((element) => ({
-				x: new Date(element[0]),
-				y: element[1],
-			}));
-		} else if (unit == "month") {
-			const interval = eachMonthOfInterval({
-				start: startTickerDate,
-				end: endDate,
-			});
-			let tickerArray = Object.fromEntries(
-				interval.map((date) => [format(date, "yyyy-MM"), 0])
-			);
-			data.forEach((record) => {
-				const formattedDate = format(record.record_date, "yyyy-MM");
-				if (formattedDate in tickerArray) {
-					tickerArray[formattedDate] += record.tassel_count;
-				}
-			});
-			return Object.entries(tickerArray).map((element) => ({
-				x: new Date(element[0]),
-				y: element[1],
-			}));
-		} else if (unit == "quarter") {
-			const interval = eachQuarterOfInterval({
-				start: startTickerDate,
-				end: endDate,
-			});
-			let tickerArray = Object.fromEntries(
-				interval.map((date) => [format(date, "yyyy-Q"), 0])
-			);
-			data.forEach((record) => {
-				const formattedDate = format(record.record_date, "yyyy-Q");
-				if (formattedDate in tickerArray) {
-					tickerArray[formattedDate] += record.tassel_count;
-				}
-			});
-			return Object.entries(tickerArray).map((element) => {
-				const splitted = element[0].split("-");
-				const quarter_month = parseInt(splitted[1]) * 3 - 1;
-				return {
-					x: new Date(splitted[0], quarter_month),
-					y: element[1],
-				};
-			});
-		} else {
-			const interval = eachYearOfInterval({
-				start: startTickerDate,
-				end: endDate,
-			});
-			let tickerArray = Object.fromEntries(
-				interval.map((date) => [format(date, "yyyy"), 0])
-			);
-			data.forEach((record) => {
-				const formattedDate = format(record.record_date, "yyyy");
-				if (formattedDate in tickerArray) {
-					tickerArray[formattedDate] += record.tassel_count;
-				}
-			});
-			return Object.entries(tickerArray).map((element) => ({
-				x: new Date(element[0]),
-				y: element[1],
-			}));
+				break;
+			default:
 		}
 	};
-	return <canvas ref={chartRef} />;
+
+	var series = [
+		{
+			name: "Tassel Count",
+			data: data.map((val) => ({ x: val.record_date.getTime(), y: val.tassel_count })),
+		},
+	];
+
+	var y_annotations = [
+		{
+			y: daily_average,
+			borderColor: "#09694d",
+			fillColor: "#09694d",
+			strokeDashArray: 4,
+			label: {
+				show: true,
+				offsetY: 6,
+				text: "Daily Average: " + daily_average,
+				style: {
+					padding: { top: 10, left: 10, right: 10, bottom: 10 },
+					color: "#FFFFFF",
+					background: "#09694d",
+				},
+			},
+		},
+	];
+
+	if (interpolated_data) {
+		series.push({
+			name: "Interpolated Tassel Count",
+			data: interpolated_data.map((val) => ({ x: val.record_date.getTime(), y: val.tassel_count })),
+		});
+		y_annotations.push({
+			y: interpolated_daily_average,
+			borderColor: "#C41E3A",
+			fillColor: "#C41E3A",
+			strokeDashArray: 4,
+			label: {
+				show: true,
+				offsetY: 6,
+				text: "Interpolated Daily Average: " + interpolated_daily_average,
+				style: {
+					padding: { top: 10, left: 10, right: 10, bottom: 10 },
+					color: "#FFFFFF",
+					background: "#C41E3A",
+				},
+			},
+		});
+	}
+
+	const options = {
+		chart: {
+			id: "area-datetime",
+			type: type,
+			toolbar: {
+				show: false,
+			},
+			zoom: { enabled: false },
+		},
+		dataLabels: {
+			enabled: show_labels,
+			hideOverflowingLabels: true,
+		},
+		stroke: {
+			curve: "smooth",
+		},
+		xaxis: {
+			type: "datetime",
+			labels: {
+				formatter: function (value, timestamp) {
+					return format(new Date(timestamp), "dd MMM yyyy");
+				},
+				max: new Date().getTime(),
+			},
+
+			datetimeUTC: false,
+		},
+		annotations: {
+			yaxis: y_annotations,
+		},
+		tooltip: {
+			x: {
+				format: "dd MMM yyyy",
+			},
+		},
+		colors: ["#019A6C", "#E91E63"],
+		fill: {
+			type: "gradient",
+			gradient: {
+				shadeIntensity: 1,
+				opacityFrom: 0.7,
+				opacityTo: 0.9,
+				stops: [0, 100],
+			},
+		},
+		markers: {
+			size: 5,
+			colors: ["#019A6C", "#E91E63"],
+			strokeColors: "#fff",
+			strokeWidth: 2,
+			hover: {
+			  size: 8,
+			}
+		  },
+	};
+	return (
+		<div className="flex flex-col gap-y-4">
+			<div className="flex flex-col sm:flex-row justify-between gap-x-4 gap-y-4">
+				<div className="flex flex-col sm:flex-row gap-x-2 gap-y-4 item-center sm:items-start">
+					<div className="flex flex-row gap-x-2 justify-between sm:justify-start w-full">
+						<Select
+							// icon={PiFarmFill}
+							id="chart_type"
+							value={type}
+							color="light"
+							className="rounded-lg hover:outline outline-custom-green-1 grow min-w-24 "
+							onChange={(ev) => setType(ev.target.value)}
+						>
+							<option key={"area"} value={"area"}>
+								Line
+							</option>
+							<option key={"bar"} value={"bar"}>
+								Bar
+							</option>
+						</Select>
+						<Button
+							id="one_month"
+							onClick={() => setSelection("one_month")}
+							className={
+								selection === "one_month"
+									? "bg-custom-green-1 ring-inset ring-custom-green-1"
+									: "bg-white border-gray-300 text-black hover:bg-gray-100 ring-inset ring-gray-100"
+							}
+						>
+							1M
+						</Button>
+
+						<Button
+							id="six_months"
+							onClick={() => setSelection("six_months")}
+							className={
+								selection === "six_months"
+									? "bg-custom-green-1 ring-inset ring-custom-green-1"
+									: "bg-white border-gray-300 text-black hover:bg-gray-100 ring-inset ring-gray-100"
+							}
+						>
+							6M
+						</Button>
+
+						<Button
+							id="one_year"
+							onClick={() => setSelection("one_year")}
+							className={
+								selection === "one_year"
+									? "bg-custom-green-1 ring-inset ring-custom-green-1"
+									: "bg-white border-gray-300 text-black hover:bg-gray-100 ring-inset ring-gray-100"
+							}
+						>
+							1Y
+						</Button>
+					</div>
+					<div className="flex flex-row gap-x-2 justify-between sm:justify-start w-full">
+						<Button
+							id="ytd"
+							onClick={() => setSelection("ytd")}
+							className={
+								selection === "ytd"
+									? "bg-custom-green-1 ring-inset ring-custom-green-1"
+									: "bg-white border-gray-300 text-black hover:bg-gray-100 ring-inset ring-gray-100"
+							}
+						>
+							YTD
+						</Button>
+
+						<Button
+							id="all"
+							onClick={() => setSelection("all")}
+							className={
+								selection === "all"
+									? "bg-custom-green-1 ring-inset ring-custom-green-1"
+									: "bg-white border-gray-300 text-black hover:bg-gray-100 ring-inset ring-gray-100"
+							}
+						>
+							ALL
+						</Button>
+						<Button
+							id="custom"
+							onClick={() => setSelection("custom")}
+							className={
+								selection === "custom"
+									? "bg-custom-green-1 ring-inset ring-custom-green-1 grow"
+									: "bg-white border-gray-300 text-black hover:bg-gray-100 ring-inset ring-gray-100 grow"
+							}
+						>
+							CUSTOM
+						</Button>
+					</div>
+				</div>
+
+				{selection == "custom" && <DoubleDatePicker filter={filter} setFilter={setFilter} min_date_key="start_date" max_date_key="end_date" />}
+			</div>
+			<div id="chart-timeline" className="">
+				<ReactApexChart options={options} series={series} type={type} height={750}/>
+			</div>
+		</div>
+	);
 }
 
 export default TasselCountChart;
