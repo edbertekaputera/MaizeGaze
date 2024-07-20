@@ -35,6 +35,10 @@ class DetectionResult(db.Model):
 		return cls.query.filter_by(farm_user=email).all()
 	
 	@classmethod
+	def queryNumOfResultByFarm(cls, email:str, farm:str) -> int:
+		return cls.query.filter_by(farm_user=email, farm_name=farm).count()
+	
+	@classmethod
 	def queryResult(cls, farm_user:str, farm_name:str, farm_patch_id:str, id:str) -> Self | None:
 		return cls.query.filter_by(farm_user=farm_user, farm_name=farm_name, farm_patch_id=farm_patch_id, id=id).one_or_none()
 	
@@ -79,9 +83,16 @@ class DetectionResult(db.Model):
 	def queryDailyStatistics(cls, email:str) -> list:
 		return db.session.query(cls.farm_name, db.func.date(cls.record_date).label("record_date"), db.func.sum(cls.tassel_count).label("total_tassel_count")) \
 			.filter_by(farm_user=email) \
+			.group_by(cls.farm_name, db.func.date(cls.record_date)) \
+			.all()
+	
+	@classmethod
+	def queryDailyPerPatchStatistics(cls, email:str) -> list:
+		return db.session.query(cls.farm_name, cls.farm_patch_id, db.func.date(cls.record_date).label("record_date"), db.func.sum(cls.tassel_count).label("total_tassel_count")) \
+			.filter_by(farm_user=email) \
 			.group_by(cls.farm_name, cls.farm_patch_id, db.func.date(cls.record_date)) \
 			.all()
-		
+	
 	@classmethod
 	def update(cls, farm_user:str, farm_name:str, patch_id:str, id:str, tassel_count:int) -> bool:
 		try:

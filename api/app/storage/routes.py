@@ -192,7 +192,7 @@ def get_storage_size() -> dict[str, float | int]:
 
 @router.route("/query_daily_statistics", methods=["GET"])
 @permissions_required(is_user=True)
-def queryDailyStatistics() -> dict[str, list[dict[str, str|int]]]:
+def query_daily_statistics() -> dict[str, list[dict[str, str|int]]]:
 	results = DetectionResult.queryDailyStatistics(session["email"])
 	resultList = []
 	for result in results:
@@ -201,11 +201,38 @@ def queryDailyStatistics() -> dict[str, list[dict[str, str|int]]]:
 			"tassel_count": int(result.total_tassel_count),
 			"record_date": result.record_date,
 			"farm_name": result.farm_name,
-			"farm_patch_id": result.farm_patch_id
 		}
 		resultList.append(result_json)
 
 	return {"result": resultList}
+
+@router.route("/query_interpolated_daily_statistics", methods=["GET"])
+@permissions_required(is_user=True)
+def query_interpolated_daily_statistics() -> dict[str, list[dict[str, str|int]]]:
+	results = DetectionResult.queryDailyPerPatchStatistics(session["email"])
+	# Map
+	result_map:dict[str,dict[str, int|str|float]] = {}
+	for result in results:
+		key = f"{result.farm_name}_{result.record_date}"
+		if not result_map.get(key):
+			result_map[key] = {
+				"tassel_count": 0,
+				"record_date": result.record_date,
+				"farm_name": result.farm_name,
+				"total_land_size": CropPatch.queryTotalFarmSize(session["email"], result.farm_name),
+				"detected_land_size":  0
+			}
+		result_map[key]["tassel_count"] += result.total_tassel_count
+		patch = CropPatch.get(session["email"], result.farm_name, result.farm_patch_id)
+		if not patch:
+			abort(404)
+		result_map[key]["detected_land_size"] += patch.land_size
+	# Interpolate
+	result_list = []
+	for key in result_map.keys():
+		result_map[key]["tassel_count"] = int(result_map[key]["tassel_count"]) * float(result_map[key]["total_land_size"]) / float(result_map[key]["detected_land_size"])
+		result_list.append(result_map[key])
+	return {"result": result_list}
 
 @router.route("/reannotate_result", methods=["POST"])
 @permissions_required(is_user=True)

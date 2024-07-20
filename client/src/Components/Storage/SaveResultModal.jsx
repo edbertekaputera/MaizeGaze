@@ -38,17 +38,11 @@ function SaveResultModal({ state, setState, file, results, post_save_action }) {
 		));
 	}, [patches]);
 
-	const cropPatches = useMemo(() => {
-		if (!selectedFarms) return [];
-		return patches
-			.filter((item) => item.farm_name === selectedFarms)
-			.map((f) => (
-				<option key={f.patch_id} value={f.patch_id}>
-					{f.patch_name}
-				</option>
-			));
-	}, [patches, selectedFarms]);
-
+	const cropPatches = (farm) => {
+		if (!farm) return [];
+		return patches.filter((item) => item.farm_name === farm);
+	};
+	
 	const handleSave = (event) => {
 		event.preventDefault();
 		let formData = new FormData();
@@ -111,14 +105,26 @@ function SaveResultModal({ state, setState, file, results, post_save_action }) {
 							<div className="flex flex-row justify-between gap-4">
 								<div className="flex flex-col gap-1 w-1/2">
 									<Label htmlFor="farm_input">Farm</Label>
-									<Select id="farm_input" required value={selectedFarms} onChange={(ev) => setSelectedFarms(ev.target.value)}>
+									<Select
+										id="farm_input"
+										required
+										value={selectedFarms}
+										onChange={(ev) => {
+											setSelectedFarms(ev.target.value);
+											setSelectedPatch(cropPatches(ev.target.value)[0].patch_id);
+										}}
+									>
 										{uniqueFarms}
 									</Select>
 								</div>
 								<div className="flex flex-col gap-1 w-1/2">
-									<Label htmlFor="farm_input">Crop Patch</Label>
-									<Select id="farm_input" required value={selectedFarms} onChange={(ev) => setSelectedFarms(ev.target.value)}>
-										{cropPatches}
+									<Label htmlFor="farm_patch_input">Crop Patch</Label>
+									<Select id="farm_patch_input" required value={selectedPatch} onChange={(ev) => setSelectedPatch(ev.target.value)}>
+										{cropPatches(selectedFarms).map((f) => (
+											<option key={f.patch_id} value={f.patch_id}>
+												{f.patch_name}
+											</option>
+										))}
 									</Select>
 								</div>
 							</div>
