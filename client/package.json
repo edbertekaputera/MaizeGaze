@@ -12,8 +12,6 @@
 	"dependencies": {
 		"apexcharts": "^3.50.0",
 		"axios": "^1.6.8",
-		"chart.js": "^4.4.3",
-		"chartjs-adapter-date-fns": "^3.0.0",
 		"date-fns": "^3.6.0",
 		"flowbite-react": "^0.9.0",
 		"openmeteo": "^1.1.4",
