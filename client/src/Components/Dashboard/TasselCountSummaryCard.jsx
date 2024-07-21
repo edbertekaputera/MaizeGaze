@@ -136,8 +136,6 @@ function TasselCountSummaryCard({ className }) {
 		}, 0);
 	};
 
-	console.log(interpolatedData)
-
 	const getFilteredData = (data_src) => {
 		let filtered_data = {};
 		data_src

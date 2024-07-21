@@ -143,7 +143,6 @@ function TasselCountChart({ data, interpolated_data, daily_average, interpolated
 				shadeIntensity: 1,
 				opacityFrom: 0.7,
 				opacityTo: 0.9,
-				stops: [0, 100],
 			},
 		},
 		markers: {
