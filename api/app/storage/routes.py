@@ -230,7 +230,7 @@ def query_interpolated_daily_statistics() -> dict[str, list[dict[str, str|int]]]
 	# Interpolate
 	result_list = []
 	for key in result_map.keys():
-		result_map[key]["tassel_count"] = int(result_map[key]["tassel_count"]) * float(result_map[key]["total_land_size"]) / float(result_map[key]["detected_land_size"])
+		result_map[key]["tassel_count"] = round(int(result_map[key]["tassel_count"]) * float(result_map[key]["total_land_size"]) / float(result_map[key]["detected_land_size"]), 2)
 		result_list.append(result_map[key])
 	return {"result": result_list}
 
