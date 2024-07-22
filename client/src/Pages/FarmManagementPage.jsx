@@ -105,36 +105,31 @@ function FarmManagementPage() {
 		return flag;
 	};
 
-	console.log("farms", farms);
-	console.log("cities", cities);
-	console.log("landsize", landSize);
-
 	const handleDelete = () => {
-		alert(selected);
-		// setIsRemoveLoading(true);
-		// selected.forEach((tier_name) => {
-		// 	axios
-		// 		.delete("/api/admin/tier_management/delete_tier", {
-		// 			data: {
-		// 				name: tier_name,
-		// 			},
-		// 		})
-		// 		.then((res) => {
-		// 			if (res.data.status_code !== 200) {
-		// 				setFailedList((prev) => [...prev, { name: tier_name, message: res.data.message }]);
-		// 			}
-		// 		})
-		// 		.catch((error) => {
-		// 			console.log(error);
-		// 		});
-		// });
-		// if (failedList.length == selected.length) {
-		// 	alert("Failed to delete tiers, please try again...");
-		// } else {
-		// 	setShowRemoveModal(false);
-		// 	setMessageModal(true);
-		// }
-		// setIsRemoveLoading(false);
+		setIsRemoveLoading(true);
+		selected.forEach((farm_name) => {
+			axios
+				.delete("/api/user/farm/delete_farm", {
+					data: {
+						name: farm_name,
+					},
+				})
+				.then((res) => {
+					if (res.data.status_code !== 200) {
+						setFailedList((prev) => [...prev, { name: farm_name, message: res.data.message }]);
+					}
+				})
+				.catch((error) => {
+					console.log(error);
+				});
+		});
+		if (failedList.length == selected.length) {
+			alert("Failed to delete tiers, please try again...");
+		} else {
+			setShowRemoveModal(false);
+			setMessageModal(true);
+		}
+		setIsRemoveLoading(false);
 	};
 
 	const check_all_city_bool = (bool_val) => {
