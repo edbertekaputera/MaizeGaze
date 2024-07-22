@@ -128,7 +128,8 @@ function TasselCountChart({ data, interpolated_data, daily_average, interpolated
 				},
 				max: new Date().getTime(),
 			},
-
+			tickAmount: "dataPoints",
+			tickPlacement: "on",
 			datetimeUTC: false,
 		},
 		annotations: {

@@ -77,3 +77,17 @@ class Farm(db.Model):
 			return True
 		except:
 			return False	
+	
+	@classmethod
+	def queryDistinctCountryCity(cls, email:str) -> dict[str,list[str]]:
+		country_dict:dict[str,list[str]] = {}
+		country_cities_pair = db.session.query(cls.country, cls.city) \
+			.filter_by(user=email) \
+			.group_by(cls.country, cls.city) \
+			.all()
+
+		for pair in country_cities_pair:
+			if not country_dict.get(pair.country):
+				country_dict[pair.country] = []
+			country_dict[pair.country].append(pair.city)		
+		return country_dict

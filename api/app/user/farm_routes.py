@@ -16,18 +16,15 @@ def query_all_farms_owned() -> dict[str, list[str|float]]:
 	farms = []
 	for farm in Farm.queryAllFarmsOwned(session["email"]):
 		patches = []
+		total_land_size = 0
 		for p in CropPatch.queryAllOwnedByFarm(session["email"], farm.name):
-			patches.append({
-				"patch_id": p.patch_id,
-				"land_size": p.land_size,
-				"name": p.name
-			})
+			total_land_size += p.land_size
 		farms.append({
 			"name": farm.name,
 			"city": farm.city,
 			"country": farm.country,
 			"address": farm.address,
-			"patches": patches
+			"total_land_size": total_land_size,
 		})
 	return {"farms": farms}
 
@@ -43,6 +40,32 @@ def query_all_patches_owned() -> dict[str, list[str|float]]:
 			"patch_id": patch.patch_id,
 		})
 	return {"patches": patches}
+
+@router.route("/query_farm", methods=["GET"])
+@permissions_required(is_user=True)
+def query_farm() -> dict[str, str|int|dict[str, str|list[dict[str, str|float]]]]:
+	farm_name = request.args["farm_name"]
+	farm = Farm.get(user=session["email"], name=farm_name)
+	if not farm:
+		return {"status_code": 400, "message": f"Farm '{farm_name}' not found."}
+	
+	patches = []
+	for p in CropPatch.queryAllOwnedByFarm(email=session["email"], farm_name=farm.name):
+		patches.append({
+			"patch_id": p.patch_id,
+			"land_size": p.land_size,
+			"name": p.name
+		})
+	return {
+		"status_code": 400, 
+		"farm": {
+			"name": farm.name,
+			"city": farm.city,
+			"country": farm.country,
+			"address": farm.address,
+			"patches": patches
+		}
+	}
 
 @router.route("/create_farm", methods=["POST"])
 @permissions_required(is_user=True)
@@ -128,3 +151,9 @@ def delete_farm() -> dict[str, int|str]:
 	if not success:
 		return {"status_code": 400, "message": f"Failed to delete Farm '{name}'."}
 	return {"status_code": 200, "message": f"Successfully deleted Farm '{name}'."}
+
+@router.route("/query_all_country_city", methods=["GET"])
+@permissions_required(is_user=True)
+def query_all_country_city() -> dict[str, dict[str,list[str]]]:
+	countries = Farm.queryDistinctCountryCity(session["email"])
+	return {"countries": countries}
