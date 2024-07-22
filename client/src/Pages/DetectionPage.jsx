@@ -1,5 +1,5 @@
+import React, { useContext, useEffect, useState, useRef } from "react";
 import { Button, Card } from "flowbite-react";
-import React, { useContext, useEffect, useState } from "react";
 import { GrPowerReset } from "react-icons/gr";
 import { GiCorn } from "react-icons/gi";
 import { MdCancel, MdOutlineSaveAlt } from "react-icons/md";
@@ -22,6 +22,7 @@ function DetectionPage() {
   const [originalImage, setOriginalImage] = useState(null);
   const [annotations, setAnnotations] = useState([]);
   const [isReannotating, setIsReannotating] = useState(false);
+  const canvasRef = useRef(null);
 
   useEffect(() => {
     fetchQuota();
@@ -116,26 +117,35 @@ function DetectionPage() {
     reader.readAsDataURL(file);
 
     const initialAnnotations = result.annotations.map((box, index) => ({
-      id: index.toString(),
+      id: (index + 1).toString(),
       mark: { x: box.x, y: box.y, width: box.width, height: box.height },
-      comment: `Tassel ${index + 1}`,
     }));
     setAnnotations(result.annotations); 
   };
 
   const onAnnotationChange = (newAnnotations) => {
-    const convertedAnnotations = newAnnotations.map(ann => ({
-      height: ann.mark.height,
-      width: ann.mark.width,
-      x: ann.mark.x,
-      y: ann.mark.y
-    }));
+    const convertedAnnotations = newAnnotations.map(ann => {
+      const centerX = ann.mark.x + (ann.mark.width / 2);
+      const centerY = ann.mark.y + (ann.mark.height / 2);
+
+      const normalizedX = centerX / result.image_width;
+      const normalizedY = centerY / result.image_height;
+      const normalizedWidth = ann.mark.width / result.image_width;
+      const normalizedHeight = ann.mark.height / result.image_height;
+
+      return {
+        x: normalizedX,
+        y: normalizedY,
+        width: normalizedWidth,
+        height: normalizedHeight
+      };
+    });
     setAnnotations(convertedAnnotations);
   };
 
-
   const handleSaveAnnotations = () => {
-    console.log("Saving new annotations:", annotations);
+    console.log("Saving new normalized annotations:", annotations);
+    drawUpdatedAnnotations();
     setIsReannotating(false);
     setResult(prevResult => ({
       ...prevResult,
@@ -144,18 +154,56 @@ function DetectionPage() {
     }));
   };
 
+  const drawUpdatedAnnotations = () => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+    const image = new Image();
+    image.src = originalImage;
+  
+    image.onload = () => {
+      canvas.width = image.width;
+      canvas.height = image.height;
+      ctx.drawImage(image, 0, 0, image.width, image.height);
+  
+      annotations.forEach((ann, index) => {
+        const centerX = ann.x * image.width;
+        const centerY = ann.y * image.height;
+        const width = ann.width * image.width;
+        const height = ann.height * image.height;
+        const x = centerX - (width / 2);
+        const y = centerY - (height / 2);
+  
+        ctx.strokeStyle = "red";
+        ctx.lineWidth = 3;
+        ctx.strokeRect(x, y, width, height);
+      });
+  
+      const updatedImage = canvas.toDataURL("image/png");
+      setResult(prevResult => ({
+        ...prevResult,
+        annotated_image: updatedImage.split(",")[1] // Remove the data URL prefix
+      }));
+    };
+  };
+
   const renderAnnotation = ({ annotation, onClick, onChange }) => {
-    const { x, y, width, height } = annotation;
+    const centerX = annotation.x * result.image_width;
+    const centerY = annotation.y * result.image_height;
+    const width = annotation.width * result.image_width;
+    const height = annotation.height * result.image_height;
+    const x = centerX - (width / 2);
+    const y = centerY - (height / 2);
+
     return (
       <div
         key={annotation.id}
         style={{
           border: "1px solid red",
           position: "absolute",
-          left: `${x * 100}%`,
-          top: `${y * 100}%`,
-          width: `${width * 100}%`,
-          height: `${height * 100}%`,
+          left: `${x}px`,
+          top: `${y}px`,
+          width: `${width}px`,
+          height: `${height}px`,
           cursor: "pointer"
         }}
         onClick={onClick}
@@ -211,28 +259,34 @@ function DetectionPage() {
                 alt="Detection Result"
               />
             )}
-    {isReannotating && (
-      <div style={{ width: "100%", height: "500px" }}>
-        <ReactPictureAnnotation
-          image={originalImage}
-          onAnnotationChange={onAnnotationChange}
-          annotationData={annotations.map((ann, index) => ({
-            id: index.toString(),
-            mark: { x: ann.x, y: ann.y, width: ann.width, height: ann.height },
-            comment: `Tassel ${index + 1}`
-          }))}
-          onChange={onAnnotationChange}
-          onSelect={handleSelect}
-          renderAnnotation={renderAnnotation}
-          width={result.image_width || 800}  // 백엔드에서 제공한 너비 사용
-          height={result.image_height || 600}  // 백엔드에서 제공한 높이 사용
-          scrollSpeed={0}
-          zoomScale={1}
-          disabled={false}
-          allowZoom={false}
-        />
-      </div>
-    )}
+            
+            {isReannotating && (
+              <div className="w-full max-w-2xl mx-auto">
+                <ReactPictureAnnotation
+                  image={originalImage}
+                  onAnnotationChange={onAnnotationChange}
+                  annotationData={annotations.map((ann, index) => ({
+                    id: (index + 1).toString(),
+                    mark: {
+                      x: (ann.x * result.image_width) - ((ann.width * result.image_width) / 2),
+                      y: (ann.y * result.image_height) - ((ann.height * result.image_height) / 2),
+                      width: ann.width * result.image_width,
+                      height: ann.height * result.image_height
+                    },
+                  }))}
+                  onChange={onAnnotationChange}
+                  onSelect={handleSelect}
+                  renderAnnotation={renderAnnotation}
+                  width={result.image_width}
+                  height={result.image_height}
+                  scrollSpeed={0}
+                  zoomScale={1}
+                  disabled={false}
+                  allowZoom={false}
+                />
+                <canvas ref={canvasRef} style={{ display: "none" }} />
+              </div>   
+            )}
           </section>
           {status !== "SUCCESS" && (
             <section className="flex flex-col lg:flex-row justify-end gap-8 mt=3">
@@ -314,7 +368,12 @@ function DetectionPage() {
                   <Button
                     disabled={!file || !result}
                     className="bg-custom-green-1 hover:bg-custom-green-2 pl-6 pr-8 py-2 shadow lg:w-56"
-                    onClick={() => setShowSaveModal(true)}
+                    onClick={() => {
+                      if (isReannotating) {
+                        handleSaveAnnotations();  // reannotation 결과를 result에 저장
+                      }
+                      setShowSaveModal(true);
+                    }}
                   >
                     <div className="flex flex-row justify-center items-center">
                       <MdOutlineSaveAlt size={16} />
