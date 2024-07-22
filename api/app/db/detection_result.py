@@ -98,18 +98,3 @@ class DetectionResult(db.Model):
 			print(e)
 			return False
 
-	@classmethod
-	def update_annotations(cls, farm_user: str, farm_name, annotations: list) -> bool:
-		try:
-			with current_app.app_context():
-				current_result = cls.queryResult(str(farm_user), str(farm_name))
-				if not current_result:
-					return False
- 
-				current_result.annotations = annotations
-				db.session.commit()
-			return True
-		except BaseException as e:
-			print(e)
-			return False
-

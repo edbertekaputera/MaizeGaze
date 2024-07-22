@@ -140,7 +140,12 @@ function DetectionPage() {
         height: normalizedHeight
       };
     });
+
     setAnnotations(convertedAnnotations);
+    setResult(prevResult => ({
+      ...prevResult,
+      tassel_count: convertedAnnotations.length
+    }));
   };
 
   const handleSaveAnnotations = () => {
