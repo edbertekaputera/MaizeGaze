@@ -19,6 +19,7 @@ import UserPlanManagementPage from "./Pages/UserPlanManagementPage";
 import PurchasePlanPage from "./Pages/PurchasePlanPage";
 import MaizeDoctorPage from "./Pages/MaizeDoctorPage";
 import ConsultationPage from "./Pages/ConsultationPage";
+import FarmManagementPage from "./Pages/FarmManagementPage";
 
 export default function AppRouter() {
 	return (
@@ -199,6 +200,16 @@ export default function AppRouter() {
 					element={
 						<PrivateRoute user_only>
 							<UserPlanManagementPage />
+						</PrivateRoute>
+					}
+				/>
+
+				<Route
+					exact
+					path="/user/farm_management"
+					element={
+						<PrivateRoute user_only>
+							<FarmManagementPage />
 						</PrivateRoute>
 					}
 				/>

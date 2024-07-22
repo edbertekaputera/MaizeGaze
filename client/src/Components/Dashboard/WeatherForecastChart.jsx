@@ -131,7 +131,8 @@ function WeatherForecastChart({ data, date, type = "bar", measurement = "tempera
 				},
 				max: new Date().getTime(),
 			},
-
+			tickAmount: "dataPoints",
+			tickPlacement: "on",
 			datetimeUTC: false,
 		},
 		annotations: {

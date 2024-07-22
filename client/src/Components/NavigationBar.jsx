@@ -13,6 +13,7 @@ import { AuthContext } from "./Authentication/PrivateRoute";
 import ConfirmationModal from "./ConfirmationModal";
 import { useNavigate } from "react-router-dom";
 import { FaPersonCircleQuestion, FaUserDoctor } from "react-icons/fa6";
+import { PiFarmFill } from "react-icons/pi";
 
 export default function NavigationBar() {
 	const { userInfo, logout } = useContext(AuthContext);
@@ -63,15 +64,19 @@ export default function NavigationBar() {
 							<span className="block truncate text-xs text-gray-400">({userInfo.type})</span>
 						</Dropdown.Header>
 						{!userInfo.is_admin && (
-							<Dropdown.Item onClick={() => navigate("/user/plan_management")} icon={CgBrowse}>
-								Plan Management
-							</Dropdown.Item>
+							<>
+								<Dropdown.Item onClick={() => navigate("/user/plan_management")} icon={CgBrowse}>
+									Plan Management
+								</Dropdown.Item>
+								<Dropdown.Item onClick={() => navigate("/user/farm_management")} icon={PiFarmFill}>
+									Farm Management
+								</Dropdown.Item>
+								<Dropdown.Item onClick={() => navigate("/user/profile")} icon={MdSettings}>
+									User Profile
+								</Dropdown.Item>
+							</>
 						)}
-						{!userInfo.is_admin && (
-							<Dropdown.Item onClick={() => navigate("/user/profile")} icon={MdSettings}>
-								User Profile
-							</Dropdown.Item>
-						)}
+
 						<Dropdown.Divider />
 						<Dropdown.Item onClick={() => setShowConfirmLogoutModal(true)} icon={MdLogout}>
 							Logout
@@ -98,6 +103,9 @@ export default function NavigationBar() {
 										<Sidebar.ItemGroup>
 											<Sidebar.Item onClick={() => navigate("/user/plan_management")} icon={CgBrowse}>
 												Plan Management
+											</Sidebar.Item>
+											<Sidebar.Item onClick={() => navigate("/user/farm_management")} icon={PiFarmFill}>
+												Farm Management
 											</Sidebar.Item>
 											<Sidebar.Item onClick={() => navigate("/user/profile")} icon={MdSettings}>
 												User Profile

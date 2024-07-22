@@ -1,4 +1,4 @@
-import { format, isSameDay, max, startOfMonth, startOfYear, subMonths, subYears } from "date-fns";
+import { format, isSameDay, max, startOfMonth, startOfYear, subMonths, subWeeks, subYears } from "date-fns";
 import React, { useEffect, useState } from "react";
 import ReactApexChart from "react-apexcharts";
 import ApexCharts from "apexcharts";
@@ -26,6 +26,9 @@ function TasselCountChart({ data, interpolated_data, daily_average, interpolated
 
 	const updateData = (timeline) => {
 		switch (timeline) {
+			case "one_week":
+				ApexCharts.exec("area-datetime", "zoomX", subWeeks(new Date(), 1).getTime(), new Date().getTime());
+				break;
 			case "one_month":
 				ApexCharts.exec("area-datetime", "zoomX", subMonths(new Date(), 1).getTime(), new Date().getTime());
 				break;
@@ -125,7 +128,8 @@ function TasselCountChart({ data, interpolated_data, daily_average, interpolated
 				},
 				max: new Date().getTime(),
 			},
-
+			tickAmount: "dataPoints",
+			tickPlacement: "on",
 			datetimeUTC: false,
 		},
 		annotations: {
@@ -151,9 +155,9 @@ function TasselCountChart({ data, interpolated_data, daily_average, interpolated
 			strokeColors: "#fff",
 			strokeWidth: 2,
 			hover: {
-			  size: 8,
-			}
-		  },
+				size: 8,
+			},
+		},
 	};
 	return (
 		<div className="flex flex-col gap-y-4">
@@ -175,6 +179,17 @@ function TasselCountChart({ data, interpolated_data, daily_average, interpolated
 								Bar
 							</option>
 						</Select>
+						<Button
+							id="one_week"
+							onClick={() => setSelection("one_week")}
+							className={
+								selection === "one_week"
+									? "bg-custom-green-1 ring-inset ring-custom-green-1"
+									: "bg-white border-gray-300 text-black hover:bg-gray-100 ring-inset ring-gray-100"
+							}
+						>
+							1W
+						</Button>
 						<Button
 							id="one_month"
 							onClick={() => setSelection("one_month")}
@@ -198,7 +213,9 @@ function TasselCountChart({ data, interpolated_data, daily_average, interpolated
 						>
 							6M
 						</Button>
+					</div>
 
+					<div className="flex flex-row gap-x-2 justify-between sm:justify-start w-full">
 						<Button
 							id="one_year"
 							onClick={() => setSelection("one_year")}
@@ -210,8 +227,6 @@ function TasselCountChart({ data, interpolated_data, daily_average, interpolated
 						>
 							1Y
 						</Button>
-					</div>
-					<div className="flex flex-row gap-x-2 justify-between sm:justify-start w-full">
 						<Button
 							id="ytd"
 							onClick={() => setSelection("ytd")}
@@ -252,7 +267,7 @@ function TasselCountChart({ data, interpolated_data, daily_average, interpolated
 				{selection == "custom" && <DoubleDatePicker filter={filter} setFilter={setFilter} min_date_key="start_date" max_date_key="end_date" />}
 			</div>
 			<div id="chart-timeline" className="">
-				<ReactApexChart options={options} series={series} type={type} height={750}/>
+				<ReactApexChart options={options} series={series} type={type} height={750} />
 			</div>
 		</div>
 	);
