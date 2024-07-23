@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState, useRef } from "react";
-import { Button, Card } from "flowbite-react";
+import { Button, Card, Tooltip } from "flowbite-react";
 import { GrPowerReset } from "react-icons/gr";
 import { GiCorn } from "react-icons/gi";
 import { MdCancel, MdOutlineSaveAlt } from "react-icons/md";
@@ -337,15 +337,21 @@ function DetectionPage() {
               </section>
               <section className="flex flex-col lg:flex-row justify-between gap-4 mt-2">
                 {!isReannotating ? (
+                <Tooltip
+                  content={userInfo.can_reannotate ? "Feel free to re-annotate and get better results!" : "You have to purchase plan to use this function."}
+                  placement="top"
+                >
                   <Button
                     className="bg-custom-brown-1 hover:bg-custom-brown-2 pl-6 pr-8 py-2 shadow w-100 lg:w-56"
                     onClick={handleReannotate}
+                    disabled={!userInfo.can_reannotate}
                   >
                     <div className="flex flex-row justify-center items-center">
                       <ImPencil2 size={16} />
                       <span className="ml-2 font-bold text-center">Reannotate</span>
                     </div>
                   </Button>
+                </Tooltip>
                 ) : (
                   <Button
                     className="bg-custom-brown-1 hover:bg-custom-brown-2 pl-6 pr-8 py-2 shadow w-100 lg:w-56"
