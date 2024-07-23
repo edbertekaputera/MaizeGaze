@@ -1,15 +1,13 @@
 import React, { useContext, useEffect, useState, useRef } from "react";
 import { Button, Card } from "flowbite-react";
-import { GrPowerReset } from "react-icons/gr";
 import { GiCorn } from "react-icons/gi";
 import { MdCancel, MdOutlineSaveAlt } from "react-icons/md";
-import { ImPencil2 } from "react-icons/im";
 import { ReactPictureAnnotation } from "react-picture-annotation";
 import axios from "axios";
 import LoadingCard from "../Components/LoadingCard";
-import { AuthContext } from "../Components/Authentication/PrivateRoute";
 import ConfirmationModal from "../Components/ConfirmationModal";
 import { useSearchParams,useNavigate } from "react-router-dom";
+import GuideButton from "../Components/GuideButton"
 
 function ReannotationPage() {
   const [searchParams] = useSearchParams();
@@ -207,6 +205,13 @@ function ReannotationPage() {
       <Card className="relative my-6 mx-4 lg:my-10 lg:mx-16 shadow-lg border xl:mb-20">
         <header className="flex flex-wrap flex-row gap-2 justify-between shadow-b border-b-2 pb-5 border-black">
           <h1 className="text-4xl font-extrabold">Re-annotation</h1>
+          <GuideButton 
+          tooltipContent="example"
+          buttonColor="bg-yellow-500"
+          buttonHoverColor="bg-yellow-600"
+          tooltipColor="bg-gray-700"
+          iconColor="text-gray-800"
+        />
         </header>
 
         <div className="flex flex-wrap flex-col justify-start px-8 mt-4 gap-3">
