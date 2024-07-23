@@ -308,19 +308,16 @@ function DetectionPage() {
               <div
                 className="relative"
                 onMouseEnter={() => setShowToolTip(true)}
-                onMouseLeave={() => setShowToolTip(false)}
-              >
+                onMouseLeave={() => setShowToolTip(false)}>
                 <div
                   hidden={quota > 0 || !showToolTip}
-                  className="absolute -top-11 lg:-left-12 text-sm lg:w-80 text-center bg-red-500 text-white px-3 py-2 rounded-lg shadow"
-                >
+                  className="absolute -top-11 lg:-left-12 text-sm lg:w-80 text-center bg-red-500 text-white px-3 py-2 rounded-lg shadow">
                   You ran out of Detection Quota this month.
                 </div>
                 <Button
                   disabled={status === "RUNNING" || quota === 0}
                   className="bg-custom-green-1 hover:bg-custom-green-2 pl-6 pr-8 py-2 shadow w-full lg:w-56"
-                  onClick={handleSubmit}
-                >
+                  onClick={handleSubmit}>
                   <div className="flex flex-row justify-center items-center">
                     <GiCorn size={16} />
                     <span className="ml-2 font-bold text-center">Detect</span>
@@ -375,7 +372,7 @@ function DetectionPage() {
                     className="bg-custom-green-1 hover:bg-custom-green-2 pl-6 pr-8 py-2 shadow lg:w-56"
                     onClick={() => {
                       if (isReannotating) {
-                        handleSaveAnnotations();  // reannotation 결과를 result에 저장
+                        handleSaveAnnotations();
                       }
                       setShowSaveModal(true);
                     }}
