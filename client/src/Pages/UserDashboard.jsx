@@ -125,9 +125,6 @@ function UserDashboard() {
 			.then(() => setIsLoadingWeather(false));
 	};
 
-	console.log(weatherData);
-	console.log(locationData);
-
 	return (
 		<div className="relative">
 			<div className="min-h-screen flex flex-col">

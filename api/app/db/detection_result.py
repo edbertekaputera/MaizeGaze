@@ -18,15 +18,16 @@ class DetectionResult(db.Model):
 	# Part of composite key (qualifier)
 	farm_name = db.Column(db.String(250), primary_key=True)
 	farm_user = db.Column(db.String(250), primary_key=True)
+	farm_patch_id = db.Column(db.String(250), primary_key=True)
 	db.ForeignKeyConstraint(
-		[farm_name, farm_user], 
-		["Farm.name", "Farm.user"],
+		[farm_name, farm_user, farm_patch_id], 
+		["CropPatch.farm_name", "CropPatch.farm_user", "CropPatch.patch_id"],
 		ondelete="cascade",
 		onupdate="cascade"
 	)
 	
-	detectionResultToFarmRel = db.relationship("Farm", 
-											back_populates="farmToDetectionResultRel",
+	detectionResultToCropPatchRel = db.relationship("CropPatch", 
+											back_populates="cropPatchToDetectionResultRel",
 											cascade="all, delete, save-update")
 
 	@classmethod
@@ -34,8 +35,12 @@ class DetectionResult(db.Model):
 		return cls.query.filter_by(farm_user=email).all()
 	
 	@classmethod
-	def queryResult(cls, farm_user:str, farm_name:str, id:str) -> Self | None:
-		return cls.query.filter_by(farm_user=farm_user, farm_name=farm_name, id=id).one_or_none()
+	def queryNumOfResultByFarm(cls, email:str, farm:str) -> int:
+		return cls.query.filter_by(farm_user=email, farm_name=farm).count()
+	
+	@classmethod
+	def queryResult(cls, farm_user:str, farm_name:str, farm_patch_id:str, id:str) -> Self | None:
+		return cls.query.filter_by(farm_user=farm_user, farm_name=farm_name, farm_patch_id=farm_patch_id, id=id).one_or_none()
 	
 	@classmethod
 	def save(cls, data:dict) -> bool:
@@ -80,12 +85,19 @@ class DetectionResult(db.Model):
 			.filter_by(farm_user=email) \
 			.group_by(cls.farm_name, db.func.date(cls.record_date)) \
 			.all()
-		
+	
 	@classmethod
-	def update(cls, farm_user:str, farm_name:str, id:str, tassel_count:int) -> bool:
+	def queryDailyPerPatchStatistics(cls, email:str) -> list:
+		return db.session.query(cls.farm_name, cls.farm_patch_id, db.func.date(cls.record_date).label("record_date"), db.func.sum(cls.tassel_count).label("total_tassel_count")) \
+			.filter_by(farm_user=email) \
+			.group_by(cls.farm_name, cls.farm_patch_id, db.func.date(cls.record_date)) \
+			.all()
+	
+	@classmethod
+	def update(cls, farm_user:str, farm_name:str, patch_id:str, id:str, tassel_count:int) -> bool:
 		try:
 			with current_app.app_context():
-				current_result = cls.queryResult(str(farm_user), str(farm_name), str(id))
+				current_result = cls.queryResult(str(farm_user), str(farm_name), str(patch_id), str(id))
 				if not current_result:
 					return False
 				
