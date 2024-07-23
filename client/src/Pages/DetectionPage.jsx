@@ -10,6 +10,10 @@ import DropImageInput from "../Components/DropImageInput";
 import LoadingCard from "../Components/LoadingCard";
 import SaveResultModal from "../Components/Storage/SaveResultModal";
 import { AuthContext } from "../Components/Authentication/PrivateRoute";
+import guide1 from "../assets/guide1.gif";
+import guide2 from "../assets/guide2.gif";
+import guide3 from "../assets/guide3.gif";
+import GuideButton from "../Components/GuideButton"
 
 function DetectionPage() {
   const { userInfo } = useContext(AuthContext);
@@ -23,6 +27,21 @@ function DetectionPage() {
   const [annotations, setAnnotations] = useState([]);
   const [isReannotating, setIsReannotating] = useState(false);
   const canvasRef = useRef(null);
+  const reannotation_guide = [
+    {
+      image: guide1,
+      subtitle: 'Add new annotation',
+      description: 'Place cursor over the desired position on the image, drag to draw a box label around the tassel.'
+    },
+    { 
+      image: guide2,
+      subtitle: 'Delete annotation',
+      description: 'Double-click the box label and click the BIN icon.' },
+    { 
+      image: guide3,
+      subtitle: 'Tassel Count',
+      description: 'Check you tassel count during re-annotating!' }   
+  ];
 
   useEffect(() => {
     fetchQuota();
@@ -239,16 +258,29 @@ function DetectionPage() {
       ))}
 
       <Card className="relative my-6 mx-4 lg:my-10 lg:mx-16 shadow-lg border xl:mb-20">
-        <header className="flex flex-wrap flex-row gap-2 justify-between shadow-b border-b-2 pb-5 border-black">
+      <div className="border-b-2 border-black pb-5">
+        <div className="w-full flex justify-between items-center">
           <h1 className="text-4xl font-extrabold">Detect Maize Tassel</h1>
           <span className="px-4 py-2 bg-custom-brown-3 rounded-lg shadow-md font-semibold">
             Monthly Quota: {quota}/{userInfo.detection_quota_limit}
           </span>
-        </header>
-        <div className="flex flex-wrap flex-col justify-start px-8 mt-4 gap-3">
-          <h2 className="text-2xl font-semibold">
-            {status === "SUCCESS" ? "Result" : "Upload Image"}
-          </h2>
+        </div>
+      </div>
+      <div className="flex justify-between items-center mt-4 px-8">
+        <h2 className="text-2xl font-semibold">
+          {status === "SUCCESS" ? "Result" : "Upload Image"}
+        </h2>
+        {isReannotating && (
+          <GuideButton 
+            tooltipContent="example"
+            buttonColor="bg-yellow-500"
+            buttonHoverColor="bg-yellow-600"
+            iconColor="text-gray-800"
+            guides={reannotation_guide}
+          />
+        )}
+      </div>
+      <div className="flex flex-wrap flex-col justify-start px-8 mt-4 gap-3">
           <section className="flex justify-center">
             {status !== "SUCCESS" && !isReannotating && (
               <DropImageInput
@@ -266,7 +298,7 @@ function DetectionPage() {
             )}
             
             {isReannotating && (
-              <div className="w-full max-w-2xl mx-auto">
+              <div className="w-full max-w-2xl mx-auto" style={{ height: '643px' }}>
                 <ReactPictureAnnotation
                   image={originalImage}
                   onAnnotationChange={onAnnotationChange}

@@ -8,6 +8,9 @@ import LoadingCard from "../Components/LoadingCard";
 import ConfirmationModal from "../Components/ConfirmationModal";
 import { useSearchParams,useNavigate } from "react-router-dom";
 import GuideButton from "../Components/GuideButton"
+import guide1 from "../assets/guide1.gif";
+import guide2 from "../assets/guide2.gif";
+import guide3 from "../assets/guide3.gif";
 
 function ReannotationPage() {
   const [searchParams] = useSearchParams();
@@ -20,6 +23,21 @@ function ReannotationPage() {
   const canvasRef = useRef(null);
   const [showSaveModal, setShowSaveModal] = useState(false);
   const navigate = useNavigate();
+  const reannotation_guide = [
+    {
+      image: guide1,
+      subtitle: 'Add new annotation',
+      description: 'Place cursor over the desired position on the image, drag to draw a box label around the tassel.'
+    },
+    { 
+      image: guide2,
+      subtitle: 'Delete annotation',
+      description: 'Double-click the box label and click the BIN icon.' },
+    { 
+      image: guide3,
+      subtitle: 'Tassel Count',
+      description: 'Check you tassel count during re-annotating!' }   
+  ];
 
   useEffect(() => {
     const fetchData = async () => {
@@ -209,14 +227,14 @@ function ReannotationPage() {
           tooltipContent="example"
           buttonColor="bg-yellow-500"
           buttonHoverColor="bg-yellow-600"
-          tooltipColor="bg-gray-700"
           iconColor="text-gray-800"
-        />
+          guides={reannotation_guide}
+          />
         </header>
 
         <div className="flex flex-wrap flex-col justify-start px-8 mt-4 gap-3">
           <section className="flex justify-center">
-          <div className="w-full max-w-2xl mx-auto">
+          <div className="w-full max-w-2xl mx-auto" style={{ height: '643px' }}>
             <ReactPictureAnnotation
               image={originalImage}
               onAnnotationChange={onAnnotationChange}
