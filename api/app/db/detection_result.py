@@ -38,6 +38,10 @@ class DetectionResult(db.Model):
 		return cls.query.filter_by(farm_user=email, farm_name=farm).count()
 	
 	@classmethod
+	def queryNumOfResultByFarmPatch(cls, email:str, farm:str, patch_id:str) -> int:
+		return cls.query.filter_by(farm_user=email, farm_name=farm, farm_patch_id=patch_id).count()
+	
+	@classmethod
 	def queryResult(cls, farm_user:str, farm_name:str, farm_patch_id:str, id:str) -> Self | None:
 		return cls.query.filter_by(farm_user=farm_user, farm_name=farm_name, farm_patch_id=farm_patch_id, id=id).one_or_none()
 	
