@@ -27,8 +27,7 @@ class DetectionResult(db.Model):
 	)
 	
 	detectionResultToCropPatchRel = db.relationship("CropPatch", 
-											back_populates="cropPatchToDetectionResultRel",
-											cascade="all, delete, save-update")
+											back_populates="cropPatchToDetectionResultRel")
 
 	@classmethod
 	def queryAllResultHistory(cls, email:str) -> list[Self]:

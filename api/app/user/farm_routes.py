@@ -109,6 +109,7 @@ def create_farm() -> dict[str, int|str|list[str]]:
 def update_farm() -> dict[str, int|str|list[str]]:
 	json = request.get_json()
 	json["user"] = session["email"]
+ 
 	# Update Farm
 	success = Farm.update_farm(details=json)
 	if not success:
@@ -117,13 +118,14 @@ def update_farm() -> dict[str, int|str|list[str]]:
 	# Update Patch
 	list_of_fails = []
 	for p in json["patches"]:
+		p_id = p.get("patch_id")
 		success = CropPatch.updateCropPatch(details={
 			"farm_name": json["name"],
 			"farm_user": json["user"],
-			"patch_id": p["patch_id"],
-			"name": p["name"],
-			"land_size": p["land_size"],
-			"deleted": p["deleted"],
+			"patch_id": p_id if p_id else str(uuid4()),
+			"name": p.get("name"),
+			"land_size": p.get("land_size"),
+			"deleted": p.get("deleted"),
 		})
 		if not success:
 			list_of_fails.append(p["name"])

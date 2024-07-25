@@ -17,8 +17,7 @@ class User(db.Model):
 	current_subscription_id = db.Column(db.String(250), nullable=True)
 	# Foreign key
 	user_type = db.Column(db.String(250), db.ForeignKey("TypeOfUser.name"), nullable=False)
-	userToTypeOfUserRel = db.relationship("TypeOfUser", back_populates="typeOfUserToUserRel", cascade="all, delete, save-update",
-									foreign_keys="User.user_type")
+	userToTypeOfUserRel = db.relationship("TypeOfUser", back_populates="typeOfUserToUserRel", foreign_keys="User.user_type")
 	# Other Relationship
 	userToDetectionQuotaRel = db.relationship("DetectionQuota", back_populates="detectionQuotaToUserRel", cascade="all, delete, save-update",
 									foreign_keys="DetectionQuota.user")
