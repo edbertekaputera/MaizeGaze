@@ -16,7 +16,7 @@ class DetectionQuota(db.Model):
 
 	# Part of composite key (qualifier)
 	user = db.Column(db.String(250), db.ForeignKey("User.email"), nullable=False, primary_key=True)
-	detectionQuotaToUserRel = db.relationship("User", back_populates="userToDetectionQuotaRel", cascade="all, delete, save-update",
+	detectionQuotaToUserRel = db.relationship("User", back_populates="userToDetectionQuotaRel",
 									foreign_keys="DetectionQuota.user")
  
 	@classmethod

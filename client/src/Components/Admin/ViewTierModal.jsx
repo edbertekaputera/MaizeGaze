@@ -255,7 +255,7 @@ function ViewTierModal({ state, setState, name }) {
 							onSubmit={(ev) => {
 								ev.preventDefault();
 								if (name.trim() != "" && price > 0 && detectionQuota > 0 && storageLimit > 0) {
-									handleCreate();
+									handleUpdate();
 								} else {
 									alert("Incomplete data.");
 								}

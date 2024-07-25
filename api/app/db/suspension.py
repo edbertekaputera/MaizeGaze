@@ -17,7 +17,7 @@ class Suspension(db.Model):
 
 	# Part of composite key (qualifier)
 	user = db.Column(db.String(250), db.ForeignKey('User.email'), nullable=False, primary_key=True)
-	suspensionToUserRel = db.relationship("User", back_populates="userToSuspensionRel", cascade='all, delete, save-update',
+	suspensionToUserRel = db.relationship("User", back_populates="userToSuspensionRel",
 								  foreign_keys="Suspension.user")
 	
 	@classmethod
