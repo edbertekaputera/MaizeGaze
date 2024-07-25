@@ -18,7 +18,7 @@ function UpdateFarmModal({ state, setState, farm }) {
 	const [address, setAddress] = useState("");
 	const [description, setDescription] = useState("");
 
-	const [isLoading, setIsLoading] = useState(true);
+	const [isLoading, setIsLoading] = useState(false);
 
 	const [showUpdateModal, setShowUpdateModal] = useState(false);
 	const [messageModal, setMessageModal] = useState(false);

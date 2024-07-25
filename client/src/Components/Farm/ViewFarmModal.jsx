@@ -103,7 +103,7 @@ function ViewFarmModal({ state, setState, name }) {
 				farm={farm}
 			></UpdateFarmModal>
 
-			<Modal show={state} size="4xl" onClose={() => setState(null)} popup>
+			<Modal show={state} size="4xl" onClose={() => setState(false)} popup>
 				<div className="rounded shadow-md overflow-y-auto">
 					<Modal.Header></Modal.Header>
 					<Modal.Body>
