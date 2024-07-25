@@ -43,18 +43,19 @@ function ReannotationPage() {
     const fetchData = async () => {
       const id = searchParams.get('id');
       const farmName = searchParams.get('farm_name');
-
-      if (!id || !farmName) {
-        setError('Missing id or farm_name in URL');
+      const farmPatchId = searchParams.get('farm_patch_id');
+  
+      if (!id || !farmName || !farmPatchId) {
+        setError('Missing id, farm_name, or farm_patch_id in URL');
         setLoading(false);
         return;
       }
-
+  
       try {
         const response = await axios.get('/api/storage/query_result', {
-          params: { id, farm_name: farmName }
+          params: { id, farm_name: farmName, farm_patch_id: farmPatchId }
         });
-
+  
         if (response.data.status_code === 200) {
           const resultData = response.data.result;
           setResult(resultData);
@@ -76,7 +77,7 @@ function ReannotationPage() {
         setLoading(false);
       }
     };
-
+  
     fetchData();
   }, [searchParams]);
 
@@ -235,28 +236,28 @@ function ReannotationPage() {
         <div className="flex flex-wrap flex-col justify-start px-8 mt-4 gap-3">
           <section className="flex justify-center">
           <div className="w-full max-w-2xl mx-auto" style={{ height: '643px' }}>
-            <ReactPictureAnnotation
-              image={originalImage}
-              onAnnotationChange={onAnnotationChange}
-              annotationData={annotations.map((ann, index) => ({
-                id: (index + 1).toString(),
-                mark: {
-                  x: (ann.x * imageDimensions.width) - ((ann.width * imageDimensions.width) / 2),
-                  y: (ann.y * imageDimensions.height) - ((ann.height * imageDimensions.height) / 2),
-                  width: ann.width * imageDimensions.width,
-                  height: ann.height * imageDimensions.height
-                },
-              }))}
-              onChange={onAnnotationChange}
-              onSelect={handleSelect}
-              renderAnnotation={renderAnnotation}
-              width={imageDimensions.width}
-              height={imageDimensions.height}
-              scrollSpeed={0}
-              zoomScale={1}
-              disabled={false}
-              allowZoom={false}
-            />
+          <ReactPictureAnnotation
+            image={originalImage}
+            onAnnotationChange={onAnnotationChange}
+            annotationData={annotations.map((ann, index) => ({
+              id: (index + 1).toString(),
+              mark: {
+                x: (ann.x * imageDimensions.width) - ((ann.width * imageDimensions.width) / 2),
+                y: (ann.y * imageDimensions.height) - ((ann.height * imageDimensions.height) / 2),
+                width: ann.width * imageDimensions.width,
+                height: ann.height * imageDimensions.height
+              },
+            }))}
+            onChange={onAnnotationChange}
+            onSelect={handleSelect}
+            renderAnnotation={renderAnnotation}
+            width={Math.min(imageDimensions.width, 1000)} // max width
+            height={Math.min(imageDimensions.height, 750)} // max height
+            scrollSpeed={0}
+            zoomScale={1}
+            disabled={false}
+            allowZoom={false}
+          />
             <canvas ref={canvasRef} style={{ display: "none" }} />
           </div>
           </section>

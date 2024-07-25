@@ -159,7 +159,7 @@ function ViewResultModal({ state, setState, id, farm_name, farm_patch_id, farm_p
 	};
 
 	const handleReannotate = () => {
-		navigate(`/user/reannotate?id=${id}&farm_name=${farm_name}`);
+		navigate(`/user/reannotate?id=${id}&farm_name=${farm_name}&farm_patch_id=${farm_patch_id}`);
 	};
 
 	return (
