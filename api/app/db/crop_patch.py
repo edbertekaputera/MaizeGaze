@@ -4,7 +4,7 @@ from flask import current_app
 
 # Local dependencies
 from .sqlalchemy import db
-
+from .detection_result import DetectionResult
 # Views Schema
 class CropPatch(db.Model):
 	__tablename__ = "CropPatch"
@@ -80,7 +80,7 @@ class CropPatch(db.Model):
 					}
 					return cls.createCropPatch(details=new_patch_details)
 				if details["deleted"]:
-					return cls.deleteCropPatch(farm_user=details["farm_user"], farm_name=details["farm_name"], patch_id=details["patch_id"])	
+					return cls.deleteCropPatch(farm_user=str(details["farm_user"]), farm_name=str(details["farm_name"]), patch_id=str(details["patch_id"]))	
 				if details.get("name") != patch.name:
 					patch.name = str(details["name"])
 				if details.get("land_size") != patch.land_size and float(details["land_size"]) > 0:
@@ -105,6 +105,8 @@ class CropPatch(db.Model):
 	@classmethod
 	def deleteCropPatch(cls, farm_user: str, farm_name: str, patch_id: str) -> bool:
 		try:
+			if DetectionResult.queryNumOfResultByFarmPatch(farm_user, farm_name, patch_id) > 0:
+				return False
 			with current_app.app_context():
 				patch = cls.get(farm_user=farm_user, farm_name=farm_name, patch_id=patch_id)
 				if patch:

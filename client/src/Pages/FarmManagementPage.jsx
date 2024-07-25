@@ -12,6 +12,7 @@ import { BiArea } from "react-icons/bi";
 import { FaEarthAsia } from "react-icons/fa6";
 import { BsArrowDownShort } from "react-icons/bs";
 import FarmManagementTable from "../Components/Farm/FarmManagementTable";
+import CreateFarmModal from "../Components/Farm/CreateFarmModal";
 
 function FarmManagementPage() {
 	const [cities, setCities] = useState({});
@@ -232,6 +233,7 @@ function FarmManagementPage() {
 				)}
 			</ConfirmationModal>
 			{/* Insert Create Farm Modal */}
+			<CreateFarmModal state={showCreateModal} setState={setShowCreateModal} />
 
 			{/* Page Card */}
 			<Card className="my-6 mx-4 lg:my:10 lg:mx-16 shadow-lg border xl:mb-20">
