@@ -16,7 +16,7 @@ class ConsultationQuota(db.Model):
 
 	# Part of composite key (qualifier)
 	user = db.Column(db.String(250), db.ForeignKey("User.email"), nullable=False, primary_key=True)
-	consultationQuotaToUserRel = db.relationship("User", back_populates="userToConsultationQuotaRel", cascade="all, delete, save-update",
+	consultationQuotaToUserRel = db.relationship("User", back_populates="userToConsultationQuotaRel",
 									foreign_keys="ConsultationQuota.user")
  
 	@classmethod

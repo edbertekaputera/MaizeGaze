@@ -25,8 +25,7 @@ class CropPatch(db.Model):
 	)
 
 	cropPatchToFarmRel = db.relationship("Farm", 
-											back_populates="farmToCropPatchRel",
-											cascade="all, delete, save-update")
+											back_populates="farmToCropPatchRel")
 	
 	# Relationship
 	cropPatchToDetectionResultRel = db.relationship("DetectionResult", 
@@ -65,16 +64,23 @@ class CropPatch(db.Model):
 		except BaseException as e:
 			print(e)
 			return False
-	
+
 	@classmethod
 	def updateCropPatch(cls, details:dict[str,str|float|bool]) -> bool:
 		try:
 			with current_app.app_context():
 				patch = cls.get(farm_user=details["farm_user"], farm_name=details["farm_name"], patch_id=details["patch_id"])
 				if not patch:
-					return cls.createCropPatch(details=details)
+					new_patch_details = {
+						"farm_name": details["farm_name"],
+						"farm_user": details["farm_user"],
+						"patch_id": details["patch_id"],
+						"name": details["name"],
+						"land_size": details["land_size"]
+					}
+					return cls.createCropPatch(details=new_patch_details)
 				if details["deleted"]:
-					return False
+					return cls.deleteCropPatch(farm_user=details["farm_user"], farm_name=details["farm_name"], patch_id=details["patch_id"])	
 				if details.get("name") != patch.name:
 					patch.name = str(details["name"])
 				if details.get("land_size") != patch.land_size and float(details["land_size"]) > 0:
@@ -82,7 +88,7 @@ class CropPatch(db.Model):
 				db.session.commit()
 			return True
 		except:
-			return False	
+			return False
 		
 	@classmethod
 	def deleteAllOwnedByFarm(cls, email:str, farm_name:str) -> bool:
@@ -94,6 +100,21 @@ class CropPatch(db.Model):
 				db.session.commit()
 			return True
 		except:
-			return False	
+			return False
+
+	@classmethod
+	def deleteCropPatch(cls, farm_user: str, farm_name: str, patch_id: str) -> bool:
+		try:
+			with current_app.app_context():
+				patch = cls.get(farm_user=farm_user, farm_name=farm_name, patch_id=patch_id)
+				if patch:
+					db.session.delete(patch)
+					db.session.commit()
+					return True
+				else:
+					return False
+		except BaseException as err:
+			return False
+
 	
 	
