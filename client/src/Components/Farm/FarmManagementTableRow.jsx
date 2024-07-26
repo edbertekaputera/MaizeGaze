@@ -1,5 +1,6 @@
 import { Button, Checkbox, Table } from "flowbite-react";
 import React, { useState } from "react";
+import ViewFarmModal from "./ViewFarmModal";
 
 function FarmManagementTableRow({ name, city, country, address, total_land_size, selected, setSelected }) {
 	const [showView, setShowView] = useState(false);
@@ -18,7 +19,7 @@ function FarmManagementTableRow({ name, city, country, address, total_land_size,
 
 	return (
 		<>
-			{/* <ViewFarmModal state={showView} setState={setShowView} name={name} /> */}
+			<ViewFarmModal state={showView} setState={setShowView} name={name} />
 			<Table.Row className="bg-white">
 				<Table.Cell className="whitespace-nowrap font-medium text-gray-900 p-4">
 					<Checkbox checked={selected} onChange={handleCheckbox} />
