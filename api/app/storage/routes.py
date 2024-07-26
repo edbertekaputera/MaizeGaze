@@ -240,10 +240,10 @@ def reannotateResult() -> dict[str, int | str]:
 	# Get Updated Result
 	data = request.get_json()
 	if not data or "updated_result" not in data:
-			return {"status_code": 400, "message": "Invalid input data."}
-		
+		return {"status_code": 400, "message": "Invalid input data."}
+
 	updated_result = data["updated_result"]
-	
+ 
 	# Update Tassel Count
 	success_update = DetectionResult.update(updated_result["farm_user"], updated_result["farm_name"], updated_result["farm_patch_id"], updated_result["id"], updated_result["tassel_count"])
 	if not success_update:

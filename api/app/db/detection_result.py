@@ -113,5 +113,3 @@ class DetectionResult(db.Model):
 			print(e)
 			return False
 
-	
-	

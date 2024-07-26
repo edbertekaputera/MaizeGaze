@@ -30,6 +30,8 @@ class Detection():
 			"annotated_image": self.convert_img_to_bytes(annotated_image), 
 		  	"annotations": annotations,
 			"tassel_count": len(results.boxes),
+            "image_width": image.width,	#add due to re-annotation
+        	"image_height": image.height
 		}
 
 	# Convert Image to base64 bytes:

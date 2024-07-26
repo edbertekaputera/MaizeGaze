@@ -19,6 +19,7 @@ import UserPlanManagementPage from "./Pages/UserPlanManagementPage";
 import PurchasePlanPage from "./Pages/PurchasePlanPage";
 import MaizeDoctorPage from "./Pages/MaizeDoctorPage";
 import ConsultationPage from "./Pages/ConsultationPage";
+import ReannotationPage from "./Pages/ReannotationPage";
 import FarmManagementPage from "./Pages/FarmManagementPage";
 
 export default function AppRouter() {
@@ -221,6 +222,17 @@ export default function AppRouter() {
 					element={
 						<PrivateRoute user_only>
 							<PurchasePlanPage />
+						</PrivateRoute>
+					}
+				/>
+
+				{/* Re-annotation (After saving detection result) Route */}
+				<Route
+					exact
+					path="/user/reannotate"
+					element={
+						<PrivateRoute user_only can_reannotate>
+							<ReannotationPage />
 						</PrivateRoute>
 					}
 				/>

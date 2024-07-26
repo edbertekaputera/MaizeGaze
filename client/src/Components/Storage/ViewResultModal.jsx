@@ -10,6 +10,9 @@ import LoadingCard from "../LoadingCard";
 import ConfirmationModal from "../ConfirmationModal";
 import MessageModal from "../MessageModal";
 import { MdDelete, MdFileDownload } from "react-icons/md";
+import { ImPencil2 } from "react-icons/im";
+import { useNavigate } from "react-router-dom";
+
 
 function ViewResultModal({ state, setState, id, farm_name, farm_patch_id, farm_patch_name }) {
 	const [isLoading, setIsLoading] = useState(true);
@@ -19,6 +22,7 @@ function ViewResultModal({ state, setState, id, farm_name, farm_patch_id, farm_p
 	const [showDeleteModal, setShowDeleteModal] = useState(false);
 	const [isDownloadLoading, setIsDownloadLoading] = useState(false);
 	const [isDeleteLoading, setIsDeleteLoading] = useState(false);
+	const navigate = useNavigate();
 
 	const [data, setData] = useState({
 		tassel_count: 0,
@@ -154,6 +158,10 @@ function ViewResultModal({ state, setState, id, farm_name, farm_patch_id, farm_p
 			.then(() => setIsDeleteLoading(false));
 	};
 
+	const handleReannotate = () => {
+		navigate(`/user/reannotate?id=${id}&farm_name=${farm_name}&farm_patch_id=${farm_patch_id}`);
+	};
+
 	return (
 		<>
 			{/* Toast */}
@@ -213,6 +221,15 @@ function ViewResultModal({ state, setState, id, farm_name, farm_patch_id, farm_p
 										<Button className="px-2 bg-custom-green-1 hover:bg-custom-green-2" onClick={() => setShowDownloadModal(true)}>
 											<IoMdDownload size={25} />
 										</Button>
+										<Button
+                                            className="bg-custom-brown-1 hover:bg-custom-brown-2"
+                                            onClick={handleReannotate}
+                                        >
+                                            <div className="flex flex-row justify-center items-center">
+                                                <ImPencil2 size={25} />
+                                                
+                                            </div>
+                                        </Button>
 									</div>
 								</div>
 								<div className="flex flex-wrap mt-5 items-center">
