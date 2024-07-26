@@ -52,7 +52,7 @@ function ViewFarmModal({ state, setState, name }) {
 					},
 				})
 				.then((res) => {
-					if (res.data.status_code !== 200) {
+					if (res.data.status_code == 200) {
 						const patchArray = Array.isArray(res.data.farm.patches) ? res.data.farm.patches : [];
 						const totalSize = patchArray.reduce((total, patch) => total + patch.land_size, 0);
 						setFarm(res.data.farm);
