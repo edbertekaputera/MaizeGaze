@@ -214,7 +214,7 @@ function CreateFarmModal({ state, setState }) {
 											<span className="text-sm">
 												Total size:{" "}
 												<span className="font-bold">
-													{patches.reduce((total, patch) => total + convertSize(parseFloat(patch.land_size), patch.sizeUnit), 0)} mu
+													{patches.reduce((total, patch) => total + convertSize(parseFloat(patch.land_size), patch.sizeUnit), 0).toFixed(2)} mu
 												</span>
 											</span>
 										</div>

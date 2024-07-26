@@ -57,12 +57,13 @@ def query_farm() -> dict[str, str|int|dict[str, str|list[dict[str, str|float]]]]
 			"name": p.name
 		})
 	return {
-		"status_code": 400, 
+		"status_code": 200, 
 		"farm": {
 			"name": farm.name,
 			"city": farm.city,
 			"country": farm.country,
 			"address": farm.address,
+			"description": farm.description,
 			"patches": patches
 		}
 	}
