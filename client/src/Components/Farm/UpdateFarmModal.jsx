@@ -67,7 +67,13 @@ function UpdateFarmModal({ state, setState, farm }) {
 
 	const isButtonDisabled =
 		Object.keys(changes).length === 0 ||
-		(changes.patches && changes.patches.length === 0 && (!changes.name || changes.name === farm.name) && (!changes.city || changes.city === farm.city));
+		(changes.patches && changes.patches.length === 0 && 
+            (!changes.name || changes.name === farm.name) && 
+            (!changes.city || changes.city === farm.city) &&
+            (!changes.address || changes.address === farm.address) &&
+            (!changes.description || changes.description === farm.description) &&
+            (!changes.country || changes.country === farm.country)
+        );
 
 	const retrieveChanges = (data) => {
 		const changes = {};
@@ -164,7 +170,7 @@ function UpdateFarmModal({ state, setState, farm }) {
 				const country = data.countries.find((c) => c.label.includes(farm.country));
 				setSelectedCountry(country);
 			});
-	}, [farm]);
+	}, [farm, state]);
 
 	useEffect(() => {
 		if (state) {
@@ -324,7 +330,7 @@ function UpdateFarmModal({ state, setState, farm }) {
 											<span className="text-sm">
 												Total size:{" "}
 												<span className="font-bold">
-													{patches.reduce((total, patch) => total + convertSize(parseFloat(patch.land_size), patch.sizeUnit), 0)} mu
+													{patches.reduce((total, patch) => total + convertSize(parseFloat(patch.land_size), patch.sizeUnit), 0).toFixed(2)} mu
 												</span>
 											</span>
 										</div>
