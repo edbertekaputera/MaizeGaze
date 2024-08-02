@@ -14,6 +14,7 @@ class DetectionResult(db.Model):
 	record_date = db.Column(db.DateTime(), nullable=False)
 	name = db.Column(db.String(250), nullable=False)
 	description = db.Column(db.String(250), nullable=False)
+	used_for_training = db.Column(db.Boolean(), default=False)
 
 	# Part of composite key (qualifier)
 	farm_name = db.Column(db.String(250), primary_key=True)
@@ -112,4 +113,18 @@ class DetectionResult(db.Model):
 		except BaseException as e:
 			print(e)
 			return False
-
+	
+	@classmethod
+	def set_trained(cls, farm_user:str, farm_name:str, patch_id:str, id:str) -> bool:
+		try:
+			with current_app.app_context():
+				current_result = cls.queryResult(str(farm_user), str(farm_name), str(patch_id), str(id))
+				if not current_result:
+					print("not found", farm_name, patch_id, id)
+					return False
+				current_result.used_for_training = True
+				db.session.commit()
+			return True
+		except BaseException as e:
+			print(e)
+			return False

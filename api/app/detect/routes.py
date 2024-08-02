@@ -1,5 +1,5 @@
 # Libraries
-from flask import session, Blueprint, request
+from flask import session, Blueprint, request, current_app
 from celery.result import AsyncResult
 from base64 import encodebytes # type: ignore
 from datetime import date 
@@ -10,8 +10,7 @@ from .task import detect_and_count
 
 # Initialize
 router = Blueprint("detection", __name__)
-
-# Utility function
+	
 def allowed_file(filename:str):
 	ALLOWED_EXTENSIONS = {'heic', 'png', 'jpg', 'jpeg'}
 	return '.' in filename and \
@@ -20,7 +19,9 @@ def allowed_file(filename:str):
 # Initialize detection task route
 @router.route("/init_detection", methods=["POST"])
 @permissions_required(is_user=True)
-def init_detection() -> dict[str, bool|str]:
+def init_detection():
+	# Get model_id (NULLABLE)
+	model_id=request.form.get("model_id")
     # Get uploaded file
 	if "image" not in request.files:
 		return {"success": False}
@@ -35,9 +36,18 @@ def init_detection() -> dict[str, bool|str]:
 	success = DetectionQuota.increment_quota(session['email'], session["detection_quota_limit"])
 	if not success:
 		return {"success": False}
+	
 	# Initialize task
-	encoded = encodebytes(file.stream.read()).decode("ascii")	
-	result = detect_and_count.delay(encoded) # type: ignore
+	b64_img = encodebytes(file.stream.read()).decode("ascii")
+	result = detect_and_count.delay(
+		b64_img_bytes=b64_img,
+		email=session["email"],
+		project_id=current_app.config["VERTEX_PROJECT_ID"],
+		endpoint_id=current_app.config["VERTEX_DETECT_ENDPOINT_ID"],
+		location=current_app.config["GOOGLE_CLOUD_REGION"],
+		google_cloud_credentials_path=current_app.config["GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS_PATH"],
+		model_id=model_id
+	) # type: ignore
 	return {"success": True, "result_id": result.id}
 
 # Retrieve detection task results route
