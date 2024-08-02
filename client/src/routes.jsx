@@ -21,6 +21,8 @@ import MaizeDoctorPage from "./Pages/MaizeDoctorPage";
 import ConsultationPage from "./Pages/ConsultationPage";
 import ReannotationPage from "./Pages/ReannotationPage";
 import FarmManagementPage from "./Pages/FarmManagementPage";
+import ReportFeedbackPage from "./Pages/ReportFeedbackPage"
+import AdminFeedbackManagementPage from "./Pages/AdminFeedbackManagementPage"
 
 export default function AppRouter() {
 	return (
@@ -236,6 +238,29 @@ export default function AppRouter() {
 						</PrivateRoute>
 					}
 				/>
+
+				{/* Feedback report Route */}
+				<Route
+					exact
+					path="/user/report_feedback"
+					element={
+						<PrivateRoute user_only>
+							<ReportFeedbackPage />
+						</PrivateRoute>
+					}
+				/>
+
+				{/* Admin view feedback Route */}
+				<Route
+					exact
+					path="/administrator/feedback_management"
+					element={
+						<PrivateRoute admin_only>
+							<AdminFeedbackManagementPage />
+						</PrivateRoute>
+					}
+				/>
+
 
 				{/* Other routes */}
 				<Route

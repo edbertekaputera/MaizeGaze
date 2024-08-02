@@ -26,6 +26,7 @@ export default function NavigationBar() {
 			// { icon: MdSpaceDashboard, link: "/administrator", name: "Dashboard" },
 			{ icon: MdManageAccounts, link: "/administrator/user_management", name: "User Management" },
 			{ icon: GoSponsorTiers, link: "/administrator/tier_management", name: "Tier Management" },
+			{ icon: GoSponsorTiers, link: "/administrator/feedback_management", name: "Feedback Management" },
 		],
 		USER: [
 			{ icon: MdSpaceDashboard, link: "/user", name: "Dashboard" },
@@ -74,6 +75,9 @@ export default function NavigationBar() {
 								<Dropdown.Item onClick={() => navigate("/user/profile")} icon={MdSettings}>
 									User Profile
 								</Dropdown.Item>
+								<Dropdown.Item onClick={() => navigate("/user/report_feedback")} icon={MdSettings}>
+									Report Feedback
+								</Dropdown.Item>
 							</>
 						)}
 
@@ -109,6 +113,9 @@ export default function NavigationBar() {
 											</Sidebar.Item>
 											<Sidebar.Item onClick={() => navigate("/user/profile")} icon={MdSettings}>
 												User Profile
+											</Sidebar.Item>
+											<Sidebar.Item onClick={() => navigate("/user/report_feedback")} icon={MdSettings}>
+												Report Feedback
 											</Sidebar.Item>
 										</Sidebar.ItemGroup>
 									)}

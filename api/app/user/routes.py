@@ -6,6 +6,7 @@ from app.db import Suspension
 from app.authentication import login_required, permissions_required, bcrypt
 from app.db import User
 from app.db import TypeOfUser
+from app.db import Feedback
 
 # Initialize
 router = Blueprint("user", __name__)
@@ -91,3 +92,26 @@ def plan_management() -> dict[str, list[dict[str, str|int|bool]] | str]:
         plans.append(plans_details)
         
     return plans
+
+@router.route('/report_feedback', methods=['POST'])
+@permissions_required(is_user=True)
+def report_feedback() -> dict[str, int|str]:
+    data = request.get_json()
+    
+    if not data or 'rating' not in data or 'content' not in data:
+        return {"status_code": 400, "message": "Missing required fields"}
+    
+    if not isinstance(data['rating'], int) or data['rating'] < 1 or data['rating'] > 5:
+        return {"status_code": 400, "message": "Invalid rating. Must be an integer between 1 and 5"}
+    
+    if len(data['content']) > 1000:
+        return {"status_code": 400, "message": "Content too long. Maximum 1000 characters allowed"}
+    
+    data["user_email"] = session["email"]
+    
+    success = Feedback.create(details=data)
+    
+    if not success:
+        return {"status_code": 500, "message": "Failed to submit feedback"}
+    
+    return {"status_code": 201, "message": "Feedback submitted successfully"}

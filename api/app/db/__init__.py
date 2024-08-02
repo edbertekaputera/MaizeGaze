@@ -8,7 +8,8 @@ from .suspension import Suspension
 from .diagnosis_quota import DiagnosisQuota
 from .consultation_quota import ConsultationQuota
 from .crop_patch import CropPatch
+from .feedback import Feedback
 __all__ = [
 	"db", "User", "TypeOfUser", "Farm", "DetectionResult", "Suspension",
-	"DiagnosisQuota", "DetectionQuota", "ConsultationQuota", "CropPatch"
+	"DiagnosisQuota", "DetectionQuota", "ConsultationQuota", "CropPatch", "Feedback"
 ]
