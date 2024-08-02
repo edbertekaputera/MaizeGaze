@@ -13,6 +13,7 @@ function AdminFeedbackManagementPage() {
         minRating: 1,
         maxRating: 5,
     });
+    const [sortOrder, setSortOrder] = useState('newest'); // 'newest' or 'oldest'
 
     const navigate = useNavigate();
 
@@ -36,10 +37,18 @@ function AdminFeedbackManagementPage() {
             .finally(() => setIsLoading(false));
     }, []);
 
-    const filterFeedbacks = () => {
-        return feedbacks.filter((feedback) => 
-            feedback.rating >= filter.minRating && feedback.rating <= filter.maxRating
-        );
+    const filterAndSortFeedbacks = () => {
+        return feedbacks
+            .filter((feedback) => 
+                feedback.rating >= filter.minRating && feedback.rating <= filter.maxRating
+            )
+            .sort((a, b) => {
+                if (sortOrder === 'newest') {
+                    return new Date(b.created_at) - new Date(a.created_at);
+                } else {
+                    return new Date(a.created_at) - new Date(b.created_at);
+                }
+            });
     };
 
     return (
@@ -51,29 +60,41 @@ function AdminFeedbackManagementPage() {
                     <h1 className="text-4xl font-extrabold">Feedback Management</h1>
                 </header>
 
-                <section className="flex flex-row justify-start gap-4 mt-4">
-                    <div className="flex items-center">
-                        <FaStar className="text-yellow-400 mr-2" />
-                        <select 
-                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5"
-                            onChange={(e) => setFilter(prev => ({...prev, minRating: parseInt(e.target.value)}))}
-                            value={filter.minRating}
-                        >
-                            {[1,2,3,4,5].map(num => (
-                                <option key={num} value={num}>Min: {num}</option>
-                            ))}
-                        </select>
+                <section className="flex flex-row justify-between gap-4 mt-4">
+                    <div className="flex items-center gap-4">
+                        <div className="flex items-center">
+                            <FaStar className="text-yellow-400 mr-2" />
+                            <select 
+                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5"
+                                onChange={(e) => setFilter(prev => ({...prev, minRating: parseInt(e.target.value)}))}
+                                value={filter.minRating}
+                            >
+                                {[1,2,3,4,5].map(num => (
+                                    <option key={num} value={num}>Min: {num}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="flex items-center">
+                            <FaStar className="text-yellow-400 mr-2" />
+                            <select 
+                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5"
+                                onChange={(e) => setFilter(prev => ({...prev, maxRating: parseInt(e.target.value)}))}
+                                value={filter.maxRating}
+                            >
+                                {[1,2,3,4,5].map(num => (
+                                    <option key={num} value={num}>Max: {num}</option>
+                                ))}
+                            </select>
+                        </div>
                     </div>
                     <div className="flex items-center">
-                        <FaStar className="text-yellow-400 mr-2" />
                         <select 
                             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5"
-                            onChange={(e) => setFilter(prev => ({...prev, maxRating: parseInt(e.target.value)}))}
-                            value={filter.maxRating}
+                            onChange={(e) => setSortOrder(e.target.value)}
+                            value={sortOrder}
                         >
-                            {[1,2,3,4,5].map(num => (
-                                <option key={num} value={num}>Max: {num}</option>
-                            ))}
+                            <option value="newest">Newest First</option>
+                            <option value="oldest">Oldest First</option>
                         </select>
                     </div>
                 </section>
@@ -82,7 +103,7 @@ function AdminFeedbackManagementPage() {
                     {isLoading ? (
                         <p>Loading feedbacks...</p>
                     ) : feedbacks.length > 0 ? (
-                        <FeedbackManagementTable feedbacks={filterFeedbacks()} />
+                        <FeedbackManagementTable feedbacks={filterAndSortFeedbacks()} />
                     ) : (
                         <p>No feedbacks available.</p>
                     )}

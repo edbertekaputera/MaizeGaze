@@ -13,7 +13,7 @@ function ViewFeedbackModal({ state, setState, feedbackId }) {
         if (state && data == null) {
             setIsLoading(true);
             axios
-                .get("/api/admin/feedback/query_feedback", {
+                .get("/api/admin/feedback_management/query_feedback", {
                     params: {
                         feedback_id: feedbackId,
                     },
