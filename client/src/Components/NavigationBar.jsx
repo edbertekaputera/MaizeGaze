@@ -1,8 +1,9 @@
 import { Avatar, Drawer, Dropdown, Navbar, Sidebar, TextInput } from "flowbite-react";
 import { RiMenu2Fill } from "react-icons/ri";
-import { GiCorn } from "react-icons/gi";
+import { GiArtificialIntelligence, GiCorn } from "react-icons/gi";
 import { MdLogout, MdSpaceDashboard, MdOutlineWorkHistory, MdManageAccounts, MdSettings } from "react-icons/md";
 import { GoSponsorTiers } from "react-icons/go";
+import { CgBrowse } from "react-icons/cg";
 
 import { LuUserCircle2 } from "react-icons/lu";
 
@@ -11,6 +12,8 @@ import { useContext, useState } from "react";
 import { AuthContext } from "./Authentication/PrivateRoute";
 import ConfirmationModal from "./ConfirmationModal";
 import { useNavigate } from "react-router-dom";
+import { FaPersonCircleQuestion, FaUserDoctor } from "react-icons/fa6";
+import { PiFarmFill } from "react-icons/pi";
 
 export default function NavigationBar() {
 	const { userInfo, logout } = useContext(AuthContext);
@@ -31,6 +34,16 @@ export default function NavigationBar() {
 		],
 	};
 
+	if (userInfo.can_diagnose) {
+		drawerRoutes.USER.push({ icon: FaUserDoctor, link: "/user/maize_doctor", name: "Maize Doctor" });
+	}
+	if (userInfo.can_chatbot) {
+		drawerRoutes.USER.push({ icon: FaPersonCircleQuestion, link: "/user/consultation", name: "Consultation" });
+	}
+	if (userInfo.can_active_learn) {
+		drawerRoutes.USER.push({ icon: GiArtificialIntelligence, link: "/user/active_learn", name: "Active Learning" });
+	}
+
 	return (
 		<>
 			{/* Logout Confirmation Modal */}
@@ -50,9 +63,20 @@ export default function NavigationBar() {
 							<span className="block truncate text-sm font-medium">{userInfo.email}</span>
 							<span className="block truncate text-xs text-gray-400">({userInfo.type})</span>
 						</Dropdown.Header>
-						<Dropdown.Item onClick={() => navigate("/user/profile")} icon={MdSettings}>
-							User Profile
-						</Dropdown.Item>
+						{!userInfo.is_admin && (
+							<>
+								<Dropdown.Item onClick={() => navigate("/user/plan_management")} icon={CgBrowse}>
+									Plan Management
+								</Dropdown.Item>
+								<Dropdown.Item onClick={() => navigate("/user/farm_management")} icon={PiFarmFill}>
+									Farm Management
+								</Dropdown.Item>
+								<Dropdown.Item onClick={() => navigate("/user/profile")} icon={MdSettings}>
+									User Profile
+								</Dropdown.Item>
+							</>
+						)}
+
 						<Dropdown.Divider />
 						<Dropdown.Item onClick={() => setShowConfirmLogoutModal(true)} icon={MdLogout}>
 							Logout
@@ -75,11 +99,19 @@ export default function NavigationBar() {
 											</Sidebar.Item>
 										))}
 									</Sidebar.ItemGroup>
-									<Sidebar.ItemGroup>
-										<Sidebar.Item onClick={() => navigate("/user/profile")} icon={MdSettings}>
-											User Profile
-										</Sidebar.Item>
-									</Sidebar.ItemGroup>
+									{!userInfo.is_admin && (
+										<Sidebar.ItemGroup>
+											<Sidebar.Item onClick={() => navigate("/user/plan_management")} icon={CgBrowse}>
+												Plan Management
+											</Sidebar.Item>
+											<Sidebar.Item onClick={() => navigate("/user/farm_management")} icon={PiFarmFill}>
+												Farm Management
+											</Sidebar.Item>
+											<Sidebar.Item onClick={() => navigate("/user/profile")} icon={MdSettings}>
+												User Profile
+											</Sidebar.Item>
+										</Sidebar.ItemGroup>
+									)}
 									<Sidebar.ItemGroup>
 										<Sidebar.Item onClick={() => setShowConfirmLogoutModal(true)} icon={MdLogout}>
 											Logout

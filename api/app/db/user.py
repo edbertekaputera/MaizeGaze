@@ -4,7 +4,8 @@ from typing_extensions import Self # type: ignore
 
 from .sqlalchemy import db
 from .farm import Farm
-
+from .crop_patch import CropPatch
+from uuid import uuid4
 
 # User Schema
 class User(db.Model):
@@ -13,16 +14,21 @@ class User(db.Model):
 	name = db.Column(db.String(250), nullable=False)
 	email_is_verified = db.Column(db.Boolean(), default=False)
 	password = db.Column(db.String(250))
-
+	current_subscription_id = db.Column(db.String(250), nullable=True)
 	# Foreign key
 	user_type = db.Column(db.String(250), db.ForeignKey("TypeOfUser.name"), nullable=False)
-	userToTypeOfUserRel = db.relationship("TypeOfUser", back_populates="typeOfUserToUserRel", cascade="all, delete, save-update",
-									foreign_keys="User.user_type")
+	userToTypeOfUserRel = db.relationship("TypeOfUser", back_populates="typeOfUserToUserRel", foreign_keys="User.user_type")
 	# Other Relationship
 	userToDetectionQuotaRel = db.relationship("DetectionQuota", back_populates="detectionQuotaToUserRel", cascade="all, delete, save-update",
 									foreign_keys="DetectionQuota.user")
+	userToDiagnosisQuotaRel = db.relationship("DiagnosisQuota", back_populates="diagnosisQuotaToUserRel", cascade="all, delete, save-update",
+									foreign_keys="DiagnosisQuota.user")
+	userToConsultationQuotaRel = db.relationship("ConsultationQuota", back_populates="consultationQuotaToUserRel", cascade="all, delete, save-update",
+									foreign_keys="ConsultationQuota.user")
 	userToFarmRel = db.relationship("Farm", back_populates="farmToUserRel", cascade="all, delete, save-update",
 									foreign_keys="Farm.user")
+	userToDetectionModelRel = db.relationship("DetectionModel", back_populates="detectionModelToUserRel", cascade="all, delete, save-update",
+									foreign_keys="DetectionModel.user")
 	userToSuspensionRel = db.relationship("Suspension", back_populates="suspensionToUserRel", cascade='all, delete, save-update',
 								  foreign_keys="Suspension.user")
 	
@@ -50,11 +56,12 @@ class User(db.Model):
 		) # type: ignore
 		
 		# TEMPORARY only for hardcoded FARM
-		temp_farm = Farm(name="Corn Farm", city="city",address="test address", country="country", land_size=1000, user=email) # type: ignore
-		
+		temp_farm = Farm(name="Corn Farm", city="city",address="test address", country="country", user=email, description="My Corn Farm.") # type: ignore
+		temp_crop_patch = CropPatch(patch_id=str(uuid4()), name="Crop Patch #1", land_size=1000, farm_name="Corn Farm", farm_user=email) # type: ignore
 		with current_app.app_context():
 			db.session.add(new_user)
 			db.session.add(temp_farm)
+			db.session.add(temp_crop_patch)
 			db.session.commit()
 		
 		inputted_user = cls.get(email)
@@ -104,4 +111,20 @@ class User(db.Model):
 				db.session.commit()
 				return True
 		except:
+			return False
+		
+	@classmethod
+	def updatePlan(cls, email:str, plan:str, subscription_id:str|None) -> bool:
+		try:
+			with current_app.app_context():
+				current_user = User.get(email)
+				if not current_user:
+					return False
+				# Update Plan
+				current_user.user_type = plan
+				current_user.current_subscription_id = subscription_id
+				db.session.commit()
+				return True
+		except Exception as err:
+			print(err)
 			return False

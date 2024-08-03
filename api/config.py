@@ -26,21 +26,11 @@ class Config(object):
 	SESSION_REDIS = redis.from_url(os.environ.get('REDIS_SESSION_URL'))
 	
 	# Celery
-	# CELERY_BROKER_URL = os.environ.get('REDIS_BROKER_URL')
-	# CELERY_RESULT_BACKEND = os.environ.get('REDIS_BROKER_URL')
-	# CELERY_TASK_IGNORE_RESULT = True
-	# CELERY_ACCEPT_CONTENT = ['json']
-	# CELERY_TASK_SERIALIZER = 'json'
-	# CELERY_RESULT_SERIALIZER = 'json'
 	CELERY = dict(
             broker_url= os.environ.get('REDIS_BROKER_URL'),
             result_backend= os.environ.get('REDIS_BROKER_URL'),
             task_ignore_result=True,
 	)
-
-	# Bucket Storage
-	USE_LOCAL_STORAGE = (os.environ.get("CLOUD_BUCKET_URL") == None)
-	LOCAL_STORAGE_PATH = os.path.join(basedir, "local_storage")
 
 	# Mail configurations
 	MAIL_DEFAULT_SENDER = os.environ.get('EMAIL_USER')
@@ -66,3 +56,31 @@ class Config(object):
 
 	# Geocoding API
 	REVERSE_GEOCODE_API = os.environ.get('REVERSE_GEOCODE_API')
+
+	# Stripe
+	STRIPE_API_KEY = os.environ["STRIPE_API_KEY"]
+	STRIPE_ENDPOINT_SECRET = os.environ["STRIPE_ENDPOINT_SECRET"]
+
+	# Google Cloud 
+	GOOGLE_CLOUD_REGION = os.environ["GOOGLE_CLOUD_REGION"]
+	GOOGLE_CLOUD_PROJECT_ID = os.environ["GOOGLE_CLOUD_PROJECT_ID"]
+
+	# GOOGLE CREDENTIALS SERVICE ACCOUNT
+	GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS_PATH = os.environ.get("GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS_PATH")
+	GOOGLE_CLOUD_SERVICE_SCOPE = ['https://www.googleapis.com/auth/cloud-platform']
+
+	# Bucket Storage
+	USE_LOCAL_STORAGE = (os.environ.get("GOOGLE_CLOUD_BUCKET_NAME") == None)
+	GOOGLE_CLOUD_BUCKET_NAME = os.environ.get("GOOGLE_CLOUD_BUCKET_NAME")
+	LOCAL_STORAGE_PATH = os.path.join(basedir, "local_storage")
+
+	# GEMINI Text Generation
+	GEMINI_API_KEY = os.environ["GEMINI_API_KEY"]
+	DIAGNOSIS_QUOTA_LIMIT = 25
+	CONSULTATION_QUOTA_LIMIT = 25
+
+	# Vertex AI
+	VERTEX_TRAIN_CONTAINER_URI = os.environ["VERTEX_TRAIN_CONTAINER_URI"]
+	VERTEX_TRAIN_STAGING_BUCKET = os.environ["VERTEX_TRAIN_STAGING_BUCKET"]
+	VERTEX_DETECT_ENDPOINT_ID = os.environ["VERTEX_DETECT_ENDPOINT_ID"]
+	VERTEX_PROJECT_ID = os.environ["VERTEX_PROJECT_ID"]

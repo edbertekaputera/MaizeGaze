@@ -207,14 +207,22 @@ function AdminTierManagementPage() {
 		<div className="min-h-screen">
 			{/* Loading Cards */}
 			<LoadingCard show={isLoading}>Loading Tier Plans...</LoadingCard>
-			<LoadingCard show={isRemoveLoading}>Removing Selected Tiers...</LoadingCard>
 			{/* Modals */}
 			{displayMessageModal()}
 			<ConfirmationModal state={showRemoveModal} setState={setShowRemoveModal} action={handleDelete}>
-				<span className="w-5/6 mx-auto">Are you sure you want to delete these tiers?</span>
-				<div className="mb-6 mx-auto my-4 w-5/6 max-h-28 overflow-auto px-4 py-2 outline-1 outline-gray-400 outline rounded-lg shadow-lg drop-shadow-sm text-2xl font-medium text-gray-900 ">
-					{displayListOfSelectedTiers()}
-				</div>
+				{isRemoveLoading ? (
+					<div className="flex flex-col justify-center mb-2 items-center">
+						<h3 className="mb-5 text-xl font-normal text-gray-600">Removing Tier...</h3>
+						<Spinner size={"xl"} color={"success"} />
+					</div>
+				) : (
+					<>
+						<span className="w-5/6 mx-auto">Are you sure you want to delete these tiers?</span>
+						<div className="mb-6 mx-auto my-4 w-5/6 max-h-28 overflow-auto px-4 py-2 outline-1 outline-gray-400 outline rounded-lg shadow-lg drop-shadow-sm text-2xl font-medium text-gray-900 ">
+							{displayListOfSelectedTiers()}
+						</div>
+					</>
+				)}
 			</ConfirmationModal>
 			<CreateTierModal state={showCreateModal} setState={setShowCreateModal} />
 			{/* Page Card */}

@@ -1,0 +1,6 @@
+typer==0.12.*
+scikit-learn==1.5.*
+pillow==10.3.*
+ultralytics==8.2.*
+dill==0.3.8
+pandas==2.2.*

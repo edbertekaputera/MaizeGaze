@@ -1,168 +1,9 @@
-import {
-	eachDayOfInterval,
-	eachMonthOfInterval,
-	eachQuarterOfInterval,
-	eachYearOfInterval,
-	format,
-	getDate,
-	getHours,
-	getMonth,
-	getYear,
-	isBefore,
-	isSameDay,
-	subDays,
-} from "date-fns";
-import { Chart, registerables } from "chart.js/auto";
-import React, { useEffect, useRef, useState } from "react";
-import "chartjs-adapter-date-fns";
+import { format, getDate, getHours, getMonth, getYear, isSameDay } from "date-fns";
+import React, { useEffect, useRef } from "react";
+import ReactApexChart from "react-apexcharts";
 
-const HorizontalLinePlugin = {
-	id: "horizontalLine",
-	afterDatasetsDraw: (chart, args, options) => {
-		const {
-			ctx,
-			scales: { y },
-		} = chart;
-		const { y: yValue, label, color, lineWidth, drawTime = "beforeDatasetsDraw" } = options;
-
-		if (drawTime === "afterDatasetsDraw") {
-			// Check if the y-value is within the chart area
-			if (yValue >= y.min && yValue <= y.max) {
-				// Calculate the y-coordinate of the line
-				const yCoordinate = y.getPixelForValue(yValue);
-
-				// Draw the line
-				ctx.beginPath();
-				ctx.moveTo(chart.chartArea.left, yCoordinate);
-				ctx.lineTo(chart.chartArea.right, yCoordinate);
-				ctx.strokeStyle = color || "black";
-				ctx.lineWidth = lineWidth || 1;
-				ctx.setLineDash([5, 5]); // Set the line dash pattern for a dotted line
-				ctx.stroke();
-				ctx.closePath();
-
-				// Draw the label
-				if (label) {
-					ctx.font = "12px Arial";
-					ctx.fillStyle = color || "black";
-					ctx.fillText(label, chart.chartArea.left - 10, yCoordinate);
-				}
-			}
-		}
-
-		// Return a dataset object representing the horizontal line
-		return {
-			label: label || "Horizontal Line",
-			data: [yValue],
-			borderColor: color || "black",
-			borderDash: [5, 5],
-			borderWidth: lineWidth || 1,
-			showLine: true,
-			pointRadius: 0,
-		};
-	},
-};
-
-// Register the necessary Chart.js components
-Chart.register(...registerables);
-Chart.register(HorizontalLinePlugin);
-
-function WeatherForecastChart({ data, date, type = "bar", measurement = "temperature_2m" }) {
-	const chartRef = useRef(null);
-	const chartInstance = useRef(null);
+function WeatherForecastChart({ data, date, type = "bar", measurement = "temperature_2m", show_labels = true }) {
 	const unit = date == "all" ? "day" : "hour";
-
-	useEffect(() => {
-		if (chartInstance.current) {
-			chartInstance.current.destroy();
-		}
-
-		const ctx = chartRef.current.getContext("2d");
-		console.log("inside data", data);
-		console.log("inside measurement", measurement);
-		console.log("inisde unit", unit);
-		const chartData = {
-			datasets: [],
-		};
-
-		if (unit == "day" && measurement == "temperature_2m") {
-			chartData.datasets.push(
-				{
-					label: `Minimum Temperature (${data.daily_units.temperature_2m_min})`,
-					data: getMinTempData(),
-					backgroundColor: "rgba(54, 162, 235, 0.6)",
-				},
-				{
-					label: `Maximum Temperature (${data.daily_units.temperature_2m_max})`,
-					data: getMaxTempData(),
-					backgroundColor: "rgba(235, 54, 54, 0.6)",
-				}
-			);
-		} else {
-			chartData.datasets.push({
-				label: `${measurement} (${data[unit == "hour" ? "hourly_units" : "daily_units"][measurement]})`,
-				data: getchartData(),
-				backgroundColor: "rgba(54, 162, 235, 0.6)",
-			});
-		}
-
-		const option = {
-			plugins: {
-				legend: {
-					display: true,
-					position: "top",
-				},
-			},
-			scales: {
-				y: {
-					beginAtZero: true,
-				},
-				x: {
-					type: "timeseries",
-					time: {
-						unit: unit,
-						minUnit: "hour",
-						displayFormats: {
-							hour: "HH:00",
-							day: "dd MMM yyyy",
-						},
-					},
-				},
-			},
-		};
-
-		if (unit != "day" || measurement != "temperature_2m") {
-			option.plugins.horizontalLine = {
-				y: (
-					Math.round(
-						(data[unit == "hour" ? "hourly" : "daily"][measurement].reduce((a, b) => a + b, 0) /
-							data[unit == "hour" ? "hourly" : "daily"][measurement].length) *
-							100
-					) / 100
-				).toFixed(2), // y-value where the line should be drawn
-				color: "red", // Optional color for the line and label
-				lineWidth: 1, // Optional line width
-				drawTime: "afterDatasetsDraw",
-			};
-		}
-
-		chartInstance.current = new Chart(ctx, {
-			type: type,
-			data: chartData,
-			options: option,
-		});
-
-		const resizeChart = () => {
-			chartInstance.current.resize();
-		};
-		window.addEventListener("resize", resizeChart);
-
-		return () => {
-			if (chartInstance.current) {
-				chartInstance.current.destroy();
-			}
-		};
-	}, [data, measurement, date]);
 
 	const getchartData = () => {
 		let preprocessed_data = [];
@@ -177,7 +18,7 @@ function WeatherForecastChart({ data, date, type = "bar", measurement = "tempera
 				);
 				if (isSameDay(processed_time, date)) {
 					preprocessed_data.push({
-						x: processed_time,
+						x: processed_time.getTime(),
 						y: element,
 					});
 				}
@@ -186,7 +27,7 @@ function WeatherForecastChart({ data, date, type = "bar", measurement = "tempera
 			data.daily[measurement].forEach((element, index) => {
 				const processed_time = new Date(getYear(data.daily.time[index]), getMonth(data.daily.time[index]), getDate(data.daily.time[index]));
 				preprocessed_data.push({
-					x: processed_time,
+					x: processed_time.getTime(),
 					y: element,
 				});
 			});
@@ -198,7 +39,7 @@ function WeatherForecastChart({ data, date, type = "bar", measurement = "tempera
 		const preprocessed_data = data.daily["temperature_2m_min"].map((element, index) => {
 			const processed_time = new Date(getYear(data.daily.time[index]), getMonth(data.daily.time[index]), getDate(data.daily.time[index]));
 			return {
-				x: processed_time,
+				x: processed_time.getTime(),
 				y: element,
 			};
 		});
@@ -209,14 +50,120 @@ function WeatherForecastChart({ data, date, type = "bar", measurement = "tempera
 		const preprocessed_data = data.daily["temperature_2m_max"].map((element, index) => {
 			const processed_time = new Date(getYear(data.daily.time[index]), getMonth(data.daily.time[index]), getDate(data.daily.time[index]));
 			return {
-				x: processed_time,
+				x: processed_time.getTime(),
 				y: element,
 			};
 		});
 		return preprocessed_data;
 	};
 
-	return <canvas ref={chartRef} />;
+	var series = [];
+	var y_annotations = [];
+
+	// Series
+	if (unit == "day" && measurement == "temperature_2m") {
+		series.push(
+			{
+				name: `Minimum Temperature (${data.daily_units.temperature_2m_min})`,
+				data: getMinTempData(),
+			},
+			{
+				name: `Maximum Temperature (${data.daily_units.temperature_2m_max})`,
+				data: getMaxTempData(),
+			}
+		);
+	} else {
+		series.push({
+			name: `${measurement} (${data[unit == "hour" ? "hourly_units" : "daily_units"][measurement]})`,
+			data: getchartData(),
+		});
+	}
+
+	// Annotations
+	if (unit != "day" || measurement != "temperature_2m") {
+		const y_val = (
+			Math.round(
+				(data[unit == "hour" ? "hourly" : "daily"][measurement].reduce((a, b) => a + b, 0) /
+					data[unit == "hour" ? "hourly" : "daily"][measurement].length) *
+					100
+			) / 100
+		).toFixed(2);
+
+		y_annotations.push({
+			y: y_val,
+			borderColor: "#09694d",
+			fillColor: "#09694d",
+			strokeDashArray: 4,
+			label: {
+				show: true,
+				offsetY: 6,
+				text: (unit == "hour" ? "Hourly Average: " : "Daily Average: ") + y_val,
+				style: {
+					padding: { top: 10, left: 10, right: 10, bottom: 10 },
+					color: "#FFFFFF",
+					background: "#09694d",
+				},
+			},
+		});
+	}
+
+	const options = {
+		chart: {
+			id: "area-datetime",
+			type: type,
+			toolbar: {
+				show: false,
+			},
+			zoom: { enabled: false },
+		},
+		dataLabels: {
+			enabled: show_labels,
+			hideOverflowingLabels: true,
+		},
+		stroke: {
+			curve: "smooth",
+		},
+		xaxis: {
+			type: "datetime",
+			labels: {
+				formatter: function (value, timestamp) {
+					return format(new Date(timestamp), unit == "hour" ? "HH:00" : "dd MMM yyyy");
+				},
+				max: new Date().getTime(),
+			},
+			tickAmount: "dataPoints",
+			tickPlacement: "on",
+			datetimeUTC: false,
+		},
+		annotations: {
+			yaxis: y_annotations,
+		},
+		tooltip: {
+			x: {
+				format: unit == "hour" ? "HH:00, dd MMM yyyy" : "dd MMM yyyy",
+			},
+		},
+		colors: ["#019A6C", "#E91E63"],
+		fill: {
+			type: "gradient",
+			gradient: {
+				shadeIntensity: 1,
+				opacityFrom: 0.7,
+				opacityTo: 0.9,
+			},
+		},
+		markers: {
+			size: 5,
+			colors: ["#019A6C", "#E91E63"],
+			strokeColors: "#fff",
+			strokeWidth: 2,
+			hover: {
+				size: 8,
+			},
+		},
+	};
+
+	return <ReactApexChart options={options} series={series} type={type} height={750} />;
 }
 
 export default WeatherForecastChart;

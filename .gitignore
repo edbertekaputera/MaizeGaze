@@ -166,3 +166,7 @@ cython_debug/
 
 # Local Storage
 local_storage/
+api/*.jpg
+runs/
+api/temp_training.yaml
+keys/

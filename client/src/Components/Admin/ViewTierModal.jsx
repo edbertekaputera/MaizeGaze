@@ -1,4 +1,4 @@
-import { Button, Modal, Card, Label, Dropdown, TextInput, Checkbox } from "flowbite-react";
+import { Button, Modal, Card, Label, Dropdown, TextInput, Checkbox, Spinner } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { FaChevronDown, FaRegUser } from "react-icons/fa";
 import axios from "axios";
@@ -24,6 +24,7 @@ function ViewTierModal({ state, setState, name }) {
 		can_reannotate: false,
 		can_chatbot: false,
 		can_active_learn: false,
+		can_diagnose: false,
 	});
 
 	// Other misc states
@@ -75,6 +76,7 @@ function ViewTierModal({ state, setState, name }) {
 				can_active_learn: tier_data.can_active_learn,
 				can_reannotate: tier_data.can_reannotate,
 				can_chatbot: tier_data.can_chatbot,
+				can_diagnose: tier_data.can_diagnose,
 			}));
 		}
 	};
@@ -167,7 +169,6 @@ function ViewTierModal({ state, setState, name }) {
 	return (
 		<>
 			{/* Removal */}
-			<LoadingCard show={isRemoveLoading}>Removing Tier...</LoadingCard>
 			<MessageModal
 				state={messageModal}
 				setState={() => {
@@ -187,7 +188,6 @@ function ViewTierModal({ state, setState, name }) {
 			</ConfirmationModal>
 
 			{/* Update */}
-			<LoadingCard show={isUpdateLoading}>Updating Tier...</LoadingCard>
 			<MessageModal
 				state={updateMessageModal}
 				setState={() => {
@@ -255,90 +255,130 @@ function ViewTierModal({ state, setState, name }) {
 							onSubmit={(ev) => {
 								ev.preventDefault();
 								if (name.trim() != "" && price > 0 && detectionQuota > 0 && storageLimit > 0) {
-									handleCreate();
+									handleUpdate();
 								} else {
 									alert("Incomplete data.");
 								}
 							}}
 						>
-							<div className="mt-4 flex flex-col gap-y-5">
-								<div className="flex flex-col sm:flex-row gap-y-4 gap-x-6">
-									<section className="flex flex-col gap-4 w-full sm:w-1/2">
-										<div className="flex flex-col gap-1">
-											<Label value="Detection Quota" />
-											<TextInput
-												type="number"
-												min={1}
-												color={"white"}
-												required
-												disabled={!isUpdating}
-												className="min-w-64 rounded-lg"
-												placeholder="Detection Quota of Tier Plan"
-												icon={TbCapture}
-												value={detectionQuota}
-												onChange={(event) => {
-													if (event.target.value > 0) {
-														setDetectionQuota(event.target.valueAsNumber);
-													}
-												}}
-											/>
-										</div>
-										<div className="flex flex-col gap-1">
-											<Label value="Storage Limit" />
-											{isUpdating ? (
-												<div className="flex flex-row min-w-64">
-													<input
-														type="number"
-														className="w-1/2 rounded-lg rounded-r-none"
-														min={1}
-														value={storageLimit}
-														placeholder="Storage limit of Tier plan"
-														required
-														onChange={(event) => {
-															if (event.target.value > 0) {
-																setStorageLimit(event.target.valueAsNumber);
-															}
-														}}
-													/>
-													<Dropdown
-														size=""
-														className=""
-														required
-														label={storageLimitUnit}
-														renderTrigger={() => (
-															<Button color="gray" className="w-1/2 border-gray-500 text-black rounded-lg rounded-l-none ">
-																{" "}
-																{storageLimitUnit} <FaChevronDown className="absolute right-2  h-5 w-5" />{" "}
-															</Button>
-														)}
-													>
-														<Dropdown.Item onClick={() => setStorageLimitUnit("MB")}>MB</Dropdown.Item>
-														<Dropdown.Item onClick={() => setStorageLimitUnit("GB")}>GB</Dropdown.Item>
-													</Dropdown>
-												</div>
-											) : (
-												<TextInput
-													color={"white"}
-													disabled={true}
-													className="min-w-64 rounded-lg"
-													icon={GrStorage}
-													value={formatBytes(data.storage_limit)}
-												/>
-											)}
-										</div>
-										<div className="flex flex-col gap-1">
-											<Label value="Price" />
-											{name !== "FREE_USER" && isUpdating ? (
+							{isUpdateLoading ? (
+								<div className="flex flex-col justify-center mb-2 items-center">
+									<h3 className="mb-5 text-xl font-normal text-gray-600">Updating Tier...</h3>
+									<Spinner size={"xl"} color={"success"} />
+								</div>
+							) : isRemoveLoading ? (
+								<div className="flex flex-col justify-center mb-2 items-center">
+									<h3 className="mb-5 text-xl font-normal text-gray-600">Removing Tier...</h3>
+									<Spinner size={"xl"} color={"success"} />
+								</div>
+							) : (
+								<div className="mt-4 flex flex-col gap-y-5">
+									<div className="flex flex-col sm:flex-row gap-y-4 gap-x-6">
+										<section className="flex flex-col gap-4 w-full sm:w-1/2">
+											<div className="flex flex-col gap-1">
+												<Label value="Detection Quota" />
 												<TextInput
 													type="number"
-													min={0.01}
+													min={1}
 													color={"white"}
 													required
 													disabled={!isUpdating}
 													className="min-w-64 rounded-lg"
-													value={price.toFixed(2)}
-													step={0.01}
-													addon={"S$"}
+													placeholder="Detection Quota of Tier Plan"
+													icon={TbCapture}
+													value={detectionQuota}
+													onChange={(event) => {
+														if (event.target.value > 0) {
+															setDetectionQuota(event.target.valueAsNumber);
+														}
+													}}
+												/>
+											</div>
+											<div className="flex flex-col gap-1">
+												<Label value="Storage Limit" />
+												{isUpdating ? (
+													<div className="flex flex-row min-w-64">
+														<input
+															type="number"
+															className="w-1/2 rounded-lg rounded-r-none"
+															min={1}
+															value={storageLimit}
+															placeholder="Storage limit of Tier plan"
+															required
+															onChange={(event) => {
+																if (event.target.value > 0) {
+																	setStorageLimit(event.target.valueAsNumber);
+																}
+															}}
+														/>
+														<Dropdown
+															size=""
+															className=""
+															required
+															label={storageLimitUnit}
+															renderTrigger={() => (
+																<Button color="gray" className="w-1/2 border-gray-500 text-black rounded-lg rounded-l-none ">
+																	{" "}
+																	{storageLimitUnit} <FaChevronDown className="absolute right-2  h-5 w-5" />{" "}
+																</Button>
+															)}
+														>
+															<Dropdown.Item onClick={() => setStorageLimitUnit("MB")}>MB</Dropdown.Item>
+															<Dropdown.Item onClick={() => setStorageLimitUnit("GB")}>GB</Dropdown.Item>
+														</Dropdown>
+													</div>
+												) : (
+													<TextInput
+														color={"white"}
+														disabled={true}
+														className="min-w-64 rounded-lg"
+														icon={GrStorage}
+														value={formatBytes(data.storage_limit)}
+													/>
+												)}
+											</div>
+											<div className="flex flex-col gap-1">
+												<Label value="Price" />
+												{name !== "FREE_USER" && isUpdating ? (
+													<TextInput
+														type="number"
+														min={0.01}
+														color={"white"}
+														required
+														disabled={!isUpdating}
+														className="min-w-64 rounded-lg"
+														value={price.toFixed(2)}
+														step={0.01}
+														addon={"S$"}
+														placeholder="Price of Tier Plan"
+														onChange={(event) => {
+															if (event.target.value > 0) {
+																setPrice(event.target.valueAsNumber);
+															}
+														}}
+													/>
+												) : (
+													<TextInput
+														color={"white"}
+														disabled={true}
+														className="min-w-64 rounded-lg"
+														icon={IoPricetagsOutline}
+														value={SGDollar.format(data.price) + " monthly"}
+													/>
+												)}
+											</div>
+										</section>
+										<section className="flex flex-col gap-4 w-full sm:w-1/2">
+											<div className="flex flex-col gap-1">
+												<Label value="Number of Subscribers" />
+												<TextInput
+													disabled
+													type="number"
+													color={"white"}
+													required
+													className="min-w-64 rounded-lg"
+													value={data.num_users}
+													icon={FaRegUser}
 													placeholder="Price of Tier Plan"
 													onChange={(event) => {
 														if (event.target.value > 0) {
@@ -346,144 +386,129 @@ function ViewTierModal({ state, setState, name }) {
 														}
 													}}
 												/>
-											) : (
-												<TextInput
-													color={"white"}
-													disabled={true}
-													className="min-w-64 rounded-lg"
-													icon={IoPricetagsOutline}
-													value={SGDollar.format(data.price) + " monthly"}
-												/>
-											)}
-										</div>
-									</section>
-									<section className="flex flex-col gap-4 w-full sm:w-1/2">
-										<div className="flex flex-col gap-1">
-											<Label value="Number of Subscribers" />
-											<TextInput
-												disabled
-												type="number"
-												color={"white"}
-												required
-												className="min-w-64 rounded-lg"
-												value={data.num_users}
-												icon={FaRegUser}
-												placeholder="Price of Tier Plan"
-												onChange={(event) => {
-													if (event.target.value > 0) {
-														setPrice(event.target.valueAsNumber);
-													}
-												}}
-											/>
-										</div>
-										<div className="flex flex-col gap-1">
-											<Label value="Permissions" />
-											<div className="flex flex-col border border-rounded p-4 rounded-lg border-gray-500 gap-3">
-												{isUpdating && (
+											</div>
+											<div className="flex flex-col gap-1">
+												<Label value="Permissions" />
+												<div className="flex flex-col border border-rounded p-4 rounded-lg border-gray-500 gap-3">
+													{isUpdating && (
+														<div className="flex items-center gap-2">
+															<Checkbox
+																id="select_all_permissions"
+																checked={permissions.can_active_learn && permissions.can_chatbot && permissions.can_reannotate && permissions.can_diagnose}
+																onChange={(ev) =>
+																	setPermissions((prev) => ({
+																		...prev,
+																		can_active_learn: ev.target.checked,
+																		can_reannotate: ev.target.checked,
+																		can_chatbot: ev.target.checked,
+																		can_diagnose: ev.target.checked,
+																	}))
+																}
+															/>
+															<Label htmlFor="select_all_permissions" className="flex text-xs">
+																Select All
+															</Label>
+														</div>
+													)}
 													<div className="flex items-center gap-2">
 														<Checkbox
-															id="select_all_permissions"
-															checked={permissions.can_active_learn && permissions.can_chatbot && permissions.can_reannotate}
-															onChange={(ev) =>
-																setPermissions((prev) => ({
-																	...prev,
-																	can_active_learn: ev.target.checked,
-																	can_reannotate: ev.target.checked,
-																	can_chatbot: ev.target.checked,
-																}))
-															}
+															disabled={!isUpdating}
+															color={isUpdating ? "blue" : "failure"}
+															id="reannotate"
+															checked={permissions.can_reannotate}
+															onChange={(ev) => setPermissions((prev) => ({ ...prev, can_reannotate: ev.target.checked }))}
 														/>
-														<Label htmlFor="select_all_permissions" className="flex text-xs">
-															Select All
+														<Label htmlFor="reannotate" className="flex text-xs">
+															Re-annotate Detection results
 														</Label>
 													</div>
-												)}
-												<div className="flex items-center gap-2">
-													<Checkbox
-														disabled={!isUpdating}
-														color={isUpdating ? "blue" : "failure"}
-														id="reannotate"
-														checked={permissions.can_reannotate}
-														onChange={(ev) => setPermissions((prev) => ({ ...prev, can_reannotate: ev.target.checked }))}
-													/>
-													<Label htmlFor="reannotate" className="flex text-xs">
-														Re-annotate Detection results
-													</Label>
-												</div>
-												<div className="flex items-center gap-2">
-													<Checkbox
-														disabled={!isUpdating}
-														color={isUpdating ? "blue" : "failure"}
-														id="chatbot"
-														checked={permissions.can_chatbot}
-														onChange={(ev) => setPermissions((prev) => ({ ...prev, can_chatbot: ev.target.checked }))}
-													/>
-													<Label htmlFor="chatbot" className="flex text-xs">
-														AI-powered Chat Bot for Q&A
-													</Label>
-												</div>
-												<div className="flex items-center gap-2">
-													<Checkbox
-														disabled={!isUpdating}
-														color={isUpdating ? "blue" : "failure"}
-														id="active_learn"
-														checked={permissions.can_active_learn}
-														onChange={(ev) => setPermissions((prev) => ({ ...prev, can_active_learn: ev.target.checked }))}
-													/>
-													<Label htmlFor="active_learn" className="flex text-xs">
-														Personalized Active Learning
-													</Label>
+													<div className="flex items-center gap-2">
+														<Checkbox
+															disabled={!isUpdating}
+															color={isUpdating ? "blue" : "failure"}
+															id="chatbot"
+															checked={permissions.can_chatbot}
+															onChange={(ev) => setPermissions((prev) => ({ ...prev, can_chatbot: ev.target.checked }))}
+														/>
+														<Label htmlFor="chatbot" className="flex text-xs">
+															AI-powered Chat Bot for Q&A
+														</Label>
+													</div>
+													<div className="flex items-center gap-2">
+														<Checkbox
+															disabled={!isUpdating}
+															color={isUpdating ? "blue" : "failure"}
+															id="active_learn"
+															checked={permissions.can_active_learn}
+															onChange={(ev) => setPermissions((prev) => ({ ...prev, can_active_learn: ev.target.checked }))}
+														/>
+														<Label htmlFor="active_learn" className="flex text-xs">
+															Personalized Active Learning
+														</Label>
+													</div>
+													<div className="flex items-center gap-2">
+														<Checkbox
+															disabled={!isUpdating}
+															color={isUpdating ? "blue" : "failure"}
+															id="diagnosis"
+															checked={permissions.can_diagnose}
+															onChange={(ev) => setPermissions((prev) => ({ ...prev, can_diagnose: ev.target.checked }))}
+														/>
+														<Label htmlFor="diagnosis" className="flex text-xs">
+															Maize Plant Disease Diagnosis
+														</Label>
+													</div>
 												</div>
 											</div>
-										</div>
-									</section>
+										</section>
+									</div>
+									{isUpdating ? (
+										<section className="flex justify-center gap-5 mt-5">
+											<Button
+												color="failure"
+												className="w-1/2 "
+												onClick={() => {
+													setIsUpdating(false);
+													resetEditable(data);
+												}}
+											>
+												<div className="flex flex-row justify-center items-center">
+													<MdOutlineCancel className="text-lg mr-1" />
+													Cancel
+												</div>
+											</Button>
+											<Button
+												disabled={Object.keys(retrieveChanges(data)).length == 0}
+												className="w-1/2 bg-custom-green-2 hover:bg-custom-green-1 text-white ring-inset ring-custom-green-1"
+												onClick={() => setShowUpdateModal(true)}
+											>
+												<div className="flex flex-row justify-center items-center">
+													<MdOutlineSaveAlt className="text-lg mr-1" />
+													Save Changes
+												</div>
+											</Button>
+										</section>
+									) : (
+										<section className="flex justify-center gap-5 mt-5">
+											<Button color="failure" className="w-1/2 " onClick={() => setShowRemoveModal(true)}>
+												<div className="flex flex-row justify-center items-center">
+													<IoTrashOutline className="text-lg mr-1" />
+													Remove
+												</div>
+											</Button>
+											<Button
+												className="w-1/2 bg-yellow-500 hover:bg-yellow-600 text-white ring-inset ring-bg-yellow-500 hover:ring-bg-yellow-600"
+												onClick={() => setIsUpdating(true)}
+											>
+												<div className="flex flex-row justify-center items-center">
+													<MdOutlineEdit className="text-lg mr-1" />
+													Edit
+												</div>
+											</Button>
+										</section>
+									)}
 								</div>
-								{isUpdating ? (
-									<section className="flex justify-center gap-5 mt-5">
-										<Button
-											color="failure"
-											className="w-1/2 "
-											onClick={() => {
-												setIsUpdating(false);
-												resetEditable(data);
-											}}
-										>
-											<div className="flex flex-row justify-center items-center">
-												<MdOutlineCancel className="text-lg mr-1" />
-												Cancel
-											</div>
-										</Button>
-										<Button
-											disabled={Object.keys(retrieveChanges(data)).length == 0}
-											className="w-1/2 bg-custom-green-2 hover:bg-custom-green-1 text-white ring-inset ring-custom-green-1"
-											onClick={() => setShowUpdateModal(true)}
-										>
-											<div className="flex flex-row justify-center items-center">
-												<MdOutlineSaveAlt className="text-lg mr-1" />
-												Save Changes
-											</div>
-										</Button>
-									</section>
-								) : (
-									<section className="flex justify-center gap-5 mt-5">
-										<Button color="failure" className="w-1/2 " onClick={() => setShowRemoveModal(true)}>
-											<div className="flex flex-row justify-center items-center">
-												<IoTrashOutline className="text-lg mr-1" />
-												Remove
-											</div>
-										</Button>
-										<Button
-											className="w-1/2 bg-yellow-500 hover:bg-yellow-600 text-white ring-inset ring-bg-yellow-500 hover:ring-bg-yellow-600"
-											onClick={() => setIsUpdating(true)}
-										>
-											<div className="flex flex-row justify-center items-center">
-												<MdOutlineEdit className="text-lg mr-1" />
-												Edit
-											</div>
-										</Button>
-									</section>
-								)}
-							</div>
+							)}
 						</form>
 					</div>
 				</Modal.Body>

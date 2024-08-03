@@ -44,6 +44,8 @@ function WeatherForecast({ className, weatherData, locationData, isLoading, erro
 	const [filter, setFilter] = useState({
 		measurement: "",
 		date: "",
+		type: "area",
+		show_label: true,
 	});
 
 	const listOfMeasurements = {
@@ -61,9 +63,6 @@ function WeatherForecast({ className, weatherData, locationData, isLoading, erro
 		}
 	}, [weatherData]);
 
-	console.log("data", weatherData);
-	console.log("list", listOfMeasurements);
-	console.log("filter", filter);
 	return (
 		<>
 			<Card className={"shadow-lg border " + className}>
@@ -132,69 +131,115 @@ function WeatherForecast({ className, weatherData, locationData, isLoading, erro
 								);
 							})}
 						</section>
-						<section className="flex flex-col sm:flex-row w-full justify-end sm:items-center mt-5 gap-4">
-							<div>
-								<Label className="mb-1 text-sm font-semibold">Date:</Label>
+						<section className="flex flex-col sm:flex-row w-full justify-between sm:items-center mt-5 gap-4">
+							<div className="flex flex-row sm:items-center gap-4">
 								<Select
-									id="date_input"
-									value={filter.date}
+									id="type_input"
+									value={filter.type}
 									color="gray"
-									icon={FaCalendar}
-									className="rounded-lg hover:outline outline-1"
-									onChange={(ev) => {
-										if (ev.target.value == "all" || filter.date == "all") {
-											setFilter((prev) => ({
-												...prev,
-												date: ev.target.value,
-												measurement: listOfMeasurements[ev.target.value == "all" ? "daily" : "hourly"][0],
-											}));
-										} else {
-											setFilter((prev) => ({
-												...prev,
-												date: ev.target.value,
-											}));
-										}
-									}}
-								>
-									<option key={"all"} value={"all"}>
-										All
-									</option>
-									{weatherData.daily.time.map((d, i) => {
-										const formatted_date = format(d, "dd MMM yyyy");
-										return (
-											<option key={i} value={d}>
-												{formatted_date}
-											</option>
-										);
-									})}
-								</Select>
-							</div>
-							<div>
-								<Label className="mb-1 text-sm font-semibold">Measurement:</Label>
-								<Select
-									id="measurement_input"
-									value={filter.measurement}
-									color="gray"
-									className="rounded-lg hover:outline outline-1"
+									className="rounded-lg hover:outline outline-1 w-1/2 sm:w-fit"
 									onChange={(ev) =>
 										setFilter((prev) => ({
 											...prev,
-											measurement: ev.target.value,
+											type: ev.target.value,
 										}))
 									}
 								>
-									{listOfMeasurements[filter.date == "all" ? "daily" : "hourly"].map((d, i) => {
-										return (
-											<option key={i} value={d}>
-												{d}
-											</option>
-										);
-									})}
+									<option key={"area"} value={"area"}>
+										Line
+									</option>
+									<option key={"bar"} value={"bar"}>
+										Bar
+									</option>
 								</Select>
+								<label className="inline-flex items-center cursor-pointer">
+									<input
+										type="checkbox"
+										checked={filter.show_label}
+										className="sr-only peer"
+										onChange={(ev) =>
+											setFilter((prev) => ({
+												...prev,
+												show_label: ev.target.checked,
+											}))
+										}
+									/>
+									<div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-custom-green-2  rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:w-5 after:h-5 after:transition-all peer-checked:bg-custom-green-1"></div>
+									<span className="ms-3 sm:ms-2 font-medium text-gray-900">Show Labels</span>
+								</label>
+							</div>
+							<div className="flex flex-col sm:flex-row sm:items-center gap-4">
+								<div>
+									<Label className="mb-1 text-sm font-semibold">Date:</Label>
+									<Select
+										id="date_input"
+										value={filter.date}
+										color="gray"
+										icon={FaCalendar}
+										className="rounded-lg hover:outline outline-1"
+										onChange={(ev) => {
+											if (ev.target.value == "all" || filter.date == "all") {
+												setFilter((prev) => ({
+													...prev,
+													date: ev.target.value,
+													measurement: listOfMeasurements[ev.target.value == "all" ? "daily" : "hourly"][0],
+												}));
+											} else {
+												setFilter((prev) => ({
+													...prev,
+													date: ev.target.value,
+												}));
+											}
+										}}
+									>
+										<option key={"all"} value={"all"}>
+											All
+										</option>
+										{weatherData.daily.time.map((d, i) => {
+											const formatted_date = format(d, "dd MMM yyyy");
+											return (
+												<option key={i} value={d}>
+													{formatted_date}
+												</option>
+											);
+										})}
+									</Select>
+								</div>
+								<div>
+									<Label className="mb-1 text-sm font-semibold">Measurement:</Label>
+									<Select
+										id="measurement_input"
+										value={filter.measurement}
+										color="gray"
+										className="rounded-lg hover:outline outline-1 min-w-64"
+										onChange={(ev) =>
+											setFilter((prev) => ({
+												...prev,
+												measurement: ev.target.value,
+											}))
+										}
+									>
+										{listOfMeasurements[filter.date == "all" ? "daily" : "hourly"].map((d, i) => {
+											return (
+												<option key={i} value={d}>
+													{d}
+												</option>
+											);
+										})}
+									</Select>
+								</div>
 							</div>
 						</section>
 						<section className="mt-5 w-full">
-							{filter.measurement && filter.date && <WeatherForecastChart data={weatherData} date={filter.date} measurement={filter.measurement} />}
+							{filter.measurement && filter.date && (
+								<WeatherForecastChart
+									data={weatherData}
+									date={filter.date}
+									measurement={filter.measurement}
+									type={filter.type}
+									show_labels={filter.show_label}
+								/>
+							)}
 						</section>
 					</div>
 				) : (

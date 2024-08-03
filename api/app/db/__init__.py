@@ -5,7 +5,13 @@ from .detection_quota import DetectionQuota
 from .farm import Farm
 from .detection_result import DetectionResult
 from .suspension import Suspension
+from .diagnosis_quota import DiagnosisQuota
+from .consultation_quota import ConsultationQuota
+from .crop_patch import CropPatch
+from .detection_model import DetectionModel
 
 __all__ = [
-	"db", "User", "TypeOfUser", "DetectionQuota", "Farm", "DetectionResult", "Suspension"
+	"db", "User", "TypeOfUser", "Farm", "DetectionResult", "Suspension",
+	"DiagnosisQuota", "DetectionQuota", "ConsultationQuota", "CropPatch",
+	"DetectionModel"
 ]
