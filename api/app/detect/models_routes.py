@@ -127,4 +127,23 @@ def query_all_model_selection() -> dict[str, list[dict[str, str | float | list[f
 				"name": model["name"]
 			})
 	return {"models": list_of_models}
-	
+
+@router.route("/delete_models", methods=["DELETE"])
+@permissions_required(is_user=True)
+def delete_models() -> dict[str, bool]:
+	json = request.get_json()
+
+	list_of_models = []
+	for result in json["model_ids"]:
+		list_of_models.append(result["model_id"])
+		
+	models = DetectionModel.deleteSelectedModels(list_of_models)
+
+	user_directory = UserDirectory()
+
+	success_flag = True
+	for m in models:
+		if not user_directory.deleteWeights(m):
+			success_flag = False
+
+	return {"success": (len(models) == len(list_of_models) and success_flag)}
