@@ -1,16 +1,10 @@
 from typing import Dict, List, Union
 from google.oauth2.service_account import Credentials
-from google.auth.transport.requests import Request
 from google.cloud import aiplatform
 from google.protobuf import json_format
 from google.protobuf.struct_pb2 import Value
 from google.protobuf.json_format import MessageToDict
 from google.protobuf.message import Message
-
-def get_authenticated_session(service_account_file_path:str, scope:List[str]) -> Credentials:
-    credentials = Credentials.from_service_account_file(service_account_file_path, scopes=scope)
-    credentials.refresh(Request())
-    return credentials
 
 def convert_nested_mapcomposite(obj):
     if isinstance(obj, (str, int, float, bool, type(None))):

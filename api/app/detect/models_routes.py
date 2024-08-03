@@ -113,4 +113,18 @@ def query_all_models() -> dict[str, list[dict[str, str | float | list[float]]]]:
 					})
 			
 	return {"models": output_list}
+
+# Retrieve Training task results route
+@router.route("/query_all_model_selection", methods=["GET"])
+@permissions_required(is_user=True)
+def query_all_model_selection() -> dict[str, list[dict[str, str | float | list[float]]]]:
+	list_of_models = []
+	output_list = query_all_models()["models"]
+	for model in output_list:
+		if model["status"] == "SUCCESS":
+			list_of_models.append({
+				"model_id": model["model_id"],
+				"name": model["name"]
+			})
+	return {"models": list_of_models}
 	

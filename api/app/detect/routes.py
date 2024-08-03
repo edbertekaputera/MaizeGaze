@@ -1,8 +1,9 @@
 # Libraries
 from flask import session, Blueprint, request, current_app
 from celery.result import AsyncResult
-from base64 import encodebytes # type: ignore
 from datetime import date 
+from base64 import encodebytes
+
 # Local dependencies
 from app.db import DetectionQuota
 from app.authentication import permissions_required
@@ -38,7 +39,7 @@ def init_detection():
 		return {"success": False}
 	
 	# Initialize task
-	b64_img = encodebytes(file.stream.read()).decode("ascii")
+	b64_img = encodebytes(file.stream.read()).decode("ascii")	
 	result = detect_and_count.delay(
 		b64_img_bytes=b64_img,
 		email=session["email"],
