@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState, useRef } from "react";
-import { Button, Card, Tooltip } from "flowbite-react";
+import { Button, Card, Select, Tooltip } from "flowbite-react";
 import { GrPowerReset } from "react-icons/gr";
 import { GiCorn } from "react-icons/gi";
 import { MdCancel, MdOutlineSaveAlt } from "react-icons/md";
@@ -14,18 +14,23 @@ import guide1 from "../assets/guide1.gif";
 import guide2 from "../assets/guide2.gif";
 import guide3 from "../assets/guide3.gif";
 import GuideButton from "../Components/GuideButton";
+import useWindowDimensions from "../Components/useWindowDimension";
 
 function DetectionPage() {
 	const { userInfo } = useContext(AuthContext);
 	const [file, setFile] = useState(null);
 	const [status, setStatus] = useState("");
 	const [result, setResult] = useState({});
+	const [models, setModels] = useState([]);
+	const [selectedModel, setSelectedModel] = useState(null);
 	const [showSaveModal, setShowSaveModal] = useState(false);
 	const [quota, setQuota] = useState(0);
 	const [showToolTip, setShowToolTip] = useState(false);
 	const [originalImage, setOriginalImage] = useState(null);
 	const [annotations, setAnnotations] = useState([]);
 	const [isReannotating, setIsReannotating] = useState(false);
+	const [isLoading, setIsLoading] = useState(true);
+	const { width, height } = useWindowDimensions();
 	const canvasRef = useRef(null);
 	const reannotation_guide = [
 		{
@@ -64,6 +69,24 @@ function DetectionPage() {
 		console.log("Current file:", file);
 	}, [result, file]);
 
+	useEffect(() => {
+		axios
+			.get("/api/detect/models/query_all_model_selection")
+			.then((res) => {
+				if (res.status == 200) {
+					setModels([{ model_id: "BASE", name: "Base Model" }, ...res.data.models]);
+					setIsLoading(false);
+				} else {
+					alert("Something went wrong.");
+					window.location.reload();
+				}
+			})
+			.catch((err) => {
+				alert("Error occured: " + err);
+				window.location.reload();
+			});
+	}, []);
+
 	const fetchQuota = async () => {
 		try {
 			const res = await axios.get("/api/detect/get_detection_quota");
@@ -83,6 +106,9 @@ function DetectionPage() {
 
 		const formData = new FormData();
 		formData.append("image", file);
+		if (selectedModel !== "BASE") {
+			formData.append("model_id", selectedModel);
+		}
 
 		try {
 			setStatus("RUNNING");
@@ -240,10 +266,27 @@ function DetectionPage() {
 	const handleSelect = (selectedId) => {
 		console.log("Selected annotation:", selectedId);
 	};
+	console.log("model id", selectedModel);
+
+	const get_max_canvas_width = () => {
+		if (width >= 1536) {
+			return 1152;
+		} else if (width >= 1280) {
+			return 1000;
+		} else if (width >= 1024) {
+			return 780;
+		} else if (width >= 768) {
+			return 640;
+		} else if (width >= 480) {
+			return 450;
+		}
+		return 375;
+	};
 
 	return (
 		<div className="relative overflow-hidden min-h-screen">
 			<LoadingCard show={status === "RUNNING"}>Detecting Maize Tassels...</LoadingCard>
+			<LoadingCard show={isLoading}>Loading Detection Models...</LoadingCard>
 			<SaveResultModal state={showSaveModal} setState={setShowSaveModal} file={file} results={result} post_save_action={handleReset} />
 
 			{/* Decorative blobs */}
@@ -267,6 +310,22 @@ function DetectionPage() {
 				</div>
 				<div className="flex justify-between items-center mt-4 px-8">
 					<h2 className="text-2xl font-semibold">{status === "SUCCESS" ? "Result" : "Upload Image"}</h2>
+					{status !== "SUCCESS" && !isReannotating && (
+						<Select
+							// icon={PiFarmFill}
+							id="model_selection"
+							value={selectedModel}
+							color="success"
+							className="shadow drop-shadow-md rounded-lg hover:outline outline-custom-green-2"
+							onChange={(ev) => setSelectedModel(ev.target.value)}
+						>
+							{models.map((m) => (
+								<option key={m.model_id} value={m.model_id}>
+									{m.name}
+								</option>
+							))}
+						</Select>
+					)}
 					{isReannotating && (
 						<GuideButton
 							tooltipContent="example"
@@ -278,14 +337,14 @@ function DetectionPage() {
 					)}
 				</div>
 				<div className="flex flex-wrap flex-col justify-start px-8 mt-4 gap-3">
-					<section className="flex justify-center">
+					<section className="flex justify-center w-full">
 						{status !== "SUCCESS" && !isReannotating && <DropImageInput file={file} setFile={setFile} disabled={status === "RUNNING"} />}
 						{status === "SUCCESS" && !isReannotating && (
 							<img className="rounded shadow border max-h-192" src={`data:image/png;base64,${result.annotated_image}`} alt="Detection Result" />
 						)}
 
 						{status === "SUCCESS" && isReannotating && (
-							<div className="w-full max-w-2xl h-192 justify-center items-center">
+							<div className="w-full h-96 md:h-128 lg:h-138 xl:h-192 2xl:h-216 justify-center items-center">
 								<ReactPictureAnnotation
 									image={originalImage}
 									onAnnotationChange={onAnnotationChange}
@@ -301,8 +360,8 @@ function DetectionPage() {
 									onChange={onAnnotationChange}
 									onSelect={handleSelect}
 									renderAnnotation={renderAnnotation}
-									width={Math.min(result.image_width, 1000)} // max width
-									height={Math.min(result.image_height, 750)} // max height
+									width={Math.min(result.image_width, get_max_canvas_width())} // max width
+									height={Math.min(result.image_height, (result.image_height * get_max_canvas_width()) / result.image_width)} // max height
 									scrollSpeed={0}
 									zoomScale={1}
 									disabled={false}
@@ -353,58 +412,69 @@ function DetectionPage() {
 									<GiCorn />
 								</div>
 							</section>
-							<section className="flex flex-col lg:flex-row justify-between gap-4 mt-2">
-								{!isReannotating ? (
-									<Tooltip
-										content={
-											userInfo.can_reannotate
-												? "Feel free to re-annotate and get better results!"
-												: "You have to purchase plan to use this function."
-										}
-										placement="top"
-									>
-										<Button
-											className="bg-custom-brown-1 hover:bg-custom-brown-2 pl-6 pr-8 py-2 shadow w-100 lg:w-56"
-											onClick={handleReannotate}
-											disabled={!userInfo.can_reannotate}
-										>
+							<section className={`flex flex-col lg:flex-row justify-between gap-4 mt-2`}>
+								{isReannotating ? (
+									<>
+										<Button className="bg-red-500 hover:bg-red-800 pl-6 pr-8 py-2 shadow lg:w-1/2" onClick={() => setIsReannotating(false)}>
 											<div className="flex flex-row justify-center items-center">
-												<ImPencil2 size={16} />
-												<span className="ml-2 font-bold text-center">Reannotate</span>
+												<MdCancel size={16} />
+												<span className="ml-2 font-bold text-center">Cancel Re-Annotation</span>
 											</div>
 										</Button>
-									</Tooltip>
+										<Button
+											disabled={!file || !result}
+											className="bg-custom-green-1 hover:bg-custom-green-2 pl-6 pr-8 py-2 shadow lg:w-1/2"
+											onClick={handleSaveAnnotations}
+										>
+											<div className="flex flex-row justify-center items-center">
+												<MdOutlineSaveAlt size={16} />
+												<span className="ml-2 font-bold text-center">Save Re-annotation</span>
+											</div>
+										</Button>
+									</>
 								) : (
-									<Button className="bg-custom-brown-1 hover:bg-custom-brown-2 pl-6 pr-8 py-2 shadow w-100 lg:w-56" onClick={handleSaveAnnotations}>
-										<div className="flex flex-row justify-center items-center">
-											<MdOutlineSaveAlt size={16} />
-											<span className="ml-2 font-bold text-center">Save</span>
-										</div>
-									</Button>
-								)}
-								<div className="flex flex-col lg:flex-row justify-end gap-4 lg:gap-8">
-									<Button className="bg-red-500 hover:bg-red-800 pl-6 pr-8 py-2 shadow w-100 lg:w-56" onClick={handleReset}>
-										<div className="flex flex-row justify-center items-center">
-											<MdCancel size={16} />
-											<span className="ml-2 font-bold text-center">Cancel</span>
-										</div>
-									</Button>
-									<Button
-										disabled={!file || !result}
-										className="bg-custom-green-1 hover:bg-custom-green-2 pl-6 pr-8 py-2 shadow lg:w-56"
-										onClick={() => {
-											if (isReannotating) {
-												handleSaveAnnotations();
+									<>
+										<Tooltip
+											content={
+												userInfo.can_reannotate
+													? width > 1024
+														? "Feel free to re-annotate and get better results!"
+														: "Please ensure you have a big enough screen, minimum 1024px wide"
+													: "You have to purchase plan to use this function."
 											}
-											setShowSaveModal(true);
-										}}
-									>
-										<div className="flex flex-row justify-center items-center">
-											<MdOutlineSaveAlt size={16} />
-											<span className="ml-2 font-bold text-center">Save</span>
+											placement="top"
+										>
+											<Button
+												className="bg-custom-brown-1 hover:bg-custom-brown-2 pl-6 pr-8 py-2 shadow w-100 lg:w-56"
+												onClick={handleReannotate}
+												disabled={!userInfo.can_reannotate || width < 1024}
+											>
+												<div className="flex flex-row justify-center items-center">
+													<ImPencil2 size={16} />
+													<span className="ml-2 font-bold text-center">Reannotate</span>
+												</div>
+											</Button>
+										</Tooltip>
+										<div className="flex flex-col lg:flex-row justify-end gap-4 lg:gap-8">
+											<Button className="bg-red-500 hover:bg-red-800 pl-6 pr-8 py-2 shadow w-100 lg:w-56" onClick={handleReset}>
+												<div className="flex flex-row justify-center items-center">
+													<MdCancel size={16} />
+													<span className="ml-2 font-bold text-center">Cancel</span>
+												</div>
+											</Button>
+											<Button
+												disabled={!file || !result}
+												className="bg-custom-green-1 hover:bg-custom-green-2 pl-6 pr-8 py-2 shadow lg:w-56"
+												onClick={() => setShowSaveModal(true)}
+											>
+												<div className="flex flex-row justify-center items-center">
+													<MdOutlineSaveAlt size={16} />
+													<span className="ml-2 font-bold text-center">Save</span>
+												</div>
+											</Button>
 										</div>
-									</Button>
-								</div>
+									</>
+								)}
 							</section>
 						</>
 					)}
