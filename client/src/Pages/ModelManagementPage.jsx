@@ -92,33 +92,27 @@ function ModelManagementPage() {
 	}, [models]);
 
 	const handleDelete = () => {
-		alert("Delete handled");
-		// let data = { results_pk: [] };
-		// selected.forEach((val) => {
-		// 	const splitted_val = val.split("_");
-		// 	data.results_pk.push({
-		// 		id: splitted_val[2],
-		// 		farm_name: splitted_val[0],
-		// 		farm_patch_id: splitted_val[1],
-		// 	});
-		// });
-		// setIsDeleteLoading(true);
-		// axios
-		// 	.delete("/api/storage/delete_results", { data: data })
-		// 	.then((res) => {
-		// 		if (res.data.success) {
-		// 			setSelected(new Set());
-		// 			setShowMessageModal(true);
-		// 		} else {
-		// 			console.log(res.status);
-		// 			alert("Something went wrong!");
-		// 		}
-		// 	})
-		// 	.catch((err) => {
-		// 		console.log(err);
-		// 		alert("Something went wrong!");
-		// 	})
-		// 	.then(() => setIsDeleteLoading(false));
+		let data = { model_ids: Array.from(selected) };
+		console.log("Delete handled", data);
+		setIsDeleteLoading(true);
+		axios
+			.delete("/api/detect/models/delete_models", {
+				data: data,
+			})
+			.then((res) => {
+				if (res.data.success) {
+					setSelected(new Set());
+					setShowMessageModal(true);
+				} else {
+					console.log(res.status);
+					alert("Something went wrong!");
+				}
+			})
+			.catch((err) => {
+				console.log(err);
+				alert("Something went wrong!");
+			})
+			.then(() => setIsDeleteLoading(false));
 	};
 
 	const formatBytes = (bytes, decimals = 2) => {
@@ -178,7 +172,6 @@ function ModelManagementPage() {
 		return filtered_list;
 	};
 
-	console.log(searchFilter());
 	return (
 		<div className="relative overflow-hidden min-h-screen">
 			{/* Loading Cards */}
@@ -206,23 +199,7 @@ function ModelManagementPage() {
 				<header className="flex flex-wrap flex-row gap-2 justify-between shadow-b border-b-2 pb-5 border-black">
 					<h1 className="text-4xl font-extrabold">Detection Models</h1>
 				</header>
-				<section className={`flex ${selected.size == 0 ? "justify-end" : "justify-between"}`}>
-					<section
-						className={`${
-							selected.size == 0 && "hidden"
-						} flex flex-row gap-4 bg-custom-green-3 items-center rounded-lg drop-shadow-md outline-custom-green-1 w-fit h-fit px-6 py-3`}
-					>
-						<span className="flex flex-row items-center text-sm text-gray-500 font-medium">
-							<MdOutlineClose size={26} className="mr-2 p-1 rounded-lg hover:bg-gray-200" onClick={() => setSelected(new Set())} />
-							You have selected {selected.size} model(s).
-						</span>
-						<div className="flex flex-row gap-2">
-							<Button color="failure" className="text-sm text-white font-medium shadow-md py-0" onClick={() => setShowDeleteModal(true)}>
-								<MdDelete size={16} />
-								<span className="ml-1 text-xs">Delete</span>
-							</Button>
-						</div>
-					</section>
+				<section className={"flex flex-row justify-end"}>
 					<div className="flex flex-col md:items-end gap-1 px-4 py-2 shadow-md rounded-lg bg-custom-white w-full md:w-fit">
 						<span className="font-semibold flex flex-col md:items-end">
 							<h2 className="font-bold text-lg">Storage used</h2>
@@ -239,7 +216,23 @@ function ModelManagementPage() {
 						/>
 					</div>
 				</section>
-				<section className="flex flex-row justify-end items-center">
+				<section className={`flex flex-col md:flex-row items-center gap-4 ${selected.size == 0 ? "justify-end" : "justify-between"}`}>
+					<section
+						className={`${
+							selected.size == 0 && "hidden"
+						} flex flex-row gap-4 bg-custom-green-3 items-center rounded-lg drop-shadow-md outline-custom-green-1 w-fit h-fit px-6 py-3`}
+					>
+						<span className="flex flex-row items-center text-sm text-gray-500 font-medium">
+							<MdOutlineClose size={26} className="mr-2 p-1 rounded-lg hover:bg-gray-200" onClick={() => setSelected(new Set())} />
+							You have selected {selected.size} model(s).
+						</span>
+						<div className="flex flex-row gap-2">
+							<Button color="failure" className="text-sm text-white font-medium shadow-md py-0" onClick={() => setShowDeleteModal(true)}>
+								<MdDelete size={16} />
+								<span className="ml-1 text-xs">Delete</span>
+							</Button>
+						</div>
+					</section>
 					<Button
 						className="bg-custom-green-1 hover:bg-custom-green-2 ring-custom-green-1 hover:ring-custom-green-2 pl-3 pr-4 items-center shadow-md"
 						onClick={() => navigate("/user/active_learn")}

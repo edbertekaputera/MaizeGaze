@@ -43,18 +43,6 @@ class DetectionModel(db.Model):
 			return False
 	
 	@classmethod
-	def create(cls, data:dict) -> bool:
-		try:
-			with current_app.app_context():
-				new_result = cls(**data)
-				db.session.add(new_result)
-				db.session.commit()
-			return True
-		except BaseException as e:
-			print(e)
-			return False
-	
-	@classmethod
 	def deleteSelectedModels(cls,model_ids:list[str]) -> list[Self]:
 		list_of_models = []
 		try:

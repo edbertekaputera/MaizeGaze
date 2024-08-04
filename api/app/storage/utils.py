@@ -291,11 +291,11 @@ class UserDirectory():
 
 	def deleteWeights(self, model:DetectionModel) -> bool:
 		try:
-			model_path = os.path.join(self.__user_directory, "models", model.model_id, "metrics.json")
+			model_path = os.path.join(self.__user_directory, "models", model.model_id)
 			if current_app.config["USE_LOCAL_STORAGE"]: # Local
 				os.remove(model_path)		
 			else: #Cloud Bucket
-				self.__bucket.remove(model_path)
+				self.__bucket.remove_directory(model_path)
 		except BaseException as err:
 			print(err)
 			return False
