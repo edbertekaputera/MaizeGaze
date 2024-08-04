@@ -21,6 +21,7 @@ import MaizeDoctorPage from "./Pages/MaizeDoctorPage";
 import ConsultationPage from "./Pages/ConsultationPage";
 import ReannotationPage from "./Pages/ReannotationPage";
 import FarmManagementPage from "./Pages/FarmManagementPage";
+import ModelManagementPage from "./Pages/ModelManagementPage";
 
 export default function AppRouter() {
 	return (
@@ -233,6 +234,17 @@ export default function AppRouter() {
 					element={
 						<PrivateRoute user_only can_reannotate>
 							<ReannotationPage />
+						</PrivateRoute>
+					}
+				/>
+
+				{/* Model Management */}
+				<Route
+					exact
+					path="/user/model_management"
+					element={
+						<PrivateRoute user_only can_active_learn>
+							<ModelManagementPage />
 						</PrivateRoute>
 					}
 				/>

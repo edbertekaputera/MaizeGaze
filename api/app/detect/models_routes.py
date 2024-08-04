@@ -84,12 +84,13 @@ def query_all_models() -> dict[str, list[dict[str, str | float | list[float]]]]:
 		metrics = retrieve_training_metrics(m)
 		# Successful Run
 		if metrics:
+			metrics["test_map"] = metrics["test_map"] * 100
 			output_list.append({
 				"model_id": m.model_id,
 				"name": m.name,
 				"training_date": m.training_date.strftime("%Y-%m-%d %H:%M:%S"),
 				"num_data": m.num_data,
-				"status": "SUCCESS",
+				"status": "ACTIVE",
 				"training_metrics": metrics,
 			})
 		else: # Check if Task Status is ERROR or RUNNING
@@ -101,7 +102,7 @@ def query_all_models() -> dict[str, list[dict[str, str | float | list[float]]]]:
 					"name": m.name,
 					"training_date": m.training_date.strftime("%Y-%m-%d %H:%M:%S"),
 					"num_data": m.num_data,
-					"status": "RUNNING"
+					"status": "TRAINING"
 				})
 			else: # ERROR
 				output_list.append({
@@ -121,7 +122,7 @@ def query_all_model_selection() -> dict[str, list[dict[str, str | float | list[f
 	list_of_models = []
 	output_list = query_all_models()["models"]
 	for model in output_list:
-		if model["status"] == "SUCCESS":
+		if model["status"] == "ACTIVE":
 			list_of_models.append({
 				"model_id": model["model_id"],
 				"name": model["name"]
