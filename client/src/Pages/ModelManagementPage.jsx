@@ -281,7 +281,6 @@ function ModelManagementPage() {
 					<ModelsTable models={searchFilter()} selected={selected} setSelected={setSelected} />
 				</section>
 			</Card>
-			<SearchNodel />
 		</div>
 	);
 }
