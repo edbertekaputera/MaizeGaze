@@ -24,8 +24,17 @@ class GoogleBucket():
 			print(err)
 			return False
 
-	def scandir(self, path:str) -> list:
+	def scandir(self, path:str) -> list[storage.Blob]:
 		return list(self.__bucket.list_blobs(prefix=f'{path}/'))
+	
+	def remove_directory(self, path:str) -> bool:
+		try:
+			for blob in self.scandir(path)[::-1]:
+				blob.delete()
+			return True
+		except BaseException as err:
+			print(err)
+			return False
 
 	def remove(self, path:str) -> bool:
 		try:

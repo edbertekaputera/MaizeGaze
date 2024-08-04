@@ -133,10 +133,7 @@ def query_all_model_selection() -> dict[str, list[dict[str, str | float | list[f
 @permissions_required(is_user=True)
 def delete_models() -> dict[str, bool]:
 	json = request.get_json()
-
-	list_of_models = []
-	for result in json["model_ids"]:
-		list_of_models.append(result["model_id"])
+	list_of_models = json["model_ids"]
 		
 	models = DetectionModel.deleteSelectedModels(list_of_models)
 
