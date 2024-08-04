@@ -42,3 +42,30 @@ class DetectionModel(db.Model):
 			print(e)
 			return False
 	
+	@classmethod
+	def create(cls, data:dict) -> bool:
+		try:
+			with current_app.app_context():
+				new_result = cls(**data)
+				db.session.add(new_result)
+				db.session.commit()
+			return True
+		except BaseException as e:
+			print(e)
+			return False
+	
+	@classmethod
+	def deleteSelectedModels(cls,model_ids:list[str]) -> list[Self]:
+		list_of_models = []
+		try:
+			with current_app.app_context():
+				for id in model_ids:
+					model = cls.get(id)
+					if not model or cls.query.filter_by(model_id=id).delete() == 0:
+						continue
+					list_of_models.append(model)
+				db.session.commit()
+		except BaseException as err:
+			print(err)
+			pass
+		return list_of_models

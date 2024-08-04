@@ -12,6 +12,7 @@ from flask import current_app, session
 from hashlib import sha256
 from json import load as json_load
 from .cloud_utils import GoogleBucket
+from app.db import DetectionModel
 
 class UserDirectory():
 	def __init__(self, email=None) -> None:
@@ -288,9 +289,14 @@ class UserDirectory():
 			self.__bucket.save_image(image_path, image, format="PNG")
 		return image_path
 
-	
-
-
-		
-
-	
+	def deleteWeights(self, model:DetectionModel) -> bool:
+		try:
+			model_path = os.path.join(self.__user_directory, "models", model.model_id, "metrics.json")
+			if current_app.config["USE_LOCAL_STORAGE"]: # Local
+				os.remove(model_path)		
+			else: #Cloud Bucket
+				self.__bucket.remove(model_path)
+		except BaseException as err:
+			print(err)
+			return False
+		return True
