@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Checkbox } from 'flowbite-react';
-import '@fortawesome/fontawesome-free/css/all.min.css';
 
 const SearchNodel = () => {
   const [showConfirm, setShowConfirm] = useState(false);

@@ -106,7 +106,7 @@ function DetectionPage() {
 
 		const formData = new FormData();
 		formData.append("image", file);
-		if (selectedModel !== "BASE") {
+		if (userInfo.can_active_learn && selectedModel !== "BASE") {
 			formData.append("model_id", selectedModel);
 		}
 
@@ -266,7 +266,6 @@ function DetectionPage() {
 	const handleSelect = (selectedId) => {
 		console.log("Selected annotation:", selectedId);
 	};
-	console.log("model id", selectedModel);
 
 	const get_max_canvas_width = () => {
 		if (width >= 1536) {
@@ -310,7 +309,7 @@ function DetectionPage() {
 				</div>
 				<div className="flex justify-between items-center mt-4 px-8">
 					<h2 className="text-2xl font-semibold">{status === "SUCCESS" ? "Result" : "Upload Image"}</h2>
-					{status !== "SUCCESS" && !isReannotating && (
+					{userInfo.can_active_learn && status !== "SUCCESS" && !isReannotating && (
 						<Select
 							// icon={PiFarmFill}
 							id="model_selection"
