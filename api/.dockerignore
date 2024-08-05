@@ -1,0 +1,8 @@
+instance/
+venv/
+model/
+__pycache__
+.DS_Store
+*.ipynb
+*.jpg
+.env
