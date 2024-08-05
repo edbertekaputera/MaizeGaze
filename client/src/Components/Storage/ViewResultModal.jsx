@@ -200,7 +200,7 @@ function ViewResultModal({ state, setState, id, farm_name, farm_patch_id, farm_p
 				Selected result records has been successfully deleted.
 			</MessageModal>
 			<Modal show={state} size="6xl" onClose={() => setState(false)} popup>
-				<div className="rounded shadow-md">
+				<div className="rounded shadow-md overflow-y-auto">
 					<Modal.Header></Modal.Header>
 					<Modal.Body>
 						<LoadingCard show={isLoading}>Loading Image...</LoadingCard>
