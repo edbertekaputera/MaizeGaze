@@ -1,14 +1,14 @@
 services:
   api:
     build: 
-        context: ./api
-        dockerfile: Dockerfile.api
+      context: ./api
+      dockerfile: Dockerfile.api
     restart: always
     ports:
-    - "5000:5000"
+      - "5000:5000"
     depends_on:
-    - worker
-    - redis
+      - worker
+      - redis
     env_file: "./api/.env"
     environment: 
       REDIS_SESSION_URL: redis://redis:6379/0
@@ -19,9 +19,13 @@ services:
       watch:
         - action: sync
           path: .
-          target: /app
+          target: /app/app
     secrets: 
       - gcp_service_account_key
+    volumes:
+      - type: bind
+        source: ./api/instance
+        target: /app/instance
 
   worker:
     build: 

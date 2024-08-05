@@ -31,7 +31,7 @@ function ViewTrainingResultsModal({ state, setState, model_name, training_date, 
 				<Modal.Header>
 					<h1 className="flex flex-wrap gap-1 text-2xl font-bold px-4 pt-2 text-center justify-center">
 						<span className="text-black">{model_name}</span>
-						<span className="text-gray-600">({format(training_date, "dd MMM yyyy, h:mma")})</span>
+						<span className="text-gray-600">({format(training_date, "dd MMM yyyy, h:mma")} SGT)</span>
 					</h1>
 				</Modal.Header>
 				<Modal.Body>

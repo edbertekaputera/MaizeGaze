@@ -9,7 +9,6 @@ import { AuthContext } from "../Authentication/PrivateRoute";
 function PlanCard({ plan, setShowCancelPlanModal }) {
 	const { userInfo } = useContext(AuthContext);
 	const { tier, price, can_reannotate, can_chatbot, can_active_learn, can_diagnose, storage_limit, detection_quota_limit } = plan;
-	console.log(plan);
 
 	const navigate = useNavigate();
 	const handlePurchase = () => {

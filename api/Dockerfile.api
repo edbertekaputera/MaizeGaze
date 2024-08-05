@@ -4,6 +4,10 @@ FROM python:3.10-slim
 # Set the working directory in the container
 WORKDIR /app
 
+# Set timezone
+ENV TZ=Asia/Singapore
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ /etc/timezone
+
 # Install necessary packages
 RUN apt-get update && apt-get install -y \
     curl \
@@ -20,4 +24,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 ENV FLASK_ENV=production
 
 EXPOSE 5000
-CMD ["gunicorn", "-b", ":5000", "--workers", "3", "app:flask_app"]
+CMD ["gunicorn", "-b", ":5000", "main:flask_app"]

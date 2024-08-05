@@ -134,10 +134,13 @@ function FarmManagementPage() {
 	};
 
 	const check_all_city_bool = (bool_val) => {
-		return Object.keys(cities).every((country) => Object.values(cities[country]).every((city_val) => city_val === bool_val));
+		return Object.values(cities).every((country) => Object.values(country).every((city_val) => city_val === bool_val));
 	};
 
 	const check_some_city_in_country_bool = (country, bool_val) => {
+		if (!cities[country]) {
+			return false
+		}
 		return Object.values(cities[country]).some((city_val) => city_val === bool_val);
 	};
 
@@ -147,7 +150,7 @@ function FarmManagementPage() {
 			// Filtering
 			const land_size_bool = landSize.min <= farm.total_land_size && landSize.max >= farm.total_land_size;
 			const country_bool = check_some_city_in_country_bool(farm.country, true);
-			const city_bool = cities[farm.country][farm.city];
+			const city_bool = cities[farm.country] && cities[farm.country][farm.city];
 
 			// Search keyword
 			const keyword = search.toLowerCase().trim();

@@ -2,7 +2,7 @@
 from flask import session, Blueprint, request, current_app
 from celery.result import AsyncResult
 from celery.states import READY_STATES
-from datetime import datetime 
+from datetime import datetime
 from uuid import uuid4
 
 # Local dependencies
@@ -51,6 +51,7 @@ def init_train() -> dict[str, bool|str]:
 		new_model_id = new_model_id,
 		list_of_filenames=list_of_file_names,
 		base_model_id=base_model_id, 
+		machine_type="n1-highmem-4"
 	) # type: ignore
 	
 	# Create new model
