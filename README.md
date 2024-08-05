@@ -157,6 +157,25 @@ docker build --platform linux/amd64 -t <YOUR_CLOUD_CONTAINER_URI> .
 docker push <YOUR_CLOUD_CONTAINER_URI>
 ```
 
+## Alternative Setup (Using Docker Compose)
+First, make sure you have `Docker` installed and set up on your device. 
+Check out `https://www.docker.com/` if you don't.
+
+You can take advantage of the `Docker Compose` orchestration setup, to run all servers from step #1 to step #3. By simply running the following commands on the base directory.
+```bash
+# Build (For the building the first time)
+docker compose up --build -d
+
+# Start
+docker compose start
+
+# Stop
+docker compose stop
+
+# Check status
+docker ps
+```
+
 ## Important Note:
 Make sure you have all three servers and the celery workers running at the same time, so that the system can work properly. For local development, make sure the Stripe CLI is also listening and forwarding events to your local endpoint.
 
