@@ -22,6 +22,7 @@ import ConsultationPage from "./Pages/ConsultationPage";
 import ReannotationPage from "./Pages/ReannotationPage";
 import FarmManagementPage from "./Pages/FarmManagementPage";
 import ModelManagementPage from "./Pages/ModelManagementPage";
+import ActiveLearningPage from "./Pages/ActiveLearningPage";
 
 export default function AppRouter() {
 	return (
@@ -171,7 +172,7 @@ export default function AppRouter() {
 					path="/user/active_learn"
 					element={
 						<PrivateRoute user_only can_active_learn>
-							ACTIVE LEARN
+							<ActiveLearningPage />
 						</PrivateRoute>
 					}
 				/>

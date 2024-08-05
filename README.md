@@ -164,7 +164,7 @@ Check out `https://www.docker.com/` if you don't.
 You can take advantage of the `Docker Compose` orchestration setup, to run all servers from step #1 to step #3. By simply running the following commands on the base directory.
 ```bash
 # Build (For the building the first time)
-docker compose up --build -d
+docker compose build
 
 # Start
 docker compose start

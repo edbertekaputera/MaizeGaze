@@ -38,34 +38,14 @@ function DetectionResultTableAL({ results, selected, setSelected }) {
 			<Table hoverable>
 				<Table.Head>
 					<Table.HeadCell className="bg-custom-brown-1 text-white p-4">
-						<Checkbox
-							checked={
-								selected.size != 0 && selected.size === results.length
-							}
-							onChange={handleAllCheckbox}
-						/>
+						<Checkbox checked={selected.size != 0 && selected.size === results.length} onChange={handleAllCheckbox} />
 					</Table.HeadCell>
-					<Table.HeadCell className="bg-custom-brown-1 text-white p-4">
-						Name
-					</Table.HeadCell>
-					<Table.HeadCell className="bg-custom-brown-1 text-white p-4">
-						Farm
-					</Table.HeadCell>
-					<Table.HeadCell className="bg-custom-brown-1 text-white p-4">
-						Patch
-					</Table.HeadCell>
-					<Table.HeadCell className="bg-custom-brown-1 text-white p-4">
-						Tassel Count
-					</Table.HeadCell>
-					<Table.HeadCell className="bg-custom-brown-1 text-white p-4">
-						Date
-					</Table.HeadCell>
-					<Table.HeadCell className="bg-custom-brown-1 text-white p-4">
-						Time
-					</Table.HeadCell>
-					<Table.HeadCell className="bg-custom-brown-1 text-white p-4">
-						<span className="sr-only">View</span>
-					</Table.HeadCell>
+					<Table.HeadCell className="bg-custom-brown-1 text-white p-4">Name</Table.HeadCell>
+					<Table.HeadCell className="bg-custom-brown-1 text-white p-4">Farm</Table.HeadCell>
+					<Table.HeadCell className="bg-custom-brown-1 text-white p-4">Patch</Table.HeadCell>
+					<Table.HeadCell className="bg-custom-brown-1 text-white p-4">Tassel Count</Table.HeadCell>
+					<Table.HeadCell className="bg-custom-brown-1 text-white p-4">Date</Table.HeadCell>
+					<Table.HeadCell className="bg-custom-brown-1 text-white p-4">Time</Table.HeadCell>
 				</Table.Head>
 				<Table.Body className="divide-y">
 					{results.map((r, index) => (
@@ -78,7 +58,7 @@ function DetectionResultTableAL({ results, selected, setSelected }) {
 							farm_patch_name={r.farm_patch_name}
 							tassel_count={r.tassel_count}
 							date={r.record_date}
-                            isTrained={r.used_for_training}
+							isTrained={r.used_for_training}
 							selected={selected.has(`${r.farm_name}_${r.farm_patch_id}_${r.id}`)}
 							setSelected={setSelected}
 						/>
@@ -86,9 +66,7 @@ function DetectionResultTableAL({ results, selected, setSelected }) {
 					{results.length == 0 && (
 						<Table.Row>
 							<Table.Cell colSpan={7}>
-								<span className="flex justify-center w-full">
-									No matching detection results found
-								</span>
+								<span className="flex justify-center w-full">No matching detection results found</span>
 							</Table.Cell>
 						</Table.Row>
 					)}
