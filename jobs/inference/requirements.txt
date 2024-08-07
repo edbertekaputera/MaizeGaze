@@ -1,0 +1,8 @@
+numpy==1.26.*
+pillow==10.3.*
+opencv-python==4.10.*
+ultralytics==8.2.*
+dill==0.3.8
+flask==2.3.*
+werkzeug==3.0.3
+gunicorn==22.0.*

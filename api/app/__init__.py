@@ -7,7 +7,8 @@ from config import Config
 from celery import Celery, Task
 from sqlalchemy import event
 import stripe
-import google.generativeai as genai
+from google.generativeai import configure as genai_configure
+from google.cloud import aiplatform
 
 # Local dependencies
 from app.db import db, User, TypeOfUser
@@ -39,7 +40,7 @@ bcrypt.init_app(flask_app)
 stripe.api_key = flask_app.config["STRIPE_API_KEY"]
 
 # Gemini AI
-genai.configure(api_key=flask_app.config["GEMINI_API_KEY"])
+genai_configure(api_key=flask_app.config["GEMINI_API_KEY"])
 
 # Celery
 def celery_init_app(app: Flask) -> Celery:
@@ -103,6 +104,9 @@ with flask_app.app_context():
 		) # type: ignore
 		db.session.add(admin)
 		db.session.commit()
+
+aiplatform.init(location=flask_app.config["GOOGLE_CLOUD_REGION"], 
+				project=flask_app.config["GOOGLE_CLOUD_PROJECT_ID"])
 
 # Routes (make sure everything starts with /api to prevent collision with web routes)
 flask_app.register_blueprint(auth_router, url_prefix="/api/authentication")

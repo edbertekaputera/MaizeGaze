@@ -166,6 +166,7 @@ def searchResultHistory() -> dict[str, list[dict[str, str|int]]]:
 				"farm_user": result.farm_user,
 				"farm_patch_id": result.farm_patch_id,
 				"farm_patch_name": "Crop Patch",
+				"used_for_training": result.used_for_training
 			}
 		else:
 			result_json = {
@@ -178,6 +179,7 @@ def searchResultHistory() -> dict[str, list[dict[str, str|int]]]:
 				"farm_user": result.farm_user,
 				"farm_patch_id": patch.patch_id,
 				"farm_patch_name": patch.name,
+				"used_for_training": result.used_for_training
 			}
 		resultList.append(result_json)
 

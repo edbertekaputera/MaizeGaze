@@ -63,8 +63,19 @@ REVERSE_GEOCODE_API = 'YOUR_API_KEY'
 STRIPE_API_KEY = 'YOUR_API_KEY'
 STRIPE_ENDPOINT_SECRET = 'YOUR_STRIPE_ENDPOINT_SECRET'
 
-# Gemini
-GEMINI_API_KEY = 'YOUR_GEMINI_API_KEEY'
+# Google
+GEMINI_API_KEY = 'YOUR_GEMINI_API_KEY'
+GOOGLE_CLOUD_BUCKET_NAME = 'YOUR_GOOGLE_CLOUD_BUCKET_NAME'
+GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS_PATH = "/PATH/TO/YOUR/SERVICE_ACCOUNT_CREDENTIALS.JSON"
+GOOGLE_CLOUD_REGION = 'YOUR_CLOUD_REGION'
+GOOGLE_CLOUD_PROJECT_ID = 'YOUR_GOOGLE_CLOUD_PROJECT'
+
+
+# Vertex AI
+VERTEX_TRAIN_CONTAINER_URI = 'YOUR_CUSTOM_TRAINING_CONTAINER_URI'
+VERTEX_TRAIN_STAGING_BUCKET = 'YOUR_STAGING_BUCKET_PATH'
+VERTEX_DETECT_ENDPOINT_ID='YOUR_VERTEX_AI_ONLINE_PREDICTIONS_ENDPOINT'
+VERTEX_PROJECT_ID='YOUR_GOOGLE_CLOUD_PROJECT_ID'
 ```
 
 To run the server, simply run `application.py` as followed, and it should be hosted locally at `port 5000`
@@ -131,6 +142,38 @@ stripe listen --forward-to localhost:5000/api/user/subscription/stripe_webhook_e
 You can also simulate specific events for testing with the following commands,
 ```bash
 stripe trigger payment_intent.succeeded
+```
+
+### 5. Docker Job Containers (For heavy tasks like model inference and training)
+There are two docker containers located at `jobs/` which are `inference` and `training`.
+Before you start, you have to build and push the containers to your cloud platform.
+Here is an example on how you would do it for one of them,
+```bash
+# Go to the directory
+cd jobs/inference
+# Build the image
+docker build --platform linux/amd64 -t <YOUR_CLOUD_CONTAINER_URI> .
+# Push to cloud artifact repository
+docker push <YOUR_CLOUD_CONTAINER_URI>
+```
+
+## Alternative Setup (Using Docker Compose)
+First, make sure you have `Docker` installed and set up on your device. 
+Check out `https://www.docker.com/` if you don't.
+
+You can take advantage of the `Docker Compose` orchestration setup, to run all servers from step #1 to step #3. By simply running the following commands on the base directory.
+```bash
+# Build (For the building the first time)
+docker compose build
+
+# Start
+docker compose start
+
+# Stop
+docker compose stop
+
+# Check status
+docker ps
 ```
 
 ## Important Note:

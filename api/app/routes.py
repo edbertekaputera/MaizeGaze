@@ -1,8 +1,8 @@
 # Libraries
 from flask import session, Blueprint
-import requests
+from datetime import datetime
 # Local dependencies
-from app.db import TypeOfUser, User
+from app.db import User
 from app.authentication import login_required
 
 # Initialize
@@ -10,7 +10,7 @@ router = Blueprint("main", __name__)
 
 @router.route('/test')
 def test():
-	return {'data': 'test success'}
+	return {'data': 'test success', "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
 
 @router.route('/test_user')
 @login_required

@@ -1,6 +1,6 @@
 import { Avatar, Drawer, Dropdown, Navbar, Sidebar, TextInput } from "flowbite-react";
 import { RiMenu2Fill } from "react-icons/ri";
-import { GiArtificialIntelligence, GiCorn } from "react-icons/gi";
+import { GiArtificialHive, GiArtificialIntelligence, GiCorn } from "react-icons/gi";
 import { MdLogout, MdSpaceDashboard, MdOutlineWorkHistory, MdManageAccounts, MdSettings } from "react-icons/md";
 import { GoSponsorTiers } from "react-icons/go";
 import { CgBrowse } from "react-icons/cg";
@@ -64,6 +64,7 @@ export default function NavigationBar() {
 							<span className="block truncate text-sm font-medium">{userInfo.email}</span>
 							<span className="block truncate text-xs text-gray-400">({userInfo.type})</span>
 						</Dropdown.Header>
+
 						{!userInfo.is_admin && (
 							<>
 								<Dropdown.Item onClick={() => navigate("/user/plan_management")} icon={CgBrowse}>
@@ -72,6 +73,11 @@ export default function NavigationBar() {
 								<Dropdown.Item onClick={() => navigate("/user/farm_management")} icon={PiFarmFill}>
 									Farm Management
 								</Dropdown.Item>
+								{userInfo.can_active_learn && (
+									<Dropdown.Item onClick={() => navigate("/user/model_management")} icon={GiArtificialHive}>
+										Model Management
+									</Dropdown.Item>
+								)}
 								<Dropdown.Item onClick={() => navigate("/user/profile")} icon={MdSettings}>
 									User Profile
 								</Dropdown.Item>
@@ -111,6 +117,11 @@ export default function NavigationBar() {
 											<Sidebar.Item onClick={() => navigate("/user/farm_management")} icon={PiFarmFill}>
 												Farm Management
 											</Sidebar.Item>
+											{userInfo.can_active_learn && (
+												<Sidebar.Item onClick={() => navigate("/user/model_management")} icon={GiArtificialHive}>
+													Model Management
+												</Sidebar.Item>
+											)}
 											<Sidebar.Item onClick={() => navigate("/user/profile")} icon={MdSettings}>
 												User Profile
 											</Sidebar.Item>

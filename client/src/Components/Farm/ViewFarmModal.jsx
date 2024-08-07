@@ -127,7 +127,7 @@ function ViewFarmModal({ state, setState, name }) {
 									<div className="flex items-center justify-end">
 										<SlSizeActual size={25} />
 										<div className="ml-2 text-xl font-bold">
-											{totalSize} <span className="text-xs"> mu </span>
+											{Math.round(totalSize * 100) / 100} <span className="text-xs"> mu </span>
 										</div>
 									</div>
 								</div>
@@ -146,7 +146,7 @@ function ViewFarmModal({ state, setState, name }) {
 											patches.map((patch, index) => (
 												<Table.Row key={index} className="bg-white">
 													<Table.Cell>{patch.name}</Table.Cell>
-													<Table.Cell>{patch.land_size}</Table.Cell>
+													<Table.Cell>{Math.round(patch.land_size * 100) / 100}</Table.Cell>
 												</Table.Row>
 											))
 										) : (

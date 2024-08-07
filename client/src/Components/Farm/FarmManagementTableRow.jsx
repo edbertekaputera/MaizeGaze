@@ -28,7 +28,7 @@ function FarmManagementTableRow({ name, city, country, address, total_land_size,
 				<Table.Cell className="whitespace-nowrap font-medium text-gray-900 p-4">{country}</Table.Cell>
 				<Table.Cell className="whitespace-nowrap font-medium text-gray-900 p-4">{city}</Table.Cell>
 				<Table.Cell className="whitespace-nowrap font-medium text-gray-900 p-4">{address}</Table.Cell>
-				<Table.Cell className="whitespace-nowrap font-medium text-gray-900 p-4">{total_land_size}</Table.Cell>
+				<Table.Cell className="whitespace-nowrap font-medium text-gray-900 p-4">{Math.round(total_land_size * 100) / 100}</Table.Cell>
 				<Table.Cell className="whitespace-nowrap font-medium text-gray-900 p-4">
 					<Button
 						type="button"

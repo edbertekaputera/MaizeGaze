@@ -23,6 +23,8 @@ import ReannotationPage from "./Pages/ReannotationPage";
 import FarmManagementPage from "./Pages/FarmManagementPage";
 import ReportFeedbackPage from "./Pages/ReportFeedbackPage"
 import AdminFeedbackManagementPage from "./Pages/AdminFeedbackManagementPage"
+import ModelManagementPage from "./Pages/ModelManagementPage";
+import ActiveLearningPage from "./Pages/ActiveLearningPage";
 
 export default function AppRouter() {
 	return (
@@ -172,7 +174,7 @@ export default function AppRouter() {
 					path="/user/active_learn"
 					element={
 						<PrivateRoute user_only can_active_learn>
-							ACTIVE LEARN
+							<ActiveLearningPage />
 						</PrivateRoute>
 					}
 				/>
@@ -250,6 +252,16 @@ export default function AppRouter() {
 					}
 				/>
 
+				{/* Model Management */}
+				<Route
+					exact
+					path="/user/model_management"
+					element={
+						<PrivateRoute user_only can_active_learn>
+							<ModelManagementPage />
+						</PrivateRoute>
+					}
+				/>
 				{/* Admin view feedback Route */}
 				<Route
 					exact
@@ -260,7 +272,6 @@ export default function AppRouter() {
 						</PrivateRoute>
 					}
 				/>
-
 
 				{/* Other routes */}
 				<Route

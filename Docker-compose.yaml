@@ -1,0 +1,62 @@
+services:
+  api:
+    build: 
+      context: ./api
+      dockerfile: Dockerfile.api
+    restart: always
+    ports:
+      - "5000:5000"
+    depends_on:
+      - worker
+      - redis
+    env_file: "./api/.env"
+    environment: 
+      REDIS_SESSION_URL: redis://redis:6379/0
+      REDIS_BROKER_URL: redis://redis:6379/1
+      GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS_PATH: /run/secrets/gcp_service_account_key
+      CLIENT_SERVER_URL: http://localhost
+    develop:
+      watch:
+        - action: sync
+          path: .
+          target: /app/app
+    secrets: 
+      - gcp_service_account_key
+    volumes:
+      - type: bind
+        source: ./api/instance
+        target: /app/instance
+
+  worker:
+    build: 
+      context: ./api
+      dockerfile: Dockerfile.celery
+    deploy:
+      replicas: 3
+    command: celery -A app worker --loglevel INFO --autoscale=5,1
+    env_file: "./api/.env"
+    environment: 
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+    depends_on:
+      - redis
+    secrets:
+      - gcp_service_account_key
+  
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+  
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile.client
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+
+secrets:
+  gcp_service_account_key:
+    file: keys/service-account-key.json

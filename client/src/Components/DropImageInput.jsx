@@ -6,28 +6,66 @@ function DropImageInput({ file, setFile, disabled }) {
 	const { getRootProps, getInputProps } = useDropzone({
 		accept: "image/*",
 		noKeyboard: true,
-		onDrop: (acceptedFiles) => {
+		onDrop: async (acceptedFiles) => {
 			const acceptedFile = acceptedFiles[0];
 			if (acceptedFile.type.startsWith("image/")) {
 				const file_size_mb = acceptedFile.size / 1024 / 1024;
 				if (file_size_mb <= 10) {
+					const resizedFile = await resizeImage(acceptedFile)
 					setFile(
-						Object.assign(acceptedFiles[0], {
-							preview: URL.createObjectURL(acceptedFiles[0]),
+						Object.assign(resizedFile, {
+							preview: URL.createObjectURL(resizedFile),
 						})
 					);
 				} else {
-					alert(
-						`Image is too large (${
-							Math.round(file_size_mb * 100) / 100
-						}MB). Please upload images under 10MB.`
-					);
+					alert(`Image is too large (${Math.round(file_size_mb * 100) / 100}MB). Please upload images under 10MB.`);
 				}
 			} else {
 				alert("Invalid file type. Please drop a proper image file.");
 			}
 		},
 	});
+
+	const resizeImage = (file, maxWidth = 1536, maxHeight = 1152) => {
+		return new Promise((resolve) => {
+			const reader = new FileReader();
+			reader.onload = (event) => {
+				const img = new Image();
+				img.onload = () => {
+					const canvas = document.createElement("canvas");
+					let width = img.width;
+					let height = img.height;
+
+					if (width > height) {
+						if (width > maxWidth) {
+							height *= maxWidth / width;
+							width = maxWidth;
+						}
+					} else {
+						if (height > maxHeight) {
+							width *= maxHeight / height;
+							height = maxHeight;
+						}
+					}
+
+					canvas.width = width;
+					canvas.height = height;
+					const ctx = canvas.getContext("2d");
+					ctx.drawImage(img, 0, 0, width, height);
+
+					canvas.toBlob((blob) => {
+						const resizedFile = new File([blob], file.name, {
+							type: file.type,
+							lastModified: Date.now(),
+						});
+						resolve(resizedFile);
+					}, file.type);
+				};
+				img.src = event.target.result;
+			};
+			reader.readAsDataURL(file);
+		});
+	};
 
 	return (
 		<div className="flex items-center justify-center w-full h-full">
@@ -39,20 +77,9 @@ function DropImageInput({ file, setFile, disabled }) {
 			>
 				{file ? (
 					<div className="text-black flex flex-col items-center gap-4 mt-4">
-						<img
-							src={file.preview}
-							onLoad={() => URL.revokeObjectURL(file.preview)}
-							className="w-1/2 h-full"
-						/>
-						{file.name}{" "}
-						<span>
-							{Math.round((file.size / 1024 / 1024) * 100) / 100}MB
-						</span>
-						<Button
-							size={"xs"}
-							color={"red"}
-							onClick={() => setFile(null)}
-						>
+						<img src={file.preview} onLoad={() => URL.revokeObjectURL(file.preview)} className="w-1/2 h-full" />
+						{file.name} <span>{Math.round((file.size / 1024 / 1024) * 100) / 100}MB</span>
+						<Button size={"xs"} color={"red"} onClick={() => setFile(null)}>
 							Remove
 						</Button>
 					</div>
@@ -75,20 +102,11 @@ function DropImageInput({ file, setFile, disabled }) {
 								></path>
 							</svg>
 							<p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-								<span className="font-semibold">Click to upload</span>{" "}
-								or drag and drop
+								<span className="font-semibold">Click to upload</span> or drag and drop
 							</p>
-							<p className="text-xs text-gray-500 dark:text-gray-400">
-								SVG, PNG, JPG, JPEG or GIF (max 10MB)
-							</p>
+							<p className="text-xs text-gray-500 dark:text-gray-400">SVG, PNG, JPG, JPEG or GIF (max 10MB)</p>
 						</div>
-						<input
-							id="dropzone-file"
-							{...getInputProps()}
-							type="file"
-							className="hidden"
-							disabled={disabled || !file}
-						/>
+						<input id="dropzone-file" {...getInputProps()} type="file" className="hidden" disabled={disabled || !file} />
 					</div>
 				)}
 			</label>

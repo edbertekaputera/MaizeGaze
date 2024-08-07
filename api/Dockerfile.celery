@@ -1,0 +1,23 @@
+# Base Image
+FROM python:3.10-slim
+# Setting the broker for celery
+ENV CELERY_BROKER_URL redis://redis:6379/1
+ENV CELERY_RESULT_BACKEND redis://redis:6379/1
+ENV C_FORCE_ROOT true
+# Moving every files to the container
+
+WORKDIR /queue
+
+# Install necessary packages
+RUN apt-get update && apt-get install -y \
+    curl \
+    gnupg \ 
+	ffmpeg libsm6 libxext6 \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY . /queue
+
+# Install any needed packages specified in requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+CMD ["celery", "-A", "app",  "worker", "--loglevel", "INFO", "-c", "3"]
