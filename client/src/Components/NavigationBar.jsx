@@ -4,6 +4,8 @@ import { GiArtificialHive, GiArtificialIntelligence, GiCorn } from "react-icons/
 import { MdLogout, MdSpaceDashboard, MdOutlineWorkHistory, MdManageAccounts, MdSettings } from "react-icons/md";
 import { GoSponsorTiers } from "react-icons/go";
 import { CgBrowse } from "react-icons/cg";
+import { Star } from 'lucide-react';
+import { VscFeedback } from "react-icons/vsc";
 
 import { LuUserCircle2 } from "react-icons/lu";
 
@@ -26,7 +28,7 @@ export default function NavigationBar() {
 			// { icon: MdSpaceDashboard, link: "/administrator", name: "Dashboard" },
 			{ icon: MdManageAccounts, link: "/administrator/user_management", name: "User Management" },
 			{ icon: GoSponsorTiers, link: "/administrator/tier_management", name: "Tier Management" },
-			{ icon: GoSponsorTiers, link: "/administrator/feedback_management", name: "Feedback Management" },
+			{ icon: VscFeedback, link: "/administrator/feedback_management", name: "Feedback Management" },
 		],
 		USER: [
 			{ icon: MdSpaceDashboard, link: "/user", name: "Dashboard" },
@@ -81,7 +83,7 @@ export default function NavigationBar() {
 								<Dropdown.Item onClick={() => navigate("/user/profile")} icon={MdSettings}>
 									User Profile
 								</Dropdown.Item>
-								<Dropdown.Item onClick={() => navigate("/user/report_feedback")} icon={MdSettings}>
+								<Dropdown.Item onClick={() => navigate("/user/report_feedback")} icon={Star}>
 									Report Feedback
 								</Dropdown.Item>
 							</>
@@ -125,7 +127,7 @@ export default function NavigationBar() {
 											<Sidebar.Item onClick={() => navigate("/user/profile")} icon={MdSettings}>
 												User Profile
 											</Sidebar.Item>
-											<Sidebar.Item onClick={() => navigate("/user/report_feedback")} icon={MdSettings}>
+											<Sidebar.Item onClick={() => navigate("/user/report_feedback")} icon={Star}>
 												Report Feedback
 											</Sidebar.Item>
 										</Sidebar.ItemGroup>
