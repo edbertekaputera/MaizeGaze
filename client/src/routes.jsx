@@ -21,6 +21,8 @@ import MaizeDoctorPage from "./Pages/MaizeDoctorPage";
 import ConsultationPage from "./Pages/ConsultationPage";
 import ReannotationPage from "./Pages/ReannotationPage";
 import FarmManagementPage from "./Pages/FarmManagementPage";
+import ReportFeedbackPage from "./Pages/ReportFeedbackPage"
+import AdminFeedbackManagementPage from "./Pages/AdminFeedbackManagementPage"
 import ModelManagementPage from "./Pages/ModelManagementPage";
 import ActiveLearningPage from "./Pages/ActiveLearningPage";
 
@@ -239,6 +241,17 @@ export default function AppRouter() {
 					}
 				/>
 
+				{/* Feedback report Route */}
+				<Route
+					exact
+					path="/user/report_feedback"
+					element={
+						<PrivateRoute user_only>
+							<ReportFeedbackPage />
+						</PrivateRoute>
+					}
+				/>
+
 				{/* Model Management */}
 				<Route
 					exact
@@ -246,6 +259,16 @@ export default function AppRouter() {
 					element={
 						<PrivateRoute user_only can_active_learn>
 							<ModelManagementPage />
+						</PrivateRoute>
+					}
+				/>
+				{/* Admin view feedback Route */}
+				<Route
+					exact
+					path="/administrator/feedback_management"
+					element={
+						<PrivateRoute admin_only>
+							<AdminFeedbackManagementPage />
 						</PrivateRoute>
 					}
 				/>

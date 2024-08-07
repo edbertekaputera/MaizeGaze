@@ -31,6 +31,8 @@ class User(db.Model):
 									foreign_keys="DetectionModel.user")
 	userToSuspensionRel = db.relationship("Suspension", back_populates="suspensionToUserRel", cascade='all, delete, save-update',
 								  foreign_keys="Suspension.user")
+	userToFeedbackRel = db.relationship("Feedback", back_populates="feedbackToUserRel", cascade="all, delete, save-update")
+	
 	
 	@classmethod
 	def get(cls, email:str) -> Self|None:
