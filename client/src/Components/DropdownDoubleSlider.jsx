@@ -3,7 +3,7 @@ import React from "react";
 import DoubleSlider from "./DoubleSlider";
 import { BsArrowDownShort } from "react-icons/bs";
 
-function DropdownDoubleSlider({ filter, setFilter, min_update_key, max_update_key, upper_limit, label, dropdown_label, icon = null }) {
+function DropdownDoubleSlider({ filter, setFilter, min_update_key, max_update_key, upper_limit, label, dropdown_label, icon = null, lower_limit = 0 }) {
 	return (
 		<div className="flex flex-col sm:w-1/2 md:w-fit">
 			<Label className="mb-1 text-sm font-semibold">{label}:</Label>
@@ -27,7 +27,7 @@ function DropdownDoubleSlider({ filter, setFilter, min_update_key, max_update_ke
 						setFilter={setFilter}
 						min_update_key={min_update_key}
 						max_update_key={max_update_key}
-						min={0}
+						min={lower_limit}
 						max={upper_limit}
 					/>
 				</div>

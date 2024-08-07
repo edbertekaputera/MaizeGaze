@@ -1,4 +1,18 @@
 services:
+  nginx:
+    build:
+      context: ./client
+      dockerfile: Dockerfile.client
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+    develop:
+      watch:
+        - action: sync
+          path: ./src
+          target: /app/src
+
   api:
     build: 
       context: ./api
@@ -47,15 +61,6 @@ services:
     image: redis
     ports:
       - "6379:6379"
-  
-  client:
-    build:
-      context: ./client
-      dockerfile: Dockerfile.client
-    ports:
-      - "80:80"
-    depends_on:
-      - api
 
 secrets:
   gcp_service_account_key:

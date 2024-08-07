@@ -15,7 +15,15 @@ class Config(object):
 	CLIENT_SERVER_URL = os.environ.get('CLIENT_SERVER_URL')
 
 	# Database configurations
-	SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
+	if os.environ.get("POSTGRES_HOST"):
+		POSTGRES_USER = os.environ.get('POSTGRES_USER')
+		POSTGRES_PASSWORD = os.environ.get('POSTGRES_PASSSWORD')
+		POSTGRES_PORT = os.environ.get('POSTGRES_PORT')
+		POSTGRES_DB_SCHEMA = os.environ.get('POSTGRES_DB_SCHEMA')
+		POSTGRES_HOST = os.environ.get('POSTGRES_HOST')
+		SQLALCHEMY_DATABASE_URI = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB_SCHEMA}"
+	else:
+		SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
 	SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 	# Session configurations
