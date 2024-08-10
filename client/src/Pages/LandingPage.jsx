@@ -21,6 +21,8 @@ import { RiQuestionAnswerLine } from "react-icons/ri";
 import { FaCheckCircle } from "react-icons/fa";
 import { MdSettingsSuggest } from "react-icons/md";
 import { Footer } from "flowbite-react";
+import { FaUserDoctor } from "react-icons/fa6";
+import { TbMathMaxMin } from "react-icons/tb";
 
 function LandingPage() {
 	const navigate = useNavigate();
@@ -175,6 +177,20 @@ function LandingPage() {
 						</div>
 						<div className="w-1/2 md:w-1/4 lg:w-1/4 justify-center mb-4 lg:mb-0">
 							<div className="flex flex-col text-center items-center hover:border rounded-md border-custom-brown-3 hover:shadow-md p-5">
+								<FaUserDoctor className="text-custom-green-2" size={100} />
+								<h1 className="font-bold text-md lg:text-xl lg:py-8 py-5">Maize Doctor</h1>
+								<p className="text-sm lg:text-lg text-gray-500">Get Diagnosis on maize plant's health condition</p>
+							</div>
+						</div>
+						<div className="w-1/2 md:w-1/4 lg:w-1/4 justify-center mb-4 lg:mb-0">
+							<div className="flex flex-col text-center items-center hover:border rounded-md border-custom-brown-3 hover:shadow-md p-5">
+								<TbMathMaxMin className="text-red-600" size={100} />
+								<h1 className="font-bold text-md lg:text-xl lg:py-8 py-5">Tassel Count Interpolation</h1>
+								<p className="text-sm lg:text-lg text-gray-500">Interpolate total farm tassel count based on a subset</p>
+							</div>
+						</div>
+						<div className="w-1/2 md:w-1/4 lg:w-1/4 justify-center mb-4 lg:mb-0">
+							<div className="flex flex-col text-center items-center hover:border rounded-md border-custom-brown-3 hover:shadow-md p-5">
 								<IoMdLogIn className="text-blue-600" size={100} />
 								<h1 className="font-bold text-md lg:text-xl lg:py-8 py-5">Fast Login</h1>
 								<p className="text-sm lg:text-lg text-gray-500">Quick and easy access</p>
@@ -217,6 +233,10 @@ function LandingPage() {
 										<FaCheckCircle />
 										<span className="text-sm font-bold text-black">Look at weather forecast</span>
 									</div>
+									<div className="flex flex-row gap-x-2 py-1">
+										<FaCheckCircle />
+										<span className="text-sm font-bold text-black">Tassel Count Interpolation</span>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -254,6 +274,14 @@ function LandingPage() {
 										<FaCheckCircle />
 										<span className="text-sm font-bold text-black">Look at weather forecast</span>
 									</div>
+									<div className="flex flex-row gap-x-2 py-1">
+										<FaCheckCircle />
+										<span className="text-sm font-bold text-black">Maize Doctor</span>
+									</div>
+									<div className="flex flex-row gap-x-2 py-1">
+										<FaCheckCircle />
+										<span className="text-sm font-bold text-black">Tassel Count Interpolation</span>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -275,9 +303,13 @@ function LandingPage() {
 										<FaCheckCircle />
 										<span className="text-sm font-bold text-black">Look at weather forecast</span>
 									</div>
-									<div className="flex flex-row gap-x-2 py-1 pb-10">
+									<div className="flex flex-row gap-x-2 py-1">
 										<FaCheckCircle />
 										<span className="text-sm font-bold text-black">Save and download detection results</span>
+									</div>
+									<div className="flex flex-row gap-x-2 py-1 pb-10">
+										<FaCheckCircle />
+										<span className="text-sm font-bold text-black">Tassel Count Interpolation</span>
 									</div>
 								</div>
 							</div>

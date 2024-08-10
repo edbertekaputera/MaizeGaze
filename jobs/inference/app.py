@@ -19,7 +19,7 @@ def test():
 def get_predictions(email:str, b64_image:str, model_id:str|None = None) -> dict[str,int| str|list[dict[str,float]]]:
 	image_pil = Detection.convert_bytes_to_img(b64_image)
 	# Perform inference
-	if model_id:
+	if model_id and len(model_id) == 36:
 		# Get hashed email
 		hashed_email = sha256(email.encode('utf-8')).hexdigest()
 		# Copy Model

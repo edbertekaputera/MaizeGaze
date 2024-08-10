@@ -48,7 +48,9 @@ def remote_login(provider:str):
 	"""
 	if provider in ["google", "github"]:
 		client = oauth.create_client(provider)
-		return client.authorize_redirect(url_for('authentication.oauth.authorized', provider=provider, _external=True)) # type: ignore
+		if provider == "google":
+			return client.authorize_redirect(current_app.config["GOOGLE_REDIRECT_URI"]) # type: ignore
+		return client.authorize_redirect(current_app.config["GITHUB_REDIRECT_URI"]) # type: ignore
 	return abort(404)
 
 # Authorized Remote Login Callback

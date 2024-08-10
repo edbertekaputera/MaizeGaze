@@ -40,6 +40,12 @@ function PlanCard({ plan, setShowCancelPlanModal }) {
 						</div>
 					</li>
 					<li className="w-full flex text-left justify-between items-center py-2">
+						<span>Interpolate Tassel Count</span>
+						<div className="text-custom-green-2 text-xl">
+							<FaCheckCircle />
+						</div>
+					</li>
+					<li className="w-full flex text-left justify-between items-center py-2">
 						<span>Interactive Model Self-training</span>
 						<div className="text-xl">
 							{can_reannotate ? <FaCheckCircle className="text-custom-green-2" /> : <FaCircleXmark className="text-red-500" />}
