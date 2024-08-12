@@ -12,10 +12,10 @@ import cv2
 # Copy Models
 def copy_model_from_gcs(hashed_email:str, model_id:str|None):
 	if not model_id:
-		gcs_model_path = os.path.join(os.environ["AIP_STORAGE_URI"], "model_artifacts", "weights.pt")
+		gcs_model_path = os.path.join(f"gs://{os.environ['BUCKET_NAME']}", "model_artifacts", "weights.pt")
 		subprocess.run(['gsutil', 'cp', gcs_model_path, os.environ["MODEL_DIR"]])
 	else:
-		gcs_model_path = os.path.join(os.environ["AIP_STORAGE_URI"], "user_data_storage", hashed_email, "models", model_id, "weights.pt")
+		gcs_model_path = os.path.join(f"gs://{os.environ['BUCKET_NAME']}", "user_data_storage", hashed_email, "models", model_id, "weights.pt")
 		subprocess.run(['gsutil', 'cp', gcs_model_path, os.environ["MODEL_DIR"]])
 
 # Detection Class
