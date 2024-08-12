@@ -174,7 +174,7 @@ function MaizeDoctorPage() {
 							</div>
 						),
 						time: new Date(),
-						children: generateDiagnosisOutput(res.data.data),
+						children: res.data.data.message ? res.data.data.message : generateDiagnosisOutput(res.data.data) ,
 					};
 					return newList;
 				});

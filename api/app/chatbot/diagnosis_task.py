@@ -44,6 +44,12 @@ Make sure to follow the following json schema:
 		]
 	}
 
+Any questions or images that is outside the scope of maize plants and corn farms, should not be answered and instead responded with a "Sorry that is out of the scope of my consultations."
+The format of this response should be following the json schema:
+	error = {
+		"message": str
+	}
+
 Here comes the farmer,
 Farmer:
 """
