@@ -11,7 +11,7 @@
 	},
 	"dependencies": {
 		"apexcharts": "^3.50.0",
-		"axios": "^1.6.8",
+		"axios": "^1.7.4",
 		"date-fns": "^3.6.0",
 		"flowbite-react": "^0.9.0",
 		"lucide-react": "^0.424.0",
